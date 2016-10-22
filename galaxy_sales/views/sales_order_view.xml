@@ -86,5 +86,20 @@
 			<field name="domain">[('state','!=',['done','cancel'])]</field>
 			
 		</record>
+		
+		<!-- Inherited product template only form view -->
+        <record id="product_template_form_view_qty_button" model="ir.ui.view">
+            <field name="name">product.template_qty</field>
+            <field name="model">product.template</field>
+            <field name="inherit_id" ref="product.product_template_only_form_view"/>
+            <field name="arch" type="xml">
+                <xpath expr="//div[@name='buttons']" position="inside">
+                   <button class="oe_stat_button" string="Qty"
+                           name="%(galaxy_sales.action_sale_order_line)d"
+                           icon="fa-building-o"
+                           type="action"/>
+                </xpath>
+            </field>
+        </record>
 	</data>
 </openerp>
