@@ -1,0 +1,57 @@
+<?xml version="1.0" encoding="utf-8"?>
+<openerp>
+    <data>
+        <!-- Form view of Product Wise Sale Reports Wizard 1-->
+        <record id="wizard_product_wise_sale_report_form_view_2" model="ir.ui.view">
+            <field name="name">wizard.product.wise.sale.report.form.view.2</field>
+            <field name="model">wiz.product.wise.sale.report.2</field>
+            <field name="arch" type="xml">
+                <form string="Product Wise Sale Report 2">
+                	<group col="4" colspan="4">
+                		<field name="start_date" />
+            			<field name="end_date"/>
+            		</group>
+                    <footer>
+                        <button name="print_report" type="object" string="Show Report"
+                            class="oe_highlight"/>
+                        Or
+                        <button string="Cancel" class="oe_link" special="cancel"/>
+                    </footer>
+                </form>
+            </field>
+        </record>
+
+        <!-- Action for Product Wise Sale Report Wizard 2-->
+        <record model="ir.actions.act_window" id="wiz_prod_wise_sale_rpt_action_2">
+            <field name="name">Product Wise Sale Report 2</field>
+            <field name="res_model">wiz.product.wise.sale.report.2</field>
+            <field name="view_type">form</field>
+            <field name="view_mode">form</field>
+            <field name="target">new</field>
+            
+        </record>
+        
+        <!-- Menu for Product Wise Sale Report Wizard 2 -->
+        <menuitem id="wiz_prod_wise_sale_rpt_2" parent="base.next_id_64"
+                  action="wiz_prod_wise_sale_rpt_action_2"/>
+
+		<!-- Tree view for product wise sale report 2 -->
+		<record model="ir.ui.view" id="product_wise_sale_report_tree_view_2">
+			<field name="name">product.wise.sale.report.tree.view.2</field>
+			<field name="model">product.wise.sale.report.2</field>
+			<field name="arch" type="xml">
+				<tree string="Product Wise Sale Report 2" create="false">
+					<field name="customer_name"/>
+                    <field name="customer_code"/>
+					<field name="product_name"/>
+                    <field name="date"/>
+					<field name="qty"/>
+					<field name="amt_in_actual_currency"/>
+                    <field name="amt_in_untax"/>
+					<field name="amt_in_sgd"/>
+                    <field name="tax_amt_sgd"/>
+				</tree>
+			</field>
+		</record>
+    </data>
+</openerp>

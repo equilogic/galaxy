@@ -1,0 +1,58 @@
+<?xml version="1.0" encoding="utf-8"?>
+<openerp>
+    <data>
+        <!-- Form view of Purchase Register Reports Wizard-->
+        <record id="wizard_purchase_register_report_form_view" model="ir.ui.view">
+            <field name="name">wizard.purchase.register.report.form.view</field>
+            <field name="model">wiz.purchase.register</field>
+            <field name="arch" type="xml">
+                <form string="Purchase Register Report">
+                	<group>
+                		<field name="start_date" />
+            			<field name="end_date"/>
+            		</group>
+                    <footer>
+                        <button name="print_report" type="object" string="Print Report"
+                            class="oe_highlight"/>
+                        Or
+                        <button string="Cancel" class="oe_link" special="cancel"/>
+                    </footer>
+                </form>
+            </field>
+        </record>
+
+        <!-- Action for Purchase Register Report Wizard -->
+        <record model="ir.actions.act_window" id="purchase_report_action">
+            <field name="name">Purchase Register Report</field>
+            <field name="res_model">wiz.purchase.register</field>
+            <field name="view_type">form</field>
+            <field name="view_mode">form</field>
+            <field name="target">new</field>
+            
+        </record>
+        
+        <!-- Menu for Purchase Register Report Wizard -->
+        <menuitem id="wiz_purchase_reg_rpt" parent="base.next_id_73"
+                  action="purchase_report_action"/>
+
+		<!-- Tree view for purchase report  -->
+		<record model="ir.ui.view" id="purchase_order_register_tree_view">
+			<field name="name">purchase.order.register.tree.view</field>
+			<field name="model">purchase.register.report</field>
+			<field name="arch" type="xml">
+				<tree string="Purchase Register Report" create="false">
+					<field name="pdate"/>
+					<field name="pur_order"/>
+					<field name="sup_inv"/>
+					<field name="sup_name"/>
+					<field name="amt"/>
+					<field name="amt_due"/>
+					<field name="state"/>
+					<field name="received"/>
+				</tree>
+			</field>
+		</record>
+		
+		
+    </data>
+</openerp>

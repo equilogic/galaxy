@@ -1,0 +1,61 @@
+<?xml version="1.0" encoding="utf-8"?>
+  <openerp>
+    <data>
+
+        <!-- Product Import wizard view -->
+        <record id="wiz_galaxy_prod_import_xls_form" model="ir.ui.view">
+            <field name="name">wiz.galaxy.prod.import.xls.form</field>
+            <field name="model">wiz.galaxy.prod.import.xls</field>
+            <field name="type">form</field>
+            <field name="arch" type="xml"> 
+                <form string="Import Products">
+                    <group col="6" colspan="4">
+                        <field name="xls_file" filename="datas_fname"/>
+                        <field name="datas_fname" invisible="1"/>
+                    </group>
+                    <newline/>
+                    <footer>
+                        <button name="import_data_xls" string="Import Products" type="object" class="oe_highlight"/>
+                        or
+                        <button special="cancel" string="Cancel" class="oe_link"/>
+                    </footer>
+                </form>
+            </field>
+        </record>
+
+        <!-- Product Import Action view -->
+        <record id="wiz_galaxy_prod_import_xls_action" model="ir.actions.act_window">
+            <field name="name">Import Products</field>
+            <field name="type">ir.actions.act_window</field>
+            <field name="res_model">wiz.galaxy.prod.import.xls</field>
+            <field name="view_type">form</field>
+            <field name="view_mode">form</field>
+            <field name="target">new</field>
+            <field name="view_id" ref="wiz_galaxy_prod_import_xls_form"/>
+        </record>
+
+        <!-- Product Import Menu -->
+        <menuitem name="Import Product" id="menu_prod_import_csv_action" parent="purchase.menu_procurement_management_product" action="wiz_galaxy_prod_import_xls_action"/>
+
+        <!-- Po create wizard View -->
+        <record id="wiz_galaxy_create_po_form" model="ir.ui.view">
+            <field name="name">wiz_galaxy_create_po.form</field>
+            <field name="model">wiz.galaxy.create.po</field>
+            <field name="type">form</field>
+            <field name="arch" type="xml"> 
+                <form string="Create Purchase Order">
+                    <group col="6" colspan="4">
+                        <field name="supplier_id" domain="[('supplier','=',True)]"/>
+                    </group>
+                    <newline/>
+                    <footer>
+                        <button name="create_po" string="Create Order" type="object" class="oe_highlight"/>
+                        or
+                        <button special="cancel" string="Cancel" class="oe_link"/>
+                    </footer>
+                </form>
+            </field>
+        </record>
+
+    </data>
+</openerp>

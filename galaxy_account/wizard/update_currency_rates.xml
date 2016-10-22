@@ -1,0 +1,54 @@
+<openerp>
+    <data>
+
+        <record id="wiz_galaxy_update_currency_rates_form" model="ir.ui.view">
+            <field name="name">wiz.galaxy.update.currency.rates.form</field>
+            <field name="model">update.currency.rates</field>
+            <field name="type">form</field>
+            <field name="arch" type="xml"> 
+                <form string="Update Currency Rates">
+                    <separator string="Currency"/>
+                    <field name="currency_ids" nolable="1">
+                        <tree string="Rates" editable="bottom">
+                            <field name="currency_id"/>
+                            <field name="current_rate" readonly="1"/>
+                            <field name="new_rate" required="1"/>
+                        </tree>
+                    </field>
+                    <newline/>
+                    <footer>
+                        <button name="chage_rates" string="Change Current Rates" type="object" class="oe_highlight"/>
+                        or
+                        <button special="cancel" string="Cancel" class="oe_link"/>
+                    </footer>
+                </form>
+            </field>
+        </record>
+
+        <record id="wiz_update_currency_rates_action" model="ir.actions.act_window">
+            <field name="name">Update Currency Rates</field>
+            <field name="type">ir.actions.act_window</field>
+            <field name="res_model">update.currency.rates</field>
+            <field name="view_type">form</field>
+            <field name="view_mode">form</field>
+            <field name="context">{'default_currency': True}</field>
+            <field name="target">new</field>
+            <field name="view_id" ref="wiz_galaxy_update_currency_rates_form"/>
+        </record>
+
+        <menuitem id="currency_rate_update_menu" action="wiz_update_currency_rates_action"
+            parent="account.menu_configuration_misc" sequence="21"/>
+
+        <record id="view_currency_form_inherit" model="ir.ui.view">
+            <field name="name">res.currency.form.inherit</field>
+            <field name="model">res.currency</field>
+            <field name="inherit_id" ref="base.view_currency_form"/>
+            <field name="arch" type="xml">
+                <field name="company_id" position="after">
+                    <field name="update_manually"/>
+                </field>
+            </field>
+        </record>
+
+    </data>
+</openerp>

@@ -1,0 +1,66 @@
+<openerp>
+    <data>
+        <!-- Wizard Form view of Purchase Reports -->
+        <record id="view_wiz_galaxy_purchase_report_form" model="ir.ui.view">
+            <field name="name">wiz.galaxy.purchase.report.form</field>
+            <field name="model">wiz.galaxy.purchase.report</field>
+            <field name="type">form</field>
+            <field name="arch" type="xml">
+                <form string="Purchase Reports">
+                    <group>
+                        <field name="report_name" required="1"/>
+                    </group>
+                    <group colspan="4" cols="4">
+                        <field name="date_from" required="1"/>
+                        <field name="date_to" required="1"/>
+                    </group>
+                    <newline/>
+                    <separator string="Suppliers" colspan="4" cols="4" attrs="{'invisible':[('report_name', '!=', 'prod_wise_purch_rep_summary')]}"/>
+                    <group>
+                        <field name="partner_ids" colspan="4" cols="4" nolabel="1" domain="[('supplier', '=', True)]" attrs="{'invisible':[('report_name', '!=', 'prod_wise_purch_rep_summary')]}"/>
+                    </group>
+                    <footer>
+                        <button name="print_report" string="Print" type="object" class="oe_highlight"/>
+                        or
+                        <button special="cancel" string="Cancel" class="oe_link"/>
+                    </footer>
+                </form>
+            </field>
+        </record>
+        
+        <!-- Wizard Action view of Purchase Reports -->
+        <record id="action_wiz_galaxy_purchase_report" model="ir.actions.act_window">
+            <field name="name">Purchase Reports</field>
+            <field name="type">ir.actions.act_window</field>
+            <field name="res_model">wiz.galaxy.purchase.report</field>
+            <field name="view_type">form</field>
+            <field name="view_mode">form</field>
+            <field name="target">new</field>
+        </record>
+        
+        <!-- Main Menuitem of Purchase Reports -->
+        <menuitem id="menu_wiz_galaxy_purchase_report" action="action_wiz_galaxy_purchase_report"
+            parent="base.next_id_73"/>
+        
+        <record id="view_wiz_galaxy_purchase_report_detail_form" model="ir.ui.view">
+            <field name="name">wiz.galaxy.purchase.report.detail.form</field>
+            <field name="model">wiz.galaxy.purchase.report.detail</field>
+            <field name="type">form</field>
+            <field name="arch" type="xml">
+                <form string="Purchase Reports">
+                    <group col="4" colspan="4">
+                        <label string="Save the File with '.xls' extension."
+                            colspan="4" />
+                        <field name="name" invisible="1" />
+                        <field name="file" readonly="1" filename="name" nolabel="1" />
+                    </group>
+                    <footer>
+                        <button name="action_back" string="_Back" type="object" class="oe_highlight"/>
+                        or
+                        <button string="Close" class="oe_highlight" special="cancel" />
+                    </footer>
+                </form>
+            </field>
+        </record>
+    </data>
+</openerp>

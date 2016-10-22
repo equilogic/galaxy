@@ -1,0 +1,7 @@
+===============================================================================
+ Version Change Log (galaxy_invoice)
+===============================================================================
+1.0 : 21 Sep : Nikita Vaghela
+	* inherit customer invoice for adding transport details,
+	  
+	

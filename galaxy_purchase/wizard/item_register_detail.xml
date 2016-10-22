@@ -1,0 +1,59 @@
+<?xml version="1.0" encoding="utf-8"?>
+<openerp>
+    <data>
+
+        <!-- Form view of Item Register Detail Wizard -->
+        <record id="wiz_item_register_detail_form_view" model="ir.ui.view">
+            <field name="name">wiz.item.register.detail.form.view</field>
+            <field name="model">wiz.item.register.detail</field>
+            <field name="arch" type="xml">
+                <form string="Item Register Report">
+                    <group>
+                        <field name="start_date" />
+                        <field name="end_date" />
+                    </group>
+                    <footer>
+                        <button name="print_report" type="object"
+                            string="Print Report" class="oe_highlight" />
+                        Or
+                        <button string="Cancel" class="oe_link"
+                            special="cancel" />
+                    </footer>
+                </form>
+            </field>
+        </record>
+
+        <!-- Action for Item Register Detail Wizard -->
+        <record model="ir.actions.act_window" id="wiz_item_register_detail_action">
+            <field name="name">Item Register Report</field>
+            <field name="res_model">wiz.item.register.detail</field>
+            <field name="view_type">form</field>
+            <field name="view_mode">form</field>
+            <field name="target">new</field>
+        </record>
+
+        <!-- Menu for Item Register Detail Wizard -->
+        <menuitem id="menu_wiz_item_register_detail" parent="base.next_id_73"
+            action="wiz_item_register_detail_action" />
+
+        <!-- Tree view for Item Register Detail -->
+        <record model="ir.ui.view" id="item_register_detail_report_tree_view">
+            <field name="name">item.register.detail.report.tree.view</field>
+            <field name="model">item.register.detail.report</field>
+            <field name="arch" type="xml">
+                <tree string="Item Register" create="false">
+                    <field name="date" />
+                    <field name="src" />
+                    <field name="po_id" />
+                    <field name="memo" />
+                    <field name="qty_change" />
+                    <!-- <field name="start_qty" /> -->
+                    <field name="amount" />
+                    <!-- <field name="on_hand" /> -->
+                    <field name="currency_id" />
+                </tree>
+            </field>
+        </record>
+
+    </data>
+</openerp>

@@ -1,0 +1,49 @@
+<openerp>
+	<data>
+		<!-- Form View of Print Wizard for Stock Analysis Report -->
+		<record id="wiz_stock_analysis_form_view" model="ir.ui.view">
+			<field name="name">Stock Analysis</field>
+			<field name="model">stock.wiz</field>
+			<field name="arch" type="xml">
+				<form string="Wizard Report">
+					<label string="Product Stock Analysis" />
+					<footer>
+						<button name="export_stock_report" class="oe_button oe_form_button oe_highlight" string="Export Stock Analysis" type="object"/>
+						<button special="cancel" string="Cancel" class="oe_button oe_form_button oe_link"/>
+					</footer>
+				</form>
+			</field>
+		</record>
+		
+		<!-- Form View of Wizard for Stock Analysis Report with file name-->
+		<record id="wiz_stock_report_file_form_view" model="ir.ui.view">
+			<field name="name">wiz.stock.report.file.form.view</field>
+			<field name="model">stock.wiz.file</field>
+			<field name="arch" type="xml">
+				<form string="Wizard Attatchment Report">
+					<group name="file_group" colspan="4" col="2">
+						<field name="file" filename="fname" readonly="1" nolabel="1" />
+						<field name="fname" invisible="1"/>
+					</group>
+					<footer>
+						<button name="back" string="Back" type="object" class="oe_button oe_form_button oe_highlight" />
+						<button special="cancel" string="Cancel" class="oe_button oe_form_button oe_link" />
+					</footer>
+				</form>
+			</field>
+		</record>
+		
+		<!-- Action of the Report Tax  wizard -->
+		<record id="action_report_wiz_stock_analysis" model="ir.actions.act_window">
+			<field name="name">Stock Analysis</field>
+			<field name="res_model">stock.wiz</field>
+			<field name="view_type">form</field>
+			<field name="view_mode">form</field>
+			<field name="target">new</field>
+		</record>
+		
+		<menuitem id="stock_analysis" name="Stock Analysis" action="action_report_wiz_stock_analysis" sequence="3" parent="stock.next_id_61" />
+		
+	</data>
+</openerp>
+		

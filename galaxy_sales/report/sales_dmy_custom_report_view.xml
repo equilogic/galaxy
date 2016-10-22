@@ -1,0 +1,69 @@
+<?xml version="1.0" encoding="utf-8"?>
+<openerp>
+    <data>
+    	<!-- Graph view of sales DMY custom report -->
+        <record model="ir.ui.view" id="view_sales_dmy_custom_report_graph">
+            <field name="name">view.sales.dmy.custom.report.graph</field>
+            <field name="model">report.sales.dmy.custom</field>
+            <field name="arch" type="xml">
+                <graph string="Sales DMY Custom Report" type="pivot">
+                    <field name="daily" type="measure"/>
+                    <field name="weekly" type="measure"/>
+                    <field name="monthly" type="measure"/>
+                    <field name="yearly" type="measure"/>
+                </graph>
+            </field>
+        </record>
+        
+        <!-- Tree view of sales DMY custom report -->
+         <record model="ir.ui.view" id="view_sales_dmy_custom_report_tree">
+            <field name="name">view.sales.dmy.custom.report.tree</field>
+            <field name="model">report.sales.dmy.custom</field>
+            <field name="arch" type="xml">
+                <tree string="Sales DMY Custom Report">
+                    <field name="daily" />
+                    <field name="weekly" />
+                    <field name="monthly" />
+                    <field name="yearly" /> 
+                </tree>
+            </field>
+        </record>
+        
+        <!-- Search view of sales DMY custom report -->
+         <record model="ir.ui.view" id="view_sales_dmy_custom_report_search">
+            <field name="name">view.sales.dmy.custom.report.search</field>
+            <field name="model">report.sales.dmy.custom</field>
+            <field name="arch" type="xml">
+                <search string="Sales DMY Custom Report">
+                    <field name="date_order"/>
+                    <field name="daily" />
+                    <field name="weekly" />
+                    <field name="monthly" />
+                    <field name="yearly" />
+                    <group expand="1" string="Group By">
+                        <filter string="Month" context="{'group_by':'date_order:month'}"/>
+                    </group>
+                </search>
+            </field>
+        </record>
+
+		<!-- Action for sales DMY custom report -->
+        <record id="action_sales_dmy_custom_report" model="ir.actions.act_window">
+            <field name="name">Sales DMY Custom Report</field>
+            <field name="res_model">report.sales.dmy.custom</field>
+            <field name="view_type">form</field>
+            <field name="search_view_id" ref="view_sales_dmy_custom_report_search"/>
+            <field name="view_mode">graph,tree,form</field>
+            <field name="help">This report allows you to analyse Sales Daily, Weekly, Monthly and Yearly report.</field>
+        </record>
+        
+        
+        <!-- Menu for  sales DMY custom report -->
+        <menuitem id="sales_dashboard" name="Sales DMY Report" sequence="1"/>
+        
+        <menuitem id="sales_dashboard1" name="Sales DMY Report" sequence="1" parent="sales_dashboard"/>
+        
+        <menuitem name="Sales DMY Report" action="action_sales_dmy_custom_report"
+            id="menu_sales_dmy_custom_report" parent="sales_dashboard1" sequence="2"/>
+    </data>
+</openerp>

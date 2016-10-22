@@ -1,0 +1,54 @@
+<openerp>
+	<data>
+		<!-- Form View of Print and Download Wizard for Scrap product Report -->
+		<record id="wiz_scrap_prod_form_view" model="ir.ui.view">
+			<field name="name">Scrap Product</field>
+			<field name="model">scrap.product</field>
+			<field name="arch" type="xml">
+				<form string="Scrap Product Report">
+
+						NOTE: Click Print Scrap Product Button for download scrap product detail's and Qty.
+
+					<footer>
+						<button name="print_scrap_prod_report" class="oe_button oe_form_button oe_highlight" string="Print Scrap Product" type="object"/>
+						or
+						<button special="cancel" string="Cancel" class="oe_button oe_form_button oe_link"/>
+					</footer>
+				</form>
+			</field>
+		</record>
+
+		
+		<!-- Form View of Wizard for Scrap Product Report with file name-->
+		<record id="wiz_scrap_product_file_form_view" model="ir.ui.view">
+			<field name="name">wiz.scrap.product.report.file.form.view</field>
+			<field name="model">scrap.product.wiz.file</field>
+			<field name="arch" type="xml">
+				<form string="Wizard Attatchment Scrap Report">
+					NOTE: Download file here.
+					<group name="file_group" colspan="4" col="2">
+						<field name="file" filename="fname" readonly="1" nolabel="1" />
+						<field name="fname" invisible="1"/>
+					</group>
+					<footer>
+						<button name="back" string="Back" type="object" class="oe_button oe_form_button oe_highlight" />
+						or
+						<button special="cancel" string="Close" class="oe_button oe_form_button oe_link" />
+					</footer>
+				</form>
+			</field>
+		</record>
+		
+		<!-- Action of the Scrap Product Report wizard -->
+		<record id="action_scrap_product_report_wiz" model="ir.actions.act_window">
+			<field name="name">Scrap Product</field>
+			<field name="res_model">scrap.product</field>
+			<field name="view_type">form</field>
+			<field name="view_mode">form</field>
+			<field name="target">new</field>
+		</record>
+		
+		<menuitem id="scrap_product_report" name="Scrap Product Report" action="action_scrap_product_report_wiz" parent="purchase.menu_procurement_management_product"/>	
+	</data>
+</openerp>
+		

@@ -1,0 +1,17 @@
+<?xml version="1.0" encoding="utf-8"?>
+<openerp>
+    <data>
+        <template id="assets_backend" name="galaxy_sales assets" inherit_id="web.assets_backend">
+            <xpath expr="." position="inside">
+                <link rel="stylesheet" href="/galaxy_sales/static/src/css/left_align.css"/>
+            </xpath>
+        </template>
+
+        <template id="web.menu_secondary_inherite" inherit_id="web.menu_secondary">
+            <xpath expr="//div[@class='oe_footer']" position="attributes">
+                <attribute name="class">oe_footer oe_footer_color</attribute>
+            </xpath>
+        </template>
+
+    </data>
+</openerp>

@@ -1,0 +1,191 @@
+<openerp>
+	<data>
+        <!-- Product Form-->
+        <record id="product_template_inherited" model="ir.ui.view">
+            <field name="name">product template</field>
+            <field name="model">product.template</field>
+            <field name="inherit_id" ref="product.product_template_form_view"/>
+            <field name="arch" type="xml">
+                <xpath expr="//group/field[@name='type']" position="after">
+                    <field name="brand"/>
+                    <field name="flavor"/>
+                    <field name="gender"/>
+                </xpath>
+                <xpath expr="//notebook/page[@string='Sales']" position="after">
+                    <page string="Origin">
+                        <field name="origin_ids">
+                            <form>
+                                <group col="4" colspan="4">
+                                    <field name="name"/>
+                                    <field name="code"/>
+                                    <field name="qty"/>
+                                </group>
+                            </form>
+                            <tree>
+                                <field name="name"/>
+                                <field name="code"/>
+                                <field name="qty"/>
+                            </tree>
+                        </field>
+                    </page>
+                </xpath>
+                 <xpath expr="//field[@name='description']" position="before">
+                    <separator string="Full Description"/>
+                </xpath>
+                <xpath expr="//label[@string='Product Name']" position="attributes">
+                    <attribute name="string">Item Name</attribute>
+                </xpath>
+            </field>
+        </record>
+
+		<!-- Inherited Search view of Product Template -->
+        <record id="product_template_inherited_1" model="ir.ui.view">
+            <field name="name">product.template.search</field>
+            <field name="model">product.template</field>
+            <field name="inherit_id" ref="product.product_template_search_view"/>
+            <field name="arch" type="xml">
+                <xpath expr="//search/field[@name='name']" position="after">
+                    <field string="Brand" name="brand" domain="[('brand','ilike',self)]"/>
+                </xpath>
+                <xpath expr="//search/field[@name='name']" position="after">
+                    <field string="Flavor" name="flavor" domain="[('flavor','ilike',self)]"/>
+                </xpath>
+                <xpath expr="//search/group/filter[@string='Type']" position="after">
+                    <field name="brand"/>
+                    <filter name="grp_braproductnd" string="Brand" domain="[]" context="{'group_by':'brand'}"/>
+                </xpath>
+                <xpath expr="//search/group/filter[@string='Type']" position="after">
+                    <field name="flavor"/>
+                    <filter name="grp_flavor" string="Flavor" domain="[]" context="{'group_by':'flavor'}"/>
+                </xpath>
+            </field>
+        </record>
+
+        <record model="ir.ui.view" id="product_form_view_sale_order_button">
+            <field name="name">product.product.sale.order</field>
+            <field name="model">product.product</field>
+            <field name="inherit_id" ref="product.product_normal_form_view"/>
+            <field name="arch" type="xml">
+                <field name="ean13" position="after">
+                	<field name='newly_imp_prod' />
+                </field>
+            </field>
+        </record>
+        
+        <!--  Brand  Tree View-->
+        <record model="ir.ui.view" id="brand_tree_view">
+            <field name="name">Brand.tree</field>
+            <field name="model">brand.brand</field>
+            <field name="arch" type="xml">
+                <tree string="Brand">                
+                       <field name="name"/>
+                       <field name="code"/>
+                </tree>
+            </field>
+        </record>
+
+        <!-- Brand Form View -->
+        <record model="ir.ui.view" id="brand_form_view">
+            <field name="name">Brand.form</field>
+            <field name="model">brand.brand</field>
+            <field name="arch" type="xml">
+                <form string="Brand">                
+                	<sheet>
+	                    <group>
+	                        <field name="name" required="1"/>
+	                        <field name="code"/>
+	                    </group>
+                    </sheet>
+                </form>
+            </field>
+        </record>
+
+		<!-- Brand Action -->
+        <record model="ir.actions.act_window" id="brand_list_action">
+            <field name="name">Brands</field>
+            <field name="res_model">brand.brand</field>
+            <field name="view_type">form</field>
+            <field name="view_mode">tree,form</field>
+        </record>
+        
+        <!-- Menu for Brand -->
+        <menuitem id="brand_menu" name="Brands" parent="base.menu_product"
+                  action="brand_list_action"/>
+                  
+        <!--  Flavor Tree View-->
+        <record model="ir.ui.view" id="falvor_tree_view">
+            <field name="name">Falvor.tree</field>
+            <field name="model">flavor.flavor</field>
+            <field name="arch" type="xml">
+                <tree string="Flavor">
+                        <field name="name" />
+                        <field name="code"/>
+                </tree>
+            </field>
+        </record>
+
+        <!-- Flavor Form View -->
+        <record model="ir.ui.view" id="falvor_form_view">
+            <field name="name">Falvor.form</field>
+            <field name="model">flavor.flavor</field>
+            <field name="arch" type="xml">
+                <form string="Flavor">
+                	<sheet>
+	                    <group>
+	                        <field name="name" required="1"/>
+	                        <field name="code"/>
+	                    </group>
+                    </sheet>
+                </form>
+            </field>
+        </record>
+
+		<!-- Action for Flavor -->
+        <record model="ir.actions.act_window" id="flavor_list_action">
+            <field name="name">Flavors</field>
+            <field name="res_model">flavor.flavor</field>
+            <field name="view_type">form</field>
+            <field name="view_mode">tree,form</field>
+        </record>
+
+		<!-- Menu for Flavor -->
+        <menuitem id="flavor_menu" name="Flavors" parent="base.menu_product"
+                  action="flavor_list_action"/>
+
+
+        <record id="product.product_template_action" model="ir.actions.act_window">
+            <field name="name">Products</field>
+            <field name="type">ir.actions.act_window</field>
+            <field name="res_model">product.template</field>
+            <field name="view_mode">tree,kanban,form</field>
+            <field name="view_type">form</field>
+            <field name="view_id" ref="product.product_template_tree_view"/>
+            <field name="context">{"search_default_filter_to_sell":1}</field>
+        </record>
+        
+	    <record id="purchase.product_normal_action_puchased" model="ir.actions.act_window">
+	        <field name="name">Products</field>
+	        <field name="type">ir.actions.act_window</field>
+	        <field name="res_model">product.template</field>
+	        <field name="view_type">form</field>
+	        <field name="view_mode">tree,form,kanban</field>
+	        <field name="context">{"search_default_filter_to_purchase":1}</field>
+	        <field name="search_view_id" eval="False"/> <!-- Force empty -->
+	        <field name="view_id" eval="False"/> <!-- Force empty -->
+	        <field name="help" type="html">
+	          <p class="oe_view_nocontent_create">
+	            Click to define a new product.
+	          </p><p>
+	            You must define a product for everything you purchase, whether
+	            it's a physical product, a consumable or services you buy to
+	            subcontractants.
+	          </p><p>
+	            The product form contains detailed information to improve the
+	            purchase process: prices, procurement logistics, accounting data,
+	            available suppliers, etc.
+	          </p>
+	        </field>
+	    </record>
+            
+	</data>
+</openerp>

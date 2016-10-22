@@ -1,0 +1,30 @@
+<openerp>
+	<data>
+		<!--Inherited Company form view to add token field and rate change button-->
+        <record id="view_company_form_inherited_ext" model="ir.ui.view">
+            <field name="name">res.company.form.inherit.ext</field>
+            <field name="model">res.company</field>
+            <field name="inherit_id" ref="base.view_company_form"/>
+            <field name="arch" type="xml">
+                <xpath expr="/form/sheet/notebook/page//group[@name='account_grp']" position="after">
+                    <separator string="Update Currency Rate"/> 
+                    <group col="4" colspan="4">
+                       <field name="api_key" placeholder="Enter Api Key..."/>
+                       <button name="refresh_currency" string="Currency Rate Update" type="object" class="oe_highlight"/>
+                    </group>
+                </xpath>
+            </field>
+        </record>
+
+        <record model="ir.cron" id="ir_cron_currency_update_every_day">
+            <field name="name">Currency Rate Update</field>
+            <field name="interval_number">1</field>
+            <field name="interval_type">days</field>
+            <field name="numbercall">-1</field>
+            <field name="doall" eval="False"/>
+            <field name="model" eval="'res.company'"/>
+            <field name="function" eval="'_run_currency_update'"/>
+            <field name="args">()</field>
+        </record>
+	</data>
+</openerp>

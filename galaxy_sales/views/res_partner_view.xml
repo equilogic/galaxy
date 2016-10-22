@@ -1,0 +1,48 @@
+<openerp>
+    <data>
+
+        <record id="res_partner_view_galaxy" model="ir.ui.view">
+            <field name="name">res.partner.view.galaxy</field>
+            <field name="model">res.partner</field>
+            <field name="inherit_id" ref="base.view_partner_form"/>
+            <field name="arch" type="xml">
+                <field name="name" position="after">
+                    <field name="last_name"/>
+                </field>
+
+                <xpath expr="/form/sheet//group//field[@name='website']" position='after'>
+                    <field name="currency" widget="many2many_tags"/>
+                </xpath>
+            </field>
+        </record>
+
+
+
+        <record id="base.action_partner_customer_form" model="ir.actions.act_window">
+            <field name="name">Customers</field>
+            <field name="type">ir.actions.act_window</field>
+            <field name="res_model">res.partner</field>
+            <field name="view_type">form</field>
+            <field name="view_mode">tree,kanban,form</field>
+            <field name="domain">[]</field>
+            <field name="context">{'default_customer':1, 'search_default_customer':1}</field>
+            <field name="filter" eval="True"/>
+            <field name="help" type="html">
+              <p class="oe_view_nocontent_create">
+                Click to add a contact in your address book.
+              </p><p>
+                Odoo helps you easily track all activities related to
+                a customer: discussions, history of business opportunities,
+                documents, etc.
+              </p>
+            </field>
+        </record>
+
+        <record id="base.action_partner_form_view1" model="ir.actions.act_window.view">
+            <field eval="3" name="sequence"/>
+            <field name="view_mode">kanban</field>
+            <field name="view_id" ref="base.res_partner_kanban_view"/>
+            <field name="act_window_id" ref="base.action_partner_form"/>
+        </record>
+    </data>
+</openerp>

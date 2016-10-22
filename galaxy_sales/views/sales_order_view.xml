@@ -1,0 +1,49 @@
+<openerp>
+    <data>
+
+        <!-- Inherited form view of sale order -->
+        <record id="inherited_sale_form_view" model="ir.ui.view">
+            <field name="name">inherited.sale.form.view.ex</field>
+            <field name="model">sale.order</field>
+            <field name="inherit_id" ref="sale.view_order_form" />
+            <field name="arch" type="xml">
+                <xpath
+                    expr="/form[@string='Sales Order']/header/button[@name='action_button_confirm']"
+                    position="before">
+                    <button name="%(wiz_galaxy_add_prod_in_so_action)d"
+                        string="Add Products" type="action" states="draft"
+                        groups="base.group_user" />
+                </xpath>
+                <xpath
+                    expr="//page[@string='Order Lines']/field[@name='order_line']/tree[@string='Sales Order Lines']/field[@name='product_uom_qty']"
+                    position='after'>
+                    <field name="origin_ids" widget="many2many_tags" />
+                    <field name="no_origin" />
+                </xpath>
+
+                    <field name="pricelist_id" position="after">
+                        <field name="currency_rate"/>
+                    </field>
+                    
+                <!-- <xpath expr="//form//group//field[@name='client_order_ref']" position='after'>
+                    <field name="sale_order_form" invisible="1"/>
+                </xpath> -->
+         	</field>
+         </record>
+
+        <!-- Inherited Search view of sale order -->
+        <record id="inherited_view_sales_order_filter" model="ir.ui.view">
+            <field name="name">inherited.sale.form.view</field>
+            <field name="model">sale.order</field>
+            <field name="inherit_id" ref="sale.view_sales_order_filter" />
+            <field name="arch" type="xml">
+                <xpath expr="//search/group/filter[@string='Order Month']" position="after">
+                    <field name="pricelist_id"/>
+                    <field name="date_order"/>
+                    <filter name="grp_currency" string="Currency" domain="[]" context="{'group_by':'pricelist_id'}"/>
+                    <filter string="Day" domain="[ ]" context="{'group_by': 'date_order:day'}" />
+                </xpath>
+            </field>
+        </record>
+    </data>
+</openerp>

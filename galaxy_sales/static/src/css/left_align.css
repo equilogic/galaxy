@@ -1,0 +1,51 @@
+ .openerp .oe_list_content td.oe_number {
+     text-align:left !important;
+}
+
+.openerp .oe_list.oe_list_editable.oe_editing .oe_form_field.oe_form_field_float input, .openerp .oe_list.oe_list_editable.oe_editing .oe_form_field.oe_form_view_integer input  {
+     text-align:left !important;
+}
+
+/* .openerp .oe_leftbar {
+	background: #28384d;
+}
+
+.openerp .nav-pills > li > a:hover, .openerp a.list-group-item > a:hover  {
+	background-color: #7c7bad;
+}
+
+.navbar-collapse {
+	background: grey;
+}
+
+#oe_main_menu_navbar li a, #oe_main_menu_navbar li button {
+  padding: 10px 4px 10px 4px;
+  margin-top: auto;
+  margin-bottom: auto;
+  font-weight: normal;
+  font-size: 13px;
+}
+
+.oe_menu_text {
+	color:white !important;
+}
+
+.openerp .oe_secondary_menu_section {
+  font-weight: normal;
+  margin-left: 8px;
+  color: #dee360;
+}
+*/
+tr [data-field="price_unit"]{
+    width:80px !important;
+}
+
+.oe_footer_color{
+    color:#eee !important;
+}
+
+.oe_footer_color a span{
+    color:#eee !important;
+}
+
+} 

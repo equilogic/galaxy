@@ -1,0 +1,3 @@
+id,name,model_id:id,group_id:id,perm_read,perm_write,perm_create,perm_unlink
+access_brand_brand,brand.brand,model_brand_brand,base.group_user,1,1,1,1
+access_flavor_flavor,access.flavor.flavor,model_flavor_flavor,base.group_user,1,1,1,1
