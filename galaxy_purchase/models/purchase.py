@@ -77,7 +77,26 @@ class purchase_order(models.Model):
     
     currency_rate = fields.Float(related="currency_id.rate_silent", string='Currency rate')
 
+    partner_inv_id = fields.Many2one('res.partner','Invoice Address',readonly=True,required=True,
+                                  states={'draft': [('readonly', False)], 'sent': [('readonly', False)]},
+                                  help="Invoice address for current sales order.")
+    partner_ship_id = fields.Many2one('res.partner','Delivery Address',readonly=True,required=True,
+                                   states={'draft': [('readonly', False)], 'sent': [('readonly', False)]},
+                                   help="Delivery address for current sales order.")
+
+    attn_pur = fields.Many2one('res.partner','ATTN')
+
+
     @api.multi
+    def onchange_partner_id(self,partner_id):
+        res = super(purchase_order,self).onchange_partner_id(partner_id)
+        part = self.env['res.partner'].browse(partner_id)
+        res_invoice= part.address_get(adr_pref=['delivery', 'invoice', 'contact']).get('invoice')
+        res_shipping= part.address_get(adr_pref=['delivery', 'invoice', 'contact']).get('delivery')
+        res['value'].update({'partner_inv_id':res_invoice,
+                             'partner_ship_id':res_shipping})
+        return res
+
     @api.depends('order_line')
     def _amount_all(self):
         line_obj = self.env['purchase.order.line']

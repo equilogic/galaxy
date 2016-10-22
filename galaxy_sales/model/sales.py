@@ -63,15 +63,16 @@ class sale_order(models.Model):
 
     pricelist_id = fields.Many2one('product.pricelist', 'Currency', required=True, readonly=True, states={'draft': [('readonly', False)], 'sent': [('readonly', False)]}, help="Pricelist for current sales order.")
     currency_rate = fields.Float(related="pricelist_id.currency_id.rate_silent", string='Currency rate')
-
-
     active = fields.Boolean('Active', default=True, help="If the active field is set to False, it will allow you to hide the sale order without removing it.")
-    
+    attn_sal = fields.Many2one('res.partner','ATTN')
+
     @api.multi
     @api.onchange('pricelist_id')
     def onchange_pricelist_id(self,pricelist_id, order_lines):
         res = super(sale_order,self).onchange_pricelist_id(pricelist_id, order_lines)
         cur_lst = []
+        
+        price_list_obj = self.env['product.pricelist'].browse(pricelist_id)
         if self.partner_id and not self.partner_id.currency:
             raise except_orm(_('Error!'), _('PLease select Currency for Customer'))
         if self.pricelist_id and self.partner_id and self.partner_id.currency:
@@ -82,6 +83,22 @@ class sale_order(models.Model):
                 raise except_orm(_('Error!'), _('Customer Currency and Selected Currency are not Match'))
         return res
 
+    @api.multi
+    @api.onchange('partner_id')
+    def onchange_partner_id(self, part):
+        res = super(sale_order,self).onchange_partner_id(part)
+
+        if part:
+            partner_data = self.env['res.partner'].browse(part)
+            if partner_data and partner_data.country_id:
+                price_list_ids = self.env['product.pricelist'].search([('currency_id','=', partner_data.country_id and partner_data.country_id.currency_id.id)])
+                if price_list_ids:
+                    res['value']['pricelist_id'] = price_list_ids.ids
+            else:
+                res['value']['pricelist_id'] = partner_data.property_product_pricelist.id
+        return res
+    
+   
     @api.v7
     def _prepare_invoice(self, cr, uid, order, lines, context=None):
         res = super(sale_order, self)._prepare_invoice(cr, uid, order, lines)

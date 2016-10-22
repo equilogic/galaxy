@@ -6,13 +6,40 @@
             <field name="model">purchase.order</field>
             <field name="inherit_id" ref="purchase.purchase_order_form"/>
             <field name="arch" type="xml">
+            	<xpath expr="//field[@name='partner_id']" position='attributes'>
+            		<attribute name="context">{'search_default_customer':1, 'show_address': 1}</attribute>
+					<attribute name="options">{"always_reload": True}</attribute>
+            	</xpath>
+            	<xpath expr="//field[@name='partner_id']" position="after">
+            		<field name="partner_inv_id"
+            		 context="{'search_default_customer':1, 'show_address': 1,'default_type':'invoice'}"
+            		 options="{'always_reload': True}"/>
+            		<field name="partner_ship_id"
+            		context="{'search_default_customer':1, 'show_address': 1,'default_type':'delivery'}"
+            		 options="{'always_reload': True}"/>
+            	</xpath>
+            	
+            	<xpath expr="//field[@name='currency_id']" position="after">
+            		<field name="attn_pur" domain="[('type','=','contact'),('parent_id','=',partner_id)]"
+            		attrs="{'readonly': [('state','not in',('draft','sent'))]}" />
+            	</xpath>
+            	
             	<xpath expr="//page[@string='Products']/field[@name='order_line']/tree[@string='Purchase Order Lines']/field[@name='name']" position='after'>
             		<field name="origin_ids" widget="many2many_tags" attrs="{ 'readonly':[('no_origin', '=', True)]}" />
             		<field name="no_origin"/>
             	</xpath>
-            	<xpath expr="//page[@string='Products']/field[@name='order_line']/tree[@string='Purchase Order Lines']/field[@name='taxes_id']" position='after'> 
+            	
+            	<xpath expr="//page[@string='Products']/field[@name='order_line']/tree[@string='Purchase Order Lines']/field[@name='price_unit']" position='replace'>
+            	</xpath>
+            	
+            	<xpath expr="//page[@string='Products']/field[@name='order_line']/tree[@string='Purchase Order Lines']/field[@name='price_subtotal']" position='replace'>
+            	</xpath>
+            	
+            	<xpath expr="//page[@string='Products']/field[@name='order_line']/tree[@string='Purchase Order Lines']/field[@name='taxes_id']" position='before'> 
             		<field name="landed_cost" />
-            		<field name="price" /> 
+            		<field name="price" />
+            		<field name="price_unit"/>
+            		<field name="price_subtotal"/>
             	</xpath>
             	<xpath expr="//page[@string='Products']/field[@name='order_line']/tree[@string='Purchase Order Lines']" position='attributes'> 
             		<attribute name="class">my_class</attribute>

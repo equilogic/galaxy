@@ -62,6 +62,31 @@ class account_invoice(models.Model):
     vessale_name_id = fields.Many2one('vessale.name', 'Vessale')
     bank = fields.Char('Bank')
     currency_rate = fields.Float(related="currency_id.rate_silent", string='Currency rate')
+    
+    part_inv_id = fields.Many2one('res.partner','Invoice Address',readonly=True,required=True,
+                                  states={'draft': [('readonly', False)], 'sent': [('readonly', False)]},
+                                  help="Invoice address for current sales order.")
+    part_ship_id = fields.Many2one('res.partner','Delivery Address',readonly=True,required=True,
+                                   states={'draft': [('readonly', False)], 'sent': [('readonly', False)]},
+                                   help="Delivery address for current sales order.")
+    attn_inv = fields.Many2one('res.partner','ATTN')
+
+    @api.multi
+    def onchange_partner_id(self, type, partner_id, date_invoice=False,
+            payment_term=False, partner_bank_id=False, company_id=False):
+        res = super(account_invoice,self).onchange_partner_id(type=type,partner_id=partner_id,
+                                    date_invoice=date_invoice,payment_term=payment_term,
+                                    partner_bank_id=partner_bank_id,company_id=company_id)
+
+        part = self.env['res.partner'].browse(partner_id)
+        res_inv= part.address_get(adr_pref=['delivery', 'invoice', 'contact']).get('invoice')
+        res_ship= part.address_get(adr_pref=['delivery', 'invoice', 'contact']).get('delivery')
+        res['value'].update({'part_inv_id':res_inv,
+                             'part_ship_id':res_ship,
+                             })
+        return res
+
+
 
     @api.multi
     def prepare_sale_order_line(self):
