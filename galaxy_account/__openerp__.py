@@ -32,7 +32,8 @@
     'demo': [],
     'data': [
             'views/invoice_form.xml',
-            'views/report_view.xml',
+            'views/report_view.xml',    
+            'views/account_invoice_sequence.xml',
             'report/galaxy_product_tax_invoice_report_view.xml',
             'wizard/update_currency_rates.xml',
     ],

@@ -105,7 +105,7 @@
 									<span ><b>INVOICE NO :</b></span>
 								</td>
 								<td width="15%">
-										<span t-field="o.number" />
+										<b><span t-field="o.number" /></b>
 								</td>
 							</tr>
 							<tr>
@@ -116,7 +116,7 @@
 									<span ><b>DATE : </b></span>
 								</td>
 								<td width="15%">
-									<span t-field="o.date_invoice" t-field-options='{"format": "dd-MM-Y"}' />
+									<b><span t-field="o.date_invoice" t-field-options='{"format": "dd-MM-Y"}' /></b>
 								</td>
 							</tr>
 						</table>
@@ -125,10 +125,10 @@
 						<span style="text-transform:uppercase;" t-field="o.ship_via_id.name" />&amp;nbsp;&amp;nbsp;&amp;nbsp;&amp;nbsp;&amp;nbsp;&amp;nbsp;&amp;nbsp;&amp;nbsp;&amp;nbsp;
 						<span>CASES</span>&amp;nbsp;&amp;nbsp;&amp;nbsp;&amp;nbsp;&amp;nbsp;&amp;nbsp;&amp;nbsp;&amp;nbsp;&amp;nbsp;
 						<span style="text-transform:uppercase;" t-field="o.cases_id.name" />
-						<span> SHIPPED IN GOOD ORDER AND CONDITION BY GALAXY ENTERPRISE PTE PER </span> &amp;nbsp;&amp;nbsp;&amp;nbsp;&amp;nbsp;&amp;nbsp;&amp;nbsp;&amp;nbsp;&amp;nbsp;&amp;nbsp;
-						<span style="text-transform:uppercase;" t-field="o.vessale_name_id.name" />
+						<span> SHIPPED IN GOOD ORDER AND CONDITION BY GALAXY ENTERPRISE PTE PER 
+						</span> &amp;nbsp;&amp;nbsp;&amp;nbsp;<span style="text-transform:uppercase;" t-field="o.vessale_name_id.name" />
 						<span>SALEING ON OR ABOUT </span><span style="text-transform:uppercase;" t-field="o.date_invoice" />
-						<span>FROM</span><span style="text-transform:uppercase;" t-field="o.from_id.name" /><span>TO</span><span style="text-transform:uppercase;" t-field="o.port_name_id.name" />
+						<span>FROM</span>&amp;nbsp;&amp;nbsp;&amp;nbsp;<span style="text-transform:uppercase;" t-field="o.from_id.name" /><span>TO</span><span style="text-transform:uppercase;" t-field="o.port_name_id.name" />
 						<span>ON ACCOUNT AND RISK OF MESSRS.</span><b> <span t-field="o.partner_id.name" /> </b>
 						</p>
 						<table width="100%">
@@ -151,11 +151,12 @@
 								<td>
 									<span>TERMS:</span>
 									<t t-if="o.payment_term">
-										<span t-field="o.payment_term" />
+										<span t-field="o.payment_term" />&amp;nbsp;
 									</t>
+									
 								</td>
 								<td>
-									<span>BANK:</span>
+									&amp;nbsp;&amp;nbsp;<span>BANK:</span>
 									<t t-if="o.bank">
 										<span t-field="o.bank" />
 									</t>
@@ -190,8 +191,8 @@
 							<tbody>
 								<tr t-foreach="o.invoice_line" t-as="line">
 									<td class="text-left" width="10%"> 
-										<span t-esc="get_qty(line.quantity)" />
-										<span t-field="line.uos_id.name" />
+										<span t-esc="get_qty(line.quantity)" /> pc
+										
 
 									</td>
 									<td class="text-left line" width="25%">
@@ -216,12 +217,14 @@
 								<tr>
 									<td></td>
 									<td>
+										<t t-if="o.payment_term">
 										<div>
 											<span>======================================</span>
-											<div>TERMS :</div>
+											<div>TERMS : <span t-field="o.payment_term" /></div>
 											<div>LESS CREDIT NO :</div>
 											<span>=======================================</span>
 										</div>
+										</t>
 									</td>
 									<td></td>
 									<td></td>
@@ -293,7 +296,7 @@
 									<tr>
 										<td width="20%"><b>AMOUNT IN WORDS:</b></td>
 										<td width="80%">
-											<span t-esc="amount_to_text(o.amount_total) or ''" />
+											<span t-esc="amount_to_text(o.amount_total,o.currency_id) or ''" />
 										</td>
 									</tr>
 								</table>
@@ -306,10 +309,10 @@
 										<td width="25%">
 										</td>
 										<td width="15%" >
-												<span>Total </span>
+												<b><span>Total </span></b>
 										</td>
 										<td width="20%" class="text-left">
-											<span t-field="o.currency_id.name" /><span t-field="o.currency_id.symbol" /><span t-field="o.amount_total" />
+											<b><span t-field="o.currency_id.name" /><span t-field="o.currency_id.symbol" /><span t-field="o.amount_total" /></b>
 										</td>
 									</tr>
 								</table>
@@ -317,8 +320,15 @@
 									<span class="text-right">GALAXY ENTERPRISE PTE LTD </span>
 								</div>
 								<br/><br/>
-								<div class="text-right">
-									<span class="text-right">_________________________ </span>
+								<div >
+									<table width="100%" >
+										<tr >
+											<td width="70%"></td>
+											<td class="text-right" style="border-top:2 px solid black" width="30%" >
+											<span style="color:white;">1111111111111111111111111</span>
+											</td>
+										</tr>
+									</table>
 								</div>
 							</div>
 						</div>

@@ -21,6 +21,8 @@
 ##############################################################################
 
 from openerp import models, fields, api
+from openerp.exceptions import except_orm
+from openerp.tools.translate import _
 
 
 class account_invoice_line(models.Model):
@@ -46,7 +48,17 @@ class account_invoice_line(models.Model):
                 res['domain'].update({'origin_ids':[('product_id', 'in', [prod_tmpl_id])]})
         return res
 
+
+
+class res_partner(models.Model):
+    _inherit = 'res.partner'
     
+    cust_code = fields.Char('Customer Code')
+    
+    _sql_constraints = [
+        ('cust_code_unique', 'unique(cust_code)', 'Please Enter Unique Customer Code'),
+    ]
+
 class account_invoice(models.Model):
     _inherit = "account.invoice"
     
@@ -63,30 +75,28 @@ class account_invoice(models.Model):
     bank = fields.Char('Bank')
     currency_rate = fields.Float(related="currency_id.rate_silent", string='Currency rate')
     
-    part_inv_id = fields.Many2one('res.partner','Invoice Address',readonly=True,required=True,
+    part_inv_id = fields.Many2one('res.partner', 'Invoice Address', readonly=True, required=True,
                                   states={'draft': [('readonly', False)], 'sent': [('readonly', False)]},
                                   help="Invoice address for current sales order.")
-    part_ship_id = fields.Many2one('res.partner','Delivery Address',readonly=True,required=True,
+    part_ship_id = fields.Many2one('res.partner', 'Delivery Address', readonly=True, required=True,
                                    states={'draft': [('readonly', False)], 'sent': [('readonly', False)]},
                                    help="Delivery address for current sales order.")
-    attn_inv = fields.Many2one('res.partner','ATTN')
+    attn_inv = fields.Many2one('res.partner', 'ATTN')
 
     @api.multi
     def onchange_partner_id(self, type, partner_id, date_invoice=False,
             payment_term=False, partner_bank_id=False, company_id=False):
-        res = super(account_invoice,self).onchange_partner_id(type=type,partner_id=partner_id,
-                                    date_invoice=date_invoice,payment_term=payment_term,
-                                    partner_bank_id=partner_bank_id,company_id=company_id)
+        res = super(account_invoice, self).onchange_partner_id(type=type, partner_id=partner_id,
+                                    date_invoice=date_invoice, payment_term=payment_term,
+                                    partner_bank_id=partner_bank_id, company_id=company_id)
 
         part = self.env['res.partner'].browse(partner_id)
-        res_inv= part.address_get(adr_pref=['delivery', 'invoice', 'contact']).get('invoice')
-        res_ship= part.address_get(adr_pref=['delivery', 'invoice', 'contact']).get('delivery')
+        res_inv = part.address_get(adr_pref=['delivery', 'invoice', 'contact']).get('invoice')
+        res_ship = part.address_get(adr_pref=['delivery', 'invoice', 'contact']).get('delivery')
         res['value'].update({'part_inv_id':res_inv,
                              'part_ship_id':res_ship,
                              })
         return res
-
-
 
     @api.multi
     def prepare_sale_order_line(self):
@@ -129,7 +139,38 @@ class account_invoice(models.Model):
        
     @api.multi
     def invoice_validate(self):
+        prefix = ''
+        cr,uid,context = self.env.args
+        if self.partner_id:
+            
+            country = self.partner_id.country_id.name
+            if self.number:
+                if country and country == 'Singapore': 
+                    self.number = self.env['ir.sequence'].get('invoice_local')
+                else:
+                    if not self.partner_id.cust_code:
+                        raise except_orm(_('Error!'), _('Please Enter Customer code'))
+                    cust_code = str(self.partner_id.cust_code)
+                    prefix = cust_code[:3].upper()
 
+                    seq_type={
+                              'name': cust_code,
+                              'code':'invoice_export_'+cust_code,
+                              }
+                    seq = {
+                        'name': cust_code,
+                        'code':'invoice_export_'+cust_code,
+                        'prefix': prefix+'/',
+                        'suffix':'/%(y)s',
+                        'number_next':8151,
+                        'number_increment': 1
+                        }
+                    cr.execute("select * from ir_sequence_type where code = %s",('invoice_export_'+cust_code,))
+                    res=cr.fetchall()
+                    if res == []:
+                        sq_type=self.env['ir.sequence.type'].create(seq_type)
+                        sq = self.env['ir.sequence'].create(seq)
+                    self.number = self.env['ir.sequence'].get('invoice_export_'+cust_code)
         self.prepare_sale_order_line()
         return self.write({'state': 'open'})
 

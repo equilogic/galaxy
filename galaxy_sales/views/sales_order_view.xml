@@ -53,9 +53,6 @@
 				<field name="pricelist_id" position="after">
 					<field name="currency_rate" />
 				</field>
-
-				<!-- <xpath expr="//form//group//field[@name='client_order_ref']" position='after'> 
-					<field name="sale_order_form" invisible="1"/> </xpath> -->
 			</field>
 		</record>
 

@@ -35,11 +35,11 @@ class report_print_tax_invoice(report_sxw.rml_parse):
             'origin': self._get_origin
         })
 
-    def _amount_to_text(self, amount):
+    def _amount_to_text(self, amount,currency):
         # Currency complete name is not available in res.currency model
         # Exceptions done here (EUR, USD, BRL) cover 75% of cases
         # For other currencies, display the currency code
-        return amount_to_text(amount)
+        return amount_to_text(amount,currency=currency.name)
 
     def _get_qty(self,qty):
         return int(qty)
@@ -49,9 +49,9 @@ class report_print_tax_invoice(report_sxw.rml_parse):
         if line and line.origin_ids:
             for origin_name in line.origin_ids:
                 if origin:
-                    origin = origin + ',' + '['+str(origin_name.qty)+']'+origin_name.name.name
+                    origin = origin + ',' + origin_name.name.name
                 else:
-                    origin = '['+str(origin_name.qty)+']'+origin_name.name.name
+                    origin = origin_name.name.name
         return origin
 
 class report_print_tax_invoice_extended(models.AbstractModel):

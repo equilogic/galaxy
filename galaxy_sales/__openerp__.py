@@ -36,7 +36,7 @@
              "views/currency_rate_update_view.xml",
              "views/template.xml",
              "views/res_partner_view.xml",
-             
+             "views/sale_order_sequence.xml",
              "wizard/wiz_sale_order_register_view.xml",
              "wizard/wiz_sale_register_view.xml",
              "wizard/wiz_product_wise_sale_report_1_view.xml",

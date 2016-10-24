@@ -66,6 +66,14 @@ class sale_order(models.Model):
     active = fields.Boolean('Active', default=True, help="If the active field is set to False, it will allow you to hide the sale order without removing it.")
     attn_sal = fields.Many2one('res.partner','ATTN')
 
+    @api.model
+    def create(self, vals):
+        if vals.get('name', '/') == '/':
+            vals['name'] = self.env['ir.sequence'].get('sale.order') or '/'
+        res = super(sale_order,self).create(vals)
+        
+        return res
+    
     @api.multi
     @api.onchange('pricelist_id')
     def onchange_pricelist_id(self,pricelist_id, order_lines):
