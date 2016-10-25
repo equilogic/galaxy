@@ -258,16 +258,14 @@
 												<span>0%GST= </span>
 												<span t-field="o.currency_id.name" />
 												<span t-field="o.currency_id.symbol" />
-												<span>0.00</span>													
+												<span>0.0</span>													
 											</t>
 										</td>
 										<td width="15%" class="text-left" >
 											SUB-TOTAL
 										</td>
 										<td width="20%" class="text-left">
-											<span t-field="o.currency_id.name" />
-											<span t-field="o.currency_id.symbol" />
-											<span t-field="o.amount_untaxed" />
+											<span t-field="o.currency_id.name" /><span t-field="o.currency_id.symbol" /><span t-field="o.amount_untaxed" />
 										</td>
 									</tr>
 									<tr>
@@ -282,12 +280,31 @@
 												<span>7% GST </span>
 												<span t-field="o.partner_id.country_id" />
 											</t>
-											<t t-if="o.partner_id.country_id.id != '199'">
+											<t t-if="not o.partner_id.country_id.id == '199'">
 												<span>GST @0% </span>
 											</t>											
 										</td>
 										<td width="20%" class="text-left">
-											<span t-field="o.currency_id.name" /><span t-field="o.currency_id.symbol" /><span>0.00</span>
+											<span t-field="o.currency_id.name" /><span t-field="o.currency_id.symbol" /><span>0.0</span>
+										</td>
+									</tr>
+									<tr>
+										<td width="25%">
+											Landed Cost:
+											<t t-if="o.landed_cost">
+												<span t-esc="get_cost(o.landed_cost)"/>
+											</t>
+										</td>
+										<td width="15%">
+											
+										</td >
+										<td width="25%">
+										</td>
+										<td width="20%" >
+											<span>Landed Cost Price </span>
+										</td>
+										<td width="20%" class="text-left">
+											<span t-field="o.currency_id.name" /><span t-field="o.currency_id.symbol" /><span t-field="o.landed_cost_price" />
 										</td>
 									</tr>
 																		

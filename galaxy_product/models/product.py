@@ -168,5 +168,10 @@ class product_product(models.Model):
             ids = self.search(cr, user, args, limit=limit, context=context)
         result = self.name_get(cr, user, ids, context=context)
         return result
+
+class landed_cost(models.Model):
+    _name='landed.cost'
     
+    name = fields.Char('Name')
+
 # vim:expandtab:smartindent:tabstop=4:softtabstop=4:shiftwidth=4:

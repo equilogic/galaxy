@@ -48,17 +48,6 @@ class account_invoice_line(models.Model):
                 res['domain'].update({'origin_ids':[('product_id', 'in', [prod_tmpl_id])]})
         return res
 
-
-
-class res_partner(models.Model):
-    _inherit = 'res.partner'
-    
-    cust_code = fields.Char('Customer Code')
-    
-    _sql_constraints = [
-        ('cust_code_unique', 'unique(cust_code)', 'Please Enter Unique Customer Code'),
-    ]
-
 class account_invoice(models.Model):
     _inherit = "account.invoice"
     
@@ -83,6 +72,8 @@ class account_invoice(models.Model):
                                    help="Delivery address for current sales order.")
     attn_inv = fields.Many2one('res.partner', 'ATTN')
 
+    landed_cost = fields.Many2many('landed.cost',string='Landed Cost')
+    landed_cost_price = fields.Float('Landed Cost Price')
     @api.multi
     def onchange_partner_id(self, type, partner_id, date_invoice=False,
             payment_term=False, partner_bank_id=False, company_id=False):
@@ -97,6 +88,13 @@ class account_invoice(models.Model):
                              'part_ship_id':res_ship,
                              })
         return res
+    
+    @api.one
+    @api.depends('invoice_line.price_subtotal', 'tax_line.amount','landed_cost_price')
+    def _compute_amount(self):
+        self.amount_untaxed = sum(line.price_subtotal for line in self.invoice_line)
+        self.amount_tax = sum(line.amount for line in self.tax_line)
+        self.amount_total = self.amount_untaxed + self.amount_tax+self.landed_cost_price
 
     @api.multi
     def prepare_sale_order_line(self):
@@ -108,6 +106,8 @@ class account_invoice(models.Model):
         if self.type == "out_invoice" and not self.invoice_from_sale:
             order_vals = {
                           'partner_id': self.partner_id.id,
+                          'partner_invoice_id':self.part_inv_id.id,
+                          'partner_shipping_id':self.part_ship_id.id,
                           'date_order': self.date_invoice,
                           'pricelist_id': self.partner_id.property_product_pricelist.id,
                           'invoiced':True,
@@ -211,6 +211,15 @@ class account_invoice(models.Model):
        
         return True
 
+class res_partner(models.Model):
+    _inherit = 'res.partner'
+    
+    cust_code = fields.Char('Customer Code')
+    
+    _sql_constraints = [
+        ('cust_code_unique', 'unique(cust_code)', 'Please Enter Unique Customer Code'),
+    ]
+    
 class ship_via(models.Model):
     _name = 'ship.via'
     

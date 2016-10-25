@@ -36,20 +36,38 @@
             	</xpath>
             	
             	<xpath expr="//page[@string='Products']/field[@name='order_line']/tree[@string='Purchase Order Lines']/field[@name='taxes_id']" position='before'> 
-            		<field name="landed_cost" />
-            		<field name="price" />
             		<field name="price_unit"/>
             		<field name="price_subtotal"/>
             	</xpath>
             	<xpath expr="//page[@string='Products']/field[@name='order_line']/tree[@string='Purchase Order Lines']" position='attributes'> 
             		<attribute name="class">my_class</attribute>
             	</xpath>
-            	<xpath expr="//page[@string='Products']/group/field[@name='amount_tax']" position='before'> 
-            		<field name="total_cost_price" widget="monetary" options="{'currency_field': 'currency_id'}" />
-            	</xpath>
             	<field name="currency_id" position="after">
             		<field name="currency_rate"/>
             	</field>
+            	
+            	<group class="oe_subtotal_footer oe_right" position="replace">
+            	</group>
+            	<xpath expr="//page[@string='Products']/field[@name='order_line']" position="after">
+            		<group col="3" >
+            			<group>
+            				<field name="landed_cost_pur" widget="many2many_tags"/>
+            			</group>
+            			<group col="1"></group>
+            			<group class="oe_right">
+            				<field name="amount_untaxed" widget="monetary" options="{'currency_field': 'currency_id'}"/>
+                            <field name="amount_tax" widget="monetary" options="{'currency_field': 'currency_id'}"/>
+                            <field name="total_cost_price" widget="monetary" 
+                            options="{'currency_field': 'currency_id'}" attrs="{ 'readonly':[('state', '!=', 'draft')]}"/>
+                            <group class="oe_subtotal_footer_separator oe_inline">
+                               <label for="amount_total"/>
+                               <button name="button_dummy"
+                                states="draft" string="(update)" type="object" class="oe_edit_only oe_link"/>
+                            </group>
+                            <field name="amount_total" nolabel="1" class="oe_subtotal_footer_separator" widget="monetary" options="{'currency_field': 'currency_id'}"/>
+            			</group>
+            		</group>
+            	</xpath>
          	</field>
          </record>
 

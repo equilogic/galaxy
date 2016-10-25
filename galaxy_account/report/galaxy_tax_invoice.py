@@ -32,9 +32,16 @@ class report_print_tax_invoice(report_sxw.rml_parse):
             'time': time,
             'amount_to_text': self._amount_to_text,
             'get_qty':self._get_qty,
-            'origin': self._get_origin
+            'origin': self._get_origin,
+            'get_cost':self._get_cost,
         })
 
+    def _get_cost(self,landed_cost):
+        str=''
+        for cost in landed_cost:
+            str += cost.name + ','
+        return str
+    
     def _amount_to_text(self, amount,currency):
         # Currency complete name is not available in res.currency model
         # Exceptions done here (EUR, USD, BRL) cover 75% of cases

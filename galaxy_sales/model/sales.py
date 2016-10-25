@@ -64,20 +64,45 @@ class sale_order(models.Model):
     pricelist_id = fields.Many2one('product.pricelist', 'Currency', required=True, readonly=True, states={'draft': [('readonly', False)], 'sent': [('readonly', False)]}, help="Pricelist for current sales order.")
     currency_rate = fields.Float(related="pricelist_id.currency_id.rate_silent", string='Currency rate')
     active = fields.Boolean('Active', default=True, help="If the active field is set to False, it will allow you to hide the sale order without removing it.")
-    attn_sal = fields.Many2one('res.partner','ATTN')
+    attn_sal = fields.Many2one('res.partner', 'ATTN')
+    landed_cost_sal = fields.Many2many('landed.cost', string="Landed Cost")
+    landed_cost_price = fields.Float('Landed Cost Price', help="landed cost price")
+    
+    amount_untaxed = fields.Float(compute="_amount_all", store=True,
+                                  string='Untaxed Amount',
+                                  help="The amount without tax")
+    amount_tax = fields.Float(compute="_amount_all", store=True,
+                              string='Taxes',
+                              help="The tax amount")
+    amount_total = fields.Float(compute="_amount_all",
+                                store=True, string='Total')
+    
+    @api.multi
+    @api.depends('order_line', 'landed_cost_price')
+    def _amount_all(self):
+        cur_obj = self.env['res.currency']
+        for order in self:
+            val = val1 = 0.0
+            cur = self.pricelist_id.currency_id
+            for line in order.order_line:
+                val1 += line.price_subtotal
+                val += self._amount_line_tax(line)
+            order.amount_tax = cur.round(val)
+            order.amount_untaxed = cur.round(val1)
+            order.amount_total = cur.round(val) + cur.round(val1) + cur.round(order.landed_cost_price)
 
     @api.model
     def create(self, vals):
         if vals.get('name', '/') == '/':
             vals['name'] = self.env['ir.sequence'].get('sale.order') or '/'
-        res = super(sale_order,self).create(vals)
+        res = super(sale_order, self).create(vals)
         
         return res
     
     @api.multi
     @api.onchange('pricelist_id')
-    def onchange_pricelist_id(self,pricelist_id, order_lines):
-        res = super(sale_order,self).onchange_pricelist_id(pricelist_id, order_lines)
+    def onchange_pricelist_id(self, pricelist_id, order_lines):
+        res = super(sale_order, self).onchange_pricelist_id(pricelist_id, order_lines)
         cur_lst = []
         
         price_list_obj = self.env['product.pricelist'].browse(pricelist_id)
@@ -94,12 +119,12 @@ class sale_order(models.Model):
     @api.multi
     @api.onchange('partner_id')
     def onchange_partner_id(self, part):
-        res = super(sale_order,self).onchange_partner_id(part)
+        res = super(sale_order, self).onchange_partner_id(part)
 
         if part:
             partner_data = self.env['res.partner'].browse(part)
             if partner_data and partner_data.country_id:
-                price_list_ids = self.env['product.pricelist'].search([('currency_id','=', partner_data.country_id and partner_data.country_id.currency_id.id)])
+                price_list_ids = self.env['product.pricelist'].search([('currency_id', '=', partner_data.country_id and partner_data.country_id.currency_id.id)])
                 if price_list_ids:
                     res['value']['pricelist_id'] = price_list_ids.ids
             else:
@@ -110,20 +135,25 @@ class sale_order(models.Model):
     @api.v7
     def _prepare_invoice(self, cr, uid, order, lines, context=None):
         res = super(sale_order, self)._prepare_invoice(cr, uid, order, lines)
-        res.update({'invoice_from_sale':True})
+        res.update({'invoice_from_sale':True,
+                    'part_inv_id':order.partner_invoice_id.id,
+                    'part_ship_id':order.partner_shipping_id.id,
+                    })
         return res
 
 
 class sale_advance_payment_inv(osv.osv_memory):
     _inherit = 'sale.advance.payment.inv'
     
-    @api.v7
-    def _prepare_advance_invoice_vals(self, cr, uid, ids, context=None):
-        res = super(sale_advance_payment_inv, self)._prepare_advance_invoice_vals(cr, uid, ids, context=context)
-        sale_obj = self.pool.get('sale.order')
+    @api.multi
+    def _prepare_advance_invoice_vals(self):
+        res = super(sale_advance_payment_inv, self)._prepare_advance_invoice_vals()
+        sale = self.env['sale.order'].browse(self._context.get('active_id'))
         for val in res:
-            val[1].update({'invoice_from_sale':True})
-
+            val[1].update({'invoice_from_sale':True,
+                           'part_inv_id':sale.partner_invoice_id.id,
+                           'part_ship_id':sale.partner_shipping_id.id,
+                           })
         return res
 
 

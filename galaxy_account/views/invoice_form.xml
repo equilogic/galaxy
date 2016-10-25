@@ -1,113 +1,165 @@
 <openerp>
 	<data>
 		<!-- Inherited Form View of Invoice Form (Customer Invoices) -->
-         <record id="invoice_form_inherited_new" model="ir.ui.view">
-            <field name="name">invoice.form.inherited.new</field>
-            <field name="model">account.invoice</field>
-            <field name="inherit_id" ref="account.invoice_form"/>
-            <field name="arch" type="xml">
-            	<xpath expr="//field[@name='partner_id']" position="after">
-            		<field name="part_inv_id"
-            		 context="{'search_default_customer':1, 'show_address': 1,'default_type':'invoice'}"
-            		 options="{'always_reload': True}"/>
-            		<field name="part_ship_id"
-            		context="{'search_default_customer':1, 'show_address': 1,'default_type':'delivery'}"
-            		 options="{'always_reload': True}"/>
-            	</xpath>
-            	<xpath expr="//field[@name='fiscal_position']" position="after">
-            		<field name="attn_inv" domain="[('type','=','contact'),('parent_id','=',partner_id)]"
-            		attrs="{'readonly': [('state','not in',('draft','sent'))]}"
-            		/>
-            	</xpath>
-            	<xpath expr="//page[@string='Payments']" position="after">
-            		<page string="Transport Details">
-            			<group col="4">
-            				<field name="ship_via_id" />
-            				<field name="vehicle_name"/>
-            				<field name="container_name"/>
-            				<field name="container_place_area_code"/>
-            				<field name="cases_id" />
-            				<field name="from_id" />
-            				<field name="port_name_id" />
-            				<field name="insurence_covered_id" />
-            				<field name="vessale_name_id" />
-            				<field name="bank"/>
-            				<field name="invoice_from_sale" invisible="1" />
-            			</group>
-            		</page>
-                </xpath>
-                
-            	<xpath expr="//page[@string='Invoice Lines']/field[@name='invoice_line']/tree[@string='Invoice Lines']/field[@name='name']" position='after'>
-            		<field name="prod_desc" />
-            	</xpath>
-            	
-            	<xpath expr="//page[@string='Invoice Lines']/field[@name='invoice_line']/tree[@string='Invoice Lines']/field[@name='product_id']" position='attributes'>
-            		<attribute name='string'>Item Name</attribute>
-            	</xpath>
-            	
-            	<xpath expr="//page[@string='Invoice Lines']/field[@name='invoice_line']/tree[@string='Invoice Lines']/field[@name='quantity']" position='after'>
-            		<field name="origin_ids" widget="many2many_tags" attrs="{ 'readonly':[('no_origin', '=', True)]}"/>
-            		<field name="no_origin"/>
-            	</xpath>
-            	
-            	<field name="account_id" position='after'>
-            		<field name="currency_rate" />
-            	</field>
-            	
-            	<xpath expr="//page[@string='Invoice Lines']/field[@name='invoice_line']/tree[@string='Invoice Lines']/field[@name='price_unit']"  position='replace'>
-            	</xpath>
-            	<xpath expr="//page[@string='Invoice Lines']/field[@name='invoice_line']/tree[@string='Invoice Lines']/field[@name='discount']"  position='after'>
-            		<field name="price_unit"/>
-            	</xpath>
-            	
-            	<xpath expr="//page[@string='Invoice Lines']/field[@name='invoice_line']/tree[@string='Invoice Lines']/field[@name='price_subtotal']"  position='replace'>
-            		<field name="invoice_line_tax_id" />
-            	</xpath>
-            	
-            	<xpath expr="//page[@string='Invoice Lines']/field[@name='invoice_line']/tree[@string='Invoice Lines']/field[@name='invoice_line_tax_id']"  position='replace'>
-            		<field name="price_subtotal" />
-            	</xpath>
-         	</field>
-         </record>
-        
-         <!-- Inherited Form View of Supplier Invoice Form -->
-         <record id="invoice_form_inherited" model="ir.ui.view">
-            <field name="name">invoice.form.inherited</field>
-            <field name="model">account.invoice</field>
-            <field name="inherit_id" ref="account.invoice_supplier_form"/>
-            <field name="arch" type="xml">
-            	<xpath expr="//page[@string='Invoice']/field[@name='invoice_line']/tree[@string='Invoice lines']/field[@name='quantity']" position='after'>
-            		<field name="origin_ids" attrs="{ 'readonly':[('no_origin', '=', True)]}"/>
-            		<field name="no_origin"/>
-            	</xpath>
-         	</field>
-         </record>
-         
-        <record id="view_account_invoice_filter_inherit" model="ir.ui.view">
-            <field name="name">account.invoice.select.inherit</field>
-            <field name="model">account.invoice</field>
-            <field name="inherit_id" ref="account.view_account_invoice_filter"/>
-            <field name="arch" type="xml">
-                 <field name="partner_id" position="after">
-                 	<field name="currency_id" />
-                 	<field name="date_invoice" />
-                 </field>
-                <xpath expr="//search/group/filter[@string='Partner']" position="after">
-                    <filter name="currency_id" string="Currency" domain="[]" context="{'group_by':'currency_id'}"/>
-                    <filter string="Day" domain="[ ]" context="{'group_by': 'date_invoice:day'}" />
-                </xpath>
-            </field>
-        </record>
-       
-        <record id="inherited_partner_view" model="ir.ui.view" >
-            <field name="name">inherited.partner.view</field>
-            <field name="model">res.partner</field>
-            <field name="inherit_id" ref="base.view_partner_form" />
-            <field name="arch" type="xml">
-            	<xpath expr="//field[@name='website']" position="after">
-            		<field name="cust_code" attrs="{ 'invisible':[('customer', '=', False)]}"/>
-            	</xpath>
-            </field>
-        </record>
+		<record id="invoice_form_inherited_new" model="ir.ui.view">
+			<field name="name">invoice.form.inherited.new</field>
+			<field name="model">account.invoice</field>
+			<field name="inherit_id" ref="account.invoice_form" />
+			<field name="arch" type="xml">
+				<xpath expr="//field[@name='partner_id']" position="after">
+					<field name="part_inv_id"
+						context="{'search_default_customer':1, 'show_address': 1,'default_type':'invoice'}"
+						options="{'always_reload': True}" />
+					<field name="part_ship_id"
+						context="{'search_default_customer':1, 'show_address': 1,'default_type':'delivery'}"
+						options="{'always_reload': True}" />
+				</xpath>
+				<xpath expr="//field[@name='fiscal_position']" position="after">
+					<field name="attn_inv"
+						domain="[('type','=','contact'),('parent_id','=',partner_id)]"
+						attrs="{'readonly': [('state','not in',('draft','sent'))]}" />
+				</xpath>
+				<xpath expr="//page[@string='Payments']" position="after">
+					<page string="Transport Details">
+						<group col="4">
+							<field name="ship_via_id" />
+							<field name="vehicle_name" />
+							<field name="container_name" />
+							<field name="container_place_area_code" />
+							<field name="cases_id" />
+							<field name="from_id" />
+							<field name="port_name_id" />
+							<field name="insurence_covered_id" />
+							<field name="vessale_name_id" />
+							<field name="bank" />
+							<field name="invoice_from_sale" invisible="1" />
+						</group>
+					</page>
+				</xpath>
+
+				<xpath
+					expr="//page[@string='Invoice Lines']/field[@name='invoice_line']/tree[@string='Invoice Lines']/field[@name='name']"
+					position='after'>
+					<field name="prod_desc" />
+				</xpath>
+
+				<xpath
+					expr="//page[@string='Invoice Lines']/field[@name='invoice_line']/tree[@string='Invoice Lines']/field[@name='product_id']"
+					position='attributes'>
+					<attribute name='string'>Item Name</attribute>
+				</xpath>
+
+				<xpath
+					expr="//page[@string='Invoice Lines']/field[@name='invoice_line']/tree[@string='Invoice Lines']/field[@name='quantity']"
+					position='after'>
+					<field name="origin_ids" widget="many2many_tags"
+						attrs="{ 'readonly':[('no_origin', '=', True)]}" />
+					<field name="no_origin" />
+				</xpath>
+
+				<field name="account_id" position='after'>
+					<field name="currency_rate" />
+				</field>
+
+				<xpath
+					expr="//page[@string='Invoice Lines']/field[@name='invoice_line']/tree[@string='Invoice Lines']/field[@name='price_unit']"
+					position='replace'>
+				</xpath>
+				<xpath
+					expr="//page[@string='Invoice Lines']/field[@name='invoice_line']/tree[@string='Invoice Lines']/field[@name='discount']"
+					position='after'>
+					<field name="price_unit" />
+				</xpath>
+
+				<xpath
+					expr="//page[@string='Invoice Lines']/field[@name='invoice_line']/tree[@string='Invoice Lines']/field[@name='price_subtotal']"
+					position='replace'>
+					<field name="invoice_line_tax_id" />
+				</xpath>
+
+				<xpath
+					expr="//page[@string='Invoice Lines']/field[@name='invoice_line']/tree[@string='Invoice Lines']/field[@name='invoice_line_tax_id']"
+					position='replace'>
+					<field name="price_subtotal" />
+				</xpath>
+
+				<group class="oe_subtotal_footer oe_right" position="replace">
+				</group>
+				<xpath expr="//page[@string='Invoice Lines']/field[@name='invoice_line']"
+					position="after">
+					<group col="3">
+						<group>
+							<field name="landed_cost" widget="many2many_tags" />
+						</group>
+						<group col="1">
+						</group>
+						<group class="oe_right">
+							<field name="amount_untaxed" widget="monetary"
+								options="{'currency_field': 'currency_id'}" />
+							<group>
+								<label for="amount_tax" />
+								<button name="button_reset_taxes" states="draft,proforma2"
+									string="(update)" class="oe_link oe_edit_only" type="object"
+									help="Recompute taxes and total" />
+							</group>
+							<field name="amount_tax" nolabel="1" widget="monetary"
+								options="{'currency_field': 'currency_id'}" />
+							<field name="landed_cost_price" attrs="{'readonly':[('state', '!=', 'draft')]}"
+								widget="monetary" options="{'currency_field': 'currency_id'}" />
+							<field name="amount_total" class="oe_subtotal_footer_separator"
+								widget="monetary" options="{'currency_field': 'currency_id'}" />
+							<field name="residual" groups="account.group_account_user"
+								widget="monetary" options="{'currency_field': 'currency_id'}" />
+							<field name="reconciled" invisible="1" />
+						</group>
+					</group>
+				</xpath>
+			</field>
+		</record>
+
+		<!-- Inherited Form View of Supplier Invoice Form -->
+		<record id="invoice_form_inherited" model="ir.ui.view">
+			<field name="name">invoice.form.inherited</field>
+			<field name="model">account.invoice</field>
+			<field name="inherit_id" ref="account.invoice_supplier_form" />
+			<field name="arch" type="xml">
+				<xpath
+					expr="//page[@string='Invoice']/field[@name='invoice_line']/tree[@string='Invoice lines']/field[@name='quantity']"
+					position='after'>
+					<field name="origin_ids" attrs="{ 'readonly':[('no_origin', '=', True)]}" />
+					<field name="no_origin" />
+				</xpath>
+			</field>
+		</record>
+
+		<record id="view_account_invoice_filter_inherit" model="ir.ui.view">
+			<field name="name">account.invoice.select.inherit</field>
+			<field name="model">account.invoice</field>
+			<field name="inherit_id" ref="account.view_account_invoice_filter" />
+			<field name="arch" type="xml">
+				<field name="partner_id" position="after">
+					<field name="currency_id" />
+					<field name="date_invoice" />
+				</field>
+				<xpath expr="//search/group/filter[@string='Partner']"
+					position="after">
+					<filter name="currency_id" string="Currency" domain="[]"
+						context="{'group_by':'currency_id'}" />
+					<filter string="Day" domain="[ ]"
+						context="{'group_by': 'date_invoice:day'}" />
+				</xpath>
+			</field>
+		</record>
+
+		<record id="inherited_partner_view" model="ir.ui.view">
+			<field name="name">inherited.partner.view</field>
+			<field name="model">res.partner</field>
+			<field name="inherit_id" ref="base.view_partner_form" />
+			<field name="arch" type="xml">
+				<xpath expr="//field[@name='website']" position="after">
+					<field name="cust_code" attrs="{ 'invisible':[('customer', '=', False)]}" />
+				</xpath>
+			</field>
+		</record>
 	</data>
 </openerp>

@@ -30,12 +30,6 @@ class purchase_order_line(models.Model):
     origin_ids = fields.Many2many('origin.origin',string='Origin')
     no_origin = fields.Boolean('No Origin')
 
-    landed_cost = fields.Selection([('shipping', 'Shipping Cost'),
-                                    ('courier', 'Courier Cost'),
-                                    ('charge', 'Charges')], default="shipping", string="Landed Cost")
-    price = fields.Float('Price')
-
-
     @api.multi
     def onchange_product_id(self,pricelist_id, product_id, qty, uom_id,
             partner_id, date_order=False, fiscal_position_id=False, date_planned=False,
@@ -72,8 +66,7 @@ class purchase_order(models.Model):
     amount_total = fields.Float(compute="_amount_all",
                                 store=True, string='Total')
     
-    total_cost_price = fields.Float(compute="_amount_all", store=True,
-                              string='Cost Price', help="The total Cost Price")
+    total_cost_price = fields.Float(string='Landed Cost Price', help="The total Landed Cost Price")
     
     currency_rate = fields.Float(related="currency_id.rate_silent", string='Currency rate')
 
@@ -86,7 +79,7 @@ class purchase_order(models.Model):
 
     attn_pur = fields.Many2one('res.partner','ATTN')
 
-
+    landed_cost_pur = fields.Many2many('landed.cost',string='Landed Cost')
     @api.multi
     def onchange_partner_id(self,partner_id):
         res = super(purchase_order,self).onchange_partner_id(partner_id)
@@ -97,7 +90,7 @@ class purchase_order(models.Model):
                              'partner_ship_id':res_shipping})
         return res
 
-    @api.depends('order_line')
+    @api.depends('order_line','total_cost_price')
     def _amount_all(self):
         line_obj = self.env['purchase.order.line']
         for order in self:
@@ -106,7 +99,6 @@ class purchase_order(models.Model):
             cur = order.pricelist_id.currency_id
             for line in order.order_line:
                 val1 += line.price_subtotal
-                val2 += line.price
                 line_price = line_obj._calc_line_base_price(line)
                 line_qty = line_obj._calc_line_quantity(line)
 
@@ -114,10 +106,9 @@ class purchase_order(models.Model):
                     for tax_t in line.taxes_id:
                         for tax in tax_t.compute_all(line.price_unit, line.product_qty).get('taxes', {}):
                             val += tax.get('amount', 0.0)
-            order.amount_tax = val
-            order.amount_untaxed = val1
-            order.total_cost_price = val2
-            order.amount_total = val + val1 + val2
+            order.amount_tax = cur.round(val)
+            order.amount_untaxed = cur.round(val1)
+            order.amount_total = cur.round(val) + cur.round(val1)+cur.round(order.total_cost_price)
         return True
     
     @api.v7
