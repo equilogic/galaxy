@@ -92,17 +92,18 @@
 			<t t-call="report.html_container">
 				<t t-call="galaxy_account.external_layout_galaxy_account_tax_invoice">
 					<div class="page" style="font-family:times new
-				roman;font-size:13px">
+				roman;font-size:12px">
 						<div class="oe_structure" />
 						<table width="100%">
 							<tr>
-								<td width="52%"  class="text-right">
+								<td width="60%"  class="text-right">
 									<span>GST REG NO. </span>
 									<t t-if="o.company_id.gst_no">
 										<span class="text-center" t-field="o.company_id.gst_no" />
 									</t>
 								</td>
-								<td width="15%" class="text-right">
+								<td width="10%"></td>
+								<td width="10%" class="text-right">
 									<span ><b>INVOICE NO :</b></span>
 								</td>
 								<td width="15%">
@@ -110,9 +111,10 @@
 								</td>
 							</tr>
 							<tr>
-								<td width="52%">
+								<td width="60%">
 									<span class="text-right"></span>
 								</td>
+								<td width="10%"></td>
 								<td width="15%" class="text-right">
 									<span ><b>DATE : </b></span>
 								</td>
@@ -144,6 +146,7 @@
 								</th>
 							</tr>
 						</table>
+						
 						<table width="100%">
 							<tr>
 								<td width="10%">
@@ -160,6 +163,7 @@
 								</td>
 							</tr>
 						</table>
+						<br/>
 						<table width="100%">
 							<tr>
 								<td width="50%">
@@ -192,14 +196,14 @@
 									<td class="text-left line" width="25%">
 										<t
 											t-if="o.partner_id.country_id.id == 199 and o.currency_id.id == 38">
-											<span t-field="line.prod_desc" />
+											<span style="text-transform:uppercase;" t-field="line.prod_desc" />
 										</t>
 										<t t-if="o.partner_id.country_id.id != 199">
-											<span t-field="line.name" />
+											<span style="text-transform:uppercase;" t-field="line.name" />
 										</t>
 									</td>
 									<td class="text-left line" width="15%">
-										<span t-esc="origin(line)" />
+										<span style="text-transform:uppercase;"  t-esc="origin(line)" />
 									</td>
 									<td class="text-right line" width="25%">
 										<span t-field="o.currency_id.name" /><span t-field="o.currency_id.symbol" /><span t-field="line.price_unit" />
