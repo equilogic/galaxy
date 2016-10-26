@@ -73,7 +73,7 @@ class account_invoice(models.Model):
     attn_inv = fields.Many2one('res.partner', 'ATTN')
 
     landed_cost = fields.Many2many('landed.cost',string='Landed Cost')
-    landed_cost_price = fields.Float('Landed Cost Price')
+    landed_cost_price = fields.Float('Landed Amount')
     @api.multi
     def onchange_partner_id(self, type, partner_id, date_invoice=False,
             payment_term=False, partner_bank_id=False, company_id=False):

@@ -1,118 +1,118 @@
 <openerp>
 	<data>
-         <!-- Inherited form view of Purchase Order -->
-         <record id="inherited_purchase_form_view" model="ir.ui.view">
-            <field name="name">inherited.purchase.form.view</field>
-            <field name="model">purchase.order</field>
-            <field name="inherit_id" ref="purchase.purchase_order_form"/>
-            <field name="arch" type="xml">
-            	<xpath expr="//field[@name='partner_id']" position='attributes'>
-            		<attribute name="context">{'search_default_customer':1, 'show_address': 1}</attribute>
+		<!-- Inherited form view of Purchase Order -->
+		<record id="inherited_purchase_form_view" model="ir.ui.view">
+			<field name="name">inherited.purchase.form.view</field>
+			<field name="model">purchase.order</field>
+			<field name="inherit_id" ref="purchase.purchase_order_form" />
+			<field name="arch" type="xml">
+				<xpath expr="//field[@name='partner_id']" position='attributes'>
+					<attribute name="context">{'search_default_customer':1,
+						'show_address': 1}</attribute>
 					<attribute name="options">{"always_reload": True}</attribute>
-            	</xpath>
-            	<xpath expr="//field[@name='partner_id']" position="after">
-            		<field name="partner_inv_id"
-            		 context="{'search_default_customer':1, 'show_address': 1,'default_type':'invoice'}"
-            		 options="{'always_reload': True}"/>
-            		<field name="partner_ship_id"
-            		context="{'search_default_customer':1, 'show_address': 1,'default_type':'delivery'}"
-            		 options="{'always_reload': True}"/>
-            	</xpath>
-            	
-            	<xpath expr="//field[@name='currency_id']" position="after">
-            		<field name="attn_pur" domain="[('type','=','contact'),('parent_id','=',partner_id)]"
-            		attrs="{'readonly': [('state','not in',('draft','sent'))]}" />
-            	</xpath>
-            	
-            	<xpath expr="//page[@string='Products']/field[@name='order_line']/tree[@string='Purchase Order Lines']/field[@name='name']" position='after'>
-            		<field name="origin_ids" widget="many2many_tags" attrs="{ 'readonly':[('no_origin', '=', True)]}" />
-            		<field name="no_origin"/>
-            	</xpath>
-            	
-            	<xpath expr="//page[@string='Products']/field[@name='order_line']/tree[@string='Purchase Order Lines']/field[@name='price_unit']" position='replace'>
-            	</xpath>
-            	
-            	<xpath expr="//page[@string='Products']/field[@name='order_line']/tree[@string='Purchase Order Lines']/field[@name='price_subtotal']" position='replace'>
-            	</xpath>
-            	
-            	<xpath expr="//page[@string='Products']/field[@name='order_line']/tree[@string='Purchase Order Lines']/field[@name='taxes_id']" position='before'> 
-            		<field name="price_unit"/>
-            		<field name="price_subtotal"/>
-            	</xpath>
-            	<xpath expr="//page[@string='Products']/field[@name='order_line']/tree[@string='Purchase Order Lines']" position='attributes'> 
-            		<attribute name="class">my_class</attribute>
-            	</xpath>
-            	<field name="currency_id" position="after">
-            		<field name="currency_rate"/>
-            	</field>
-            	
-            	<group class="oe_subtotal_footer oe_right" position="replace">
-            	</group>
-            	<xpath expr="//page[@string='Products']/field[@name='order_line']" position="after">
-            		<group col="3" >
-            			<group>
-            				<field name="landed_cost_pur" widget="many2many_tags"/>
-            			</group>
-            			<group col="1"></group>
-            			<group class="oe_right">
-            				<field name="amount_untaxed" widget="monetary" options="{'currency_field': 'currency_id'}"/>
-                            <field name="amount_tax" widget="monetary" options="{'currency_field': 'currency_id'}"/>
-                            <field name="total_cost_price" widget="monetary" 
-                            options="{'currency_field': 'currency_id'}" attrs="{ 'readonly':[('state', '!=', 'draft')]}"/>
-                            <group class="oe_subtotal_footer_separator oe_inline">
-                               <label for="amount_total"/>
-                               <button name="button_dummy"
-                                states="draft" string="(update)" type="object" class="oe_edit_only oe_link"/>
-                            </group>
-                            <field name="amount_total" nolabel="1" class="oe_subtotal_footer_separator" widget="monetary" options="{'currency_field': 'currency_id'}"/>
-            			</group>
-            		</group>
-            	</xpath>
-         	</field>
-         </record>
+				</xpath>
+				<xpath expr="//field[@name='partner_id']" position="after">
+					<field name="partner_inv_id"
+						context="{'search_default_customer':1, 'show_address': 1,'default_type':'invoice'}"
+						options="{'always_reload': True}" />
+					<field name="partner_ship_id"
+						context="{'search_default_customer':1, 'show_address': 1,'default_type':'delivery'}"
+						options="{'always_reload': True}" />
+				</xpath>
 
-        <record id="base.action_partner_supplier_form" model="ir.actions.act_window">
-            <field name="name">Suppliers</field>
-            <field name="type">ir.actions.act_window</field>
-            <field name="res_model">res.partner</field>
-            <field name="view_type">form</field>
-            <field name="domain">[]</field>
-            <field name="view_mode">tree,kanban,form</field>
-            <field name="context">{'search_default_supplier': 1,'default_customer': 0,'default_supplier': 1}</field>
-            <field name="filter" eval="True"/>
-            <field name="help" type="html">
-              <p class="oe_view_nocontent_create">
-                Click to add a contact in your address book.
-              </p><p>
-                Odoo helps you easily track all activities related to
-                a supplier: discussions, history of purchases,
-                documents, etc.
-              </p>
-            </field>
-        </record>
+				<xpath expr="//field[@name='currency_id']" position="after">
+					<field name="attn_pur"
+						domain="[('type','=','contact'),('parent_id','=',partner_id)]"
+						attrs="{'readonly': [('state','not in',('draft','sent'))]}" />
+					<field name="landed_cost_pur" widget="many2many_tags" />
+				</xpath>
 
-        <record id="base.action_partner_form_view1" model="ir.actions.act_window.view">
-            <field eval="3" name="sequence"/>
-            <field name="view_mode">kanban</field>
-            <field name="view_id" ref="base.res_partner_kanban_view"/>
-            <field name="act_window_id" ref="base.action_partner_form"/>
-        </record>
-         
-        <record id="view_request_for_quotation_filter_inherit" model="ir.ui.view">  
-            <field name="name">request.quotation.select.inherit</field>
-            <field name="model">purchase.order</field>
-            <field name="inherit_id" ref="purchase.view_purchase_order_filter"/>
-            <field name="arch" type="xml">
-                 <field name="partner_id" position="after">
-                 	<field name="currency_id" />
-                 	<field name="date_order" />
-                 </field>
-                <xpath expr="//search/group/filter[@string='Supplier']" position="after">
-                    <filter name="currency_id" string="Currency" domain="[]" context="{'group_by':'currency_id'}"/>
-                    <filter string="Day" domain="[ ]" context="{'group_by': 'date_order:day'}" />
-                </xpath>
-            </field>
-        </record>
-                 
+				<xpath
+					expr="//page[@string='Products']/field[@name='order_line']/tree[@string='Purchase Order Lines']/field[@name='name']"
+					position='after'>
+					<field name="origin_ids" widget="many2many_tags"
+						attrs="{ 'readonly':[('no_origin', '=', True)]}" />
+					<field name="no_origin" />
+				</xpath>
+
+				<xpath
+					expr="//page[@string='Products']/field[@name='order_line']/tree[@string='Purchase Order Lines']/field[@name='price_unit']"
+					position='replace'>
+				</xpath>
+
+				<xpath
+					expr="//page[@string='Products']/field[@name='order_line']/tree[@string='Purchase Order Lines']/field[@name='price_subtotal']"
+					position='replace'>
+				</xpath>
+
+				<xpath
+					expr="//page[@string='Products']/field[@name='order_line']/tree[@string='Purchase Order Lines']/field[@name='taxes_id']"
+					position='before'>
+					<field name="price_unit" />
+					<field name="price_subtotal" />
+				</xpath>
+				<xpath
+					expr="//page[@string='Products']/field[@name='order_line']/tree[@string='Purchase Order Lines']"
+					position='attributes'>
+					<attribute name="class">my_class</attribute>
+				</xpath>
+				<field name="currency_id" position="after">
+					<field name="currency_rate" />
+				</field>
+
+				<xpath expr="//field[@name='amount_untaxed']" position='after'>
+					<field name="total_cost_price" widget="monetary"
+					options="{'currency_field': 'currency_id'}" attrs="{ 'readonly':[('state', '!=', 'draft')]}" />
+				</xpath>
+			</field>
+		</record>
+
+		<record id="base.action_partner_supplier_form" model="ir.actions.act_window">
+			<field name="name">Suppliers</field>
+			<field name="type">ir.actions.act_window</field>
+			<field name="res_model">res.partner</field>
+			<field name="view_type">form</field>
+			<field name="domain">[]</field>
+			<field name="view_mode">tree,kanban,form</field>
+			<field name="context">{'search_default_supplier': 1,'default_customer':
+				0,'default_supplier': 1}</field>
+			<field name="filter" eval="True" />
+			<field name="help" type="html">
+				<p class="oe_view_nocontent_create">
+					Click to add a contact in your address book.
+				</p>
+				<p>
+					Odoo helps you easily track all activities related to
+					a supplier: discussions, history of purchases,
+					documents, etc.
+				</p>
+			</field>
+		</record>
+
+		<record id="base.action_partner_form_view1" model="ir.actions.act_window.view">
+			<field eval="3" name="sequence" />
+			<field name="view_mode">kanban</field>
+			<field name="view_id" ref="base.res_partner_kanban_view" />
+			<field name="act_window_id" ref="base.action_partner_form" />
+		</record>
+
+		<record id="view_request_for_quotation_filter_inherit" model="ir.ui.view">
+			<field name="name">request.quotation.select.inherit</field>
+			<field name="model">purchase.order</field>
+			<field name="inherit_id" ref="purchase.view_purchase_order_filter" />
+			<field name="arch" type="xml">
+				<field name="partner_id" position="after">
+					<field name="currency_id" />
+					<field name="date_order" />
+				</field>
+				<xpath expr="//search/group/filter[@string='Supplier']"
+					position="after">
+					<filter name="currency_id" string="Currency" domain="[]"
+						context="{'group_by':'currency_id'}" />
+					<filter string="Day" domain="[ ]" context="{'group_by': 'date_order:day'}" />
+				</xpath>
+			</field>
+		</record>
+
 	</data>
 </openerp>

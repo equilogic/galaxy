@@ -66,7 +66,7 @@ class purchase_order(models.Model):
     amount_total = fields.Float(compute="_amount_all",
                                 store=True, string='Total')
     
-    total_cost_price = fields.Float(string='Landed Cost Price', help="The total Landed Cost Price")
+    total_cost_price = fields.Float(string='Landed Amount', help="The total Landed Cost Price")
     
     currency_rate = fields.Float(related="currency_id.rate_silent", string='Currency rate')
 

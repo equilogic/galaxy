@@ -276,7 +276,7 @@
 										<td width="25%">
 										</td>
 										<td width="15%" >
-											<t t-if="o.partner_id.country_id.id == '199'">
+											<t t-if="o.partner_id.country_id == '199'">
 												<span>7% GST </span>
 												<span t-field="o.partner_id.country_id" />
 											</t>

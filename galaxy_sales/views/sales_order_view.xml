@@ -14,6 +14,12 @@
 						type="action" states="draft" groups="base.group_user" />
 				</xpath>
 				<xpath
+					expr="//page[@string='Order Lines']/field[@name='order_line']/form//field[@name='price_unit']"
+					position='after'>
+					<field name="origin_ids" widget="many2many_tags" />
+					<field name="no_origin" />
+				</xpath>
+				<xpath
 					expr="//page[@string='Order Lines']/field[@name='order_line']/tree[@string='Sales Order Lines']/field[@name='product_uom_qty']"
 					position='after'>
 					<field name="origin_ids" widget="many2many_tags" />
@@ -41,6 +47,7 @@
 					<field name="attn_sal"
 						domain="[('type','=','contact'),('parent_id','=',partner_id)]"
 						attrs="{'readonly': [('state','not in',('draft','sent'))]}" />
+					<field name="landed_cost_sal" widget="many2many_tags" />
 				</xpath>
 				<xpath
 					expr="//page[@string='Order Lines']/field[@name='order_line']/tree[@string='Sales Order Lines']/field[@name='price_unit']"
@@ -69,33 +76,9 @@
 					<field name="currency_rate" />
 				</field>
 
-				<group class="oe_subtotal_footer oe_right" position="replace">
-				</group>
-				<xpath expr="//page[@string='Order Lines']/field[@name='order_line']"
-					position="after">
-					<group col="3">
-						<group>
-							<field name="landed_cost_sal" widget="many2many_tags" />
-						</group>
-						<group col="1">
-						</group>
-						<group class="oe_right">
-							<field name="amount_untaxed" widget='monetary'
-								options="{'currency_field': 'currency_id'}" />
-							<field name="amount_tax" widget='monetary'
-								options="{'currency_field': 'currency_id'}" />
-							<field name="landed_cost_price" attrs="{'readonly':[('state', '!=', 'draft')]}"
-								widget="monetary" options="{'currency_field': 'currency_id'}" />
-							<group class="oe_subtotal_footer_separator oe_inline">
-								<label for="amount_total" />
-								<button name="button_dummy" states="draft,sent" string="(update)"
-									type="object" class="oe_edit_only oe_link" />
-							</group>
-							<field name="amount_total" nolabel="1"
-								class="oe_subtotal_footer_separator" widget='monetary'
-								options="{'currency_field': 'currency_id'}" />
-						</group>
-					</group>
+				<xpath expr="//field[@name='amount_untaxed']" position="after">
+					<field name="landed_cost_price" attrs="{'readonly':[('state', '!=', 'draft')]}"
+					widget="monetary" options="{'currency_field': 'currency_id'}" />
 				</xpath>
 
 			</field>

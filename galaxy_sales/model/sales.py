@@ -66,7 +66,7 @@ class sale_order(models.Model):
     active = fields.Boolean('Active', default=True, help="If the active field is set to False, it will allow you to hide the sale order without removing it.")
     attn_sal = fields.Many2one('res.partner', 'ATTN')
     landed_cost_sal = fields.Many2many('landed.cost', string="Landed Cost")
-    landed_cost_price = fields.Float('Landed Cost Price', help="landed cost price")
+    landed_cost_price = fields.Float('Landed Amount', help="landed cost price")
     
     amount_untaxed = fields.Float(compute="_amount_all", store=True,
                                   string='Untaxed Amount',
