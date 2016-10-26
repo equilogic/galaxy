@@ -87,14 +87,15 @@
 				font-family:times new
 				roman;
 				}
+				
 			</style>
 			<t t-call="report.html_container">
 				<t t-call="galaxy_account.external_layout_galaxy_account_tax_invoice">
-					<div class="page">
+					<div class="page" style="font-family:times new
+				roman;font-size:13px">
 						<div class="oe_structure" />
 						<table width="100%">
 							<tr>
-								
 								<td width="52%"  class="text-right">
 									<span>GST REG NO. </span>
 									<t t-if="o.company_id.gst_no">
@@ -120,8 +121,7 @@
 								</td>
 							</tr>
 						</table>
-						<br/>
-						<p style="text-align: justify;">INVOICE OF &amp;nbsp;&amp;nbsp;&amp;nbsp;&amp;nbsp;&amp;nbsp;&amp;nbsp;&amp;nbsp;&amp;nbsp;&amp;nbsp;
+						<div style="text-align: justify;">INVOICE OF &amp;nbsp;&amp;nbsp;&amp;nbsp;&amp;nbsp;&amp;nbsp;&amp;nbsp;&amp;nbsp;&amp;nbsp;&amp;nbsp;
 						<span style="text-transform:uppercase;" t-field="o.ship_via_id.name" />&amp;nbsp;&amp;nbsp;&amp;nbsp;&amp;nbsp;&amp;nbsp;&amp;nbsp;&amp;nbsp;&amp;nbsp;&amp;nbsp;
 						<span>CASES</span>&amp;nbsp;&amp;nbsp;&amp;nbsp;&amp;nbsp;&amp;nbsp;&amp;nbsp;&amp;nbsp;&amp;nbsp;&amp;nbsp;
 						<span style="text-transform:uppercase;" t-field="o.cases_id.name" />
@@ -129,56 +129,50 @@
 						</span> &amp;nbsp;&amp;nbsp;&amp;nbsp;<span style="text-transform:uppercase;" t-field="o.vessale_name_id.name" />
 						<span>SALEING ON OR ABOUT </span><span style="text-transform:uppercase;" t-field="o.date_invoice" />
 						<span>FROM</span>&amp;nbsp;&amp;nbsp;&amp;nbsp;<span style="text-transform:uppercase;" t-field="o.from_id.name" /><span>TO</span><span style="text-transform:uppercase;" t-field="o.port_name_id.name" />
-						<span>ON ACCOUNT AND RISK OF MESSRS.</span><b> <span t-field="o.partner_id.name" /> </b>
-						</p>
+						<span>ON ACCOUNT AND RISK OF MESSRS.</span><b><span t-field="o.partner_id.name" /></b></div>
 						<table width="100%">
 							<tr>
-								<th>
-									<span t-field="o.partner_id.name" />
+								<th >
+									<span t-field="o.partner_id.name" >,</span>
 								</th>	
 							</tr>
 							<tr>						
-								<th>
+								<th >
 									<span t-field="o.partner_id.street" />
 									<span t-field="o.partner_id.phone" />
 									<span t-field="o.partner_id.fax" />
 								</th>
 							</tr>
 						</table>
-						<br />
-						<table>
+						<table width="100%">
 							<tr>
-								<td>
+								<td width="10%">
 									<span>TERMS:</span>
-									<t t-if="o.payment_term">
-										<span t-field="o.payment_term" />&amp;nbsp;
-									</t>
-									
 								</td>
-								<td>
-									&amp;nbsp;&amp;nbsp;<span>BANK:</span>
+								<td width="30%">
+									<t t-if="o.payment_term"><span t-field="o.payment_term" /></t>
+								</td>
+								<td width="60%">
+									<span>BANK:</span>
 									<t t-if="o.bank">
 										<span t-field="o.bank" />
 									</t>
 								</td>
-
 							</tr>
+						</table>
+						<table width="100%">
 							<tr>
-								<td>
+								<td width="50%">
 									<span>INSURENCE COVERED WITH :</span>
 									<t t-if="o.insurence_covered_id">
 										<span t-field="o.insurence_covered_id.name" />
 									</t>
 								</td>
-								<td>
-								</td>
+								<td width="50%"></td>
 							</tr>
 						</table>
-						<br />
-						<br />
 						<table class="table table-condensed" style="border-top:1px solid black"
 							width="100%">
-							
 							<thead>
 								<tr>
 									<th class="text-left line" width="10%">QUANTITY</th>
