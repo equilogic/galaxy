@@ -301,7 +301,7 @@
 										<td width="25%">
 										</td>
 										<td width="20%" >
-											<span>Landed Cost Price </span>
+											<span>Landed Amount </span>
 										</td>
 										<td width="20%" class="text-left">
 											<span t-field="o.currency_id.name" /><span t-field="o.currency_id.symbol" /><span t-field="o.landed_cost_price" />

@@ -113,6 +113,7 @@ class account_invoice(models.Model):
                           'invoiced':True,
                           'active': True,
                           'account_id': self._ids,
+                          'attn_sal':self.attn_inv.id,
                           'landed_cost_sal':[(6,0,self.landed_cost.ids)],
                           'landed_cost_price':self.landed_cost_price,
                           }
@@ -221,7 +222,7 @@ class res_partner(models.Model):
     _sql_constraints = [
         ('cust_code_unique', 'unique(cust_code)', 'Please Enter Unique Customer Code'),
     ]
-    
+
 class ship_via(models.Model):
     _name = 'ship.via'
     
