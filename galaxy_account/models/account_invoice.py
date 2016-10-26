@@ -73,7 +73,7 @@ class account_invoice(models.Model):
     attn_inv = fields.Many2one('res.partner', 'ATTN')
 
     landed_cost = fields.Many2many('landed.cost',string='Landed Cost')
-    landed_cost_price = fields.Float('Landed Amount')
+    landed_cost_price = fields.Float(compute='_compute_amount',store=True,string='Landed Amount')
     @api.multi
     def onchange_partner_id(self, type, partner_id, date_invoice=False,
             payment_term=False, partner_bank_id=False, company_id=False):
@@ -90,11 +90,16 @@ class account_invoice(models.Model):
         return res
     
     @api.one
-    @api.depends('invoice_line.price_subtotal', 'tax_line.amount','landed_cost_price')
+    @api.depends('invoice_line.price_subtotal', 'tax_line.amount','landed_cost')
     def _compute_amount(self):
-        self.amount_untaxed = sum(line.price_subtotal for line in self.invoice_line)
-        self.amount_tax = sum(line.amount for line in self.tax_line)
+        val=0.0
+        for cost in self.landed_cost:
+            val += cost.amount
+        self.landed_cost_price = self.currency_id.round(val)
+        self.amount_untaxed = self.currency_id.round(sum(line.price_subtotal for line in self.invoice_line))
+        self.amount_tax = self.currency_id.round(sum(line.amount for line in self.tax_line))
         self.amount_total = self.amount_untaxed + self.amount_tax+self.landed_cost_price
+        
 
     @api.multi
     def prepare_sale_order_line(self):

@@ -66,7 +66,7 @@ class purchase_order(models.Model):
     amount_total = fields.Float(compute="_amount_all",
                                 store=True, string='Total')
     
-    total_cost_price = fields.Float(string='Landed Amount', help="The total Landed Cost Price")
+    total_cost_price = fields.Float(compute="_amount_all",string='Landed Amount', help="The total Landed Cost Price")
     
     currency_rate = fields.Float(related="currency_id.rate_silent", string='Currency rate')
 
@@ -90,12 +90,12 @@ class purchase_order(models.Model):
                              'partner_ship_id':res_shipping})
         return res
 
-    @api.depends('order_line','total_cost_price')
+    @api.depends('order_line','landed_cost_pur')
     def _amount_all(self):
         line_obj = self.env['purchase.order.line']
         for order in self:
-            val = val1 = 0.0
-            val2 = 0.0
+            val = val1 =val2= 0.0
+            val3 = 0.0
             cur = order.pricelist_id.currency_id
             for line in order.order_line:
                 val1 += line.price_subtotal
@@ -106,9 +106,12 @@ class purchase_order(models.Model):
                     for tax_t in line.taxes_id:
                         for tax in tax_t.compute_all(line.price_unit, line.product_qty).get('taxes', {}):
                             val += tax.get('amount', 0.0)
+            for landed_cost in order.landed_cost_pur:
+                val3+=landed_cost.amount
             order.amount_tax = cur.round(val)
             order.amount_untaxed = cur.round(val1)
-            order.amount_total = cur.round(val) + cur.round(val1)+cur.round(order.total_cost_price)
+            order.total_cost_price = cur.round(val3)
+            order.amount_total = cur.round(val) + cur.round(val1)+cur.round(val3)
         return True
     
     @api.v7

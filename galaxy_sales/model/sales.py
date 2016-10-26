@@ -66,7 +66,7 @@ class sale_order(models.Model):
     active = fields.Boolean('Active', default=True, help="If the active field is set to False, it will allow you to hide the sale order without removing it.")
     attn_sal = fields.Many2one('res.partner', 'ATTN')
     landed_cost_sal = fields.Many2many('landed.cost', string="Landed Cost")
-    landed_cost_price = fields.Float('Landed Amount', help="landed cost price")
+    landed_cost_price = fields.Float(compute='_amount_all', string='Landed Amount', help="landed cost price", store=True)
     
     amount_untaxed = fields.Float(compute="_amount_all", store=True,
                                   string='Untaxed Amount',
@@ -78,18 +78,21 @@ class sale_order(models.Model):
                                 store=True, string='Total')
     
     @api.multi
-    @api.depends('order_line', 'landed_cost_price')
+    @api.depends('order_line', 'landed_cost_sal')
     def _amount_all(self):
         cur_obj = self.env['res.currency']
         for order in self:
-            val = val1 = 0.0
+            val = val1 = val2 = 0.0
             cur = self.pricelist_id.currency_id
             for line in order.order_line:
                 val1 += line.price_subtotal
                 val += self._amount_line_tax(line)
+            for cost in order.landed_cost_sal:
+                val2 += cost.amount 
             order.amount_tax = cur.round(val)
             order.amount_untaxed = cur.round(val1)
-            order.amount_total = cur.round(val) + cur.round(val1) + cur.round(order.landed_cost_price)
+            order.landed_cost_price = cur.round(val2)
+            order.amount_total = cur.round(val) + cur.round(val1) + cur.round(val2)
 
     @api.model
     def create(self, vals):

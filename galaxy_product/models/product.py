@@ -173,5 +173,6 @@ class landed_cost(models.Model):
     _name='landed.cost'
     
     name = fields.Char('Name')
+    amount = fields.Float('Amount')
 
 # vim:expandtab:smartindent:tabstop=4:softtabstop=4:shiftwidth=4:

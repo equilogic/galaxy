@@ -18,7 +18,6 @@
 					<field name="attn_inv"
 						domain="[('type','=','contact'),('parent_id','=',partner_id)]"
 						attrs="{'readonly': [('state','not in',('draft','sent'))]}" />
-					<field name="landed_cost" widget="many2many_tags" />
 				</xpath>
 				<xpath expr="//page[@string='Payments']" position="after">
 					<page string="Transport Details">
@@ -35,6 +34,14 @@
 							<field name="bank" />
 							<field name="invoice_from_sale" invisible="1" />
 						</group>
+					</page>
+					<page string="Landed Cost Details">
+						<field name="landed_cost">
+							<tree editable="bottom">
+								<field name="name"/>
+								<field name="amount"/>
+							</tree>
+						</field>
 					</page>
 				</xpath>
 
@@ -85,7 +92,7 @@
 				</xpath>
 
 				<xpath expr="//field[@name='amount_untaxed']" position="after">
-					<field name="landed_cost_price" attrs="{'readonly':[('state', '!=', 'draft')]}"
+					<field name="landed_cost_price" readonly="1"
 					widget="monetary" options="{'currency_field': 'currency_id'}" />
 				</xpath>
 			</field>
