@@ -104,11 +104,54 @@
 			<field name="model">account.invoice</field>
 			<field name="inherit_id" ref="account.invoice_supplier_form" />
 			<field name="arch" type="xml">
+				<xpath expr="//field[@name='partner_id']" position="after">
+					<field name="part_inv_id"
+						context="{'search_default_customer':1, 'show_address': 1,'default_type':'invoice'}"
+						options="{'always_reload': True}" />
+					<field name="part_ship_id"
+						context="{'search_default_customer':1, 'show_address': 1,'default_type':'delivery'}"
+						options="{'always_reload': True}" />
+				</xpath>
+				<xpath expr="//field[@name='fiscal_position']" position="after">
+					<field name="attn_inv"
+						domain="[('type','=','contact'),('parent_id','=',partner_id)]"
+						attrs="{'readonly': [('state','not in',('draft','sent'))]}" />
+				</xpath>
 				<xpath
 					expr="//page[@string='Invoice']/field[@name='invoice_line']/tree[@string='Invoice lines']/field[@name='quantity']"
 					position='after'>
-					<field name="origin_ids" attrs="{ 'readonly':[('no_origin', '=', True)]}" />
+					<field name="origin_ids" widget="many2many_tags"
+						attrs="{ 'readonly':[('no_origin', '=', True)]}" />
 					<field name="no_origin" />
+				</xpath>
+				<xpath expr="//page[@string='Payments']" position="after">
+					<page string="Transport Details">
+						<group col="4">
+							<field name="ship_via_id" />
+							<field name="vehicle_name" />
+							<field name="container_name" />
+							<field name="container_place_area_code" />
+							<field name="cases_id" />
+							<field name="from_id" />
+							<field name="port_name_id" />
+							<field name="insurence_covered_id" />
+							<field name="vessale_name_id" />
+							<field name="bank" />
+							<field name="invoice_from_sale" invisible="1" />
+						</group>
+					</page>
+					<page string="Landed Cost Details">
+						<field name="landed_cost">
+							<tree editable="bottom">
+								<field name="name"/>
+								<field name="amount"/>
+							</tree>
+						</field>
+					</page>
+				</xpath>
+				<xpath expr="//field[@name='amount_untaxed']" position="after">
+					<field name="landed_cost_price" readonly="1"
+					widget="monetary" options="{'currency_field': 'currency_id'}" />
 				</xpath>
 			</field>
 		</record>
