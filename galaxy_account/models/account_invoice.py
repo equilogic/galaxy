@@ -113,6 +113,8 @@ class account_invoice(models.Model):
                           'invoiced':True,
                           'active': True,
                           'account_id': self._ids,
+                          'landed_cost_sal':[(6,0,self.landed_cost.ids)],
+                          'landed_cost_price':self.landed_cost_price,
                           }
             res = so_obj.create(order_vals)
             for line in self.invoice_line:

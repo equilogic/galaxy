@@ -138,6 +138,8 @@ class sale_order(models.Model):
         res.update({'invoice_from_sale':True,
                     'part_inv_id':order.partner_invoice_id.id,
                     'part_ship_id':order.partner_shipping_id.id,
+                    'landed_cost':[(6, 0, order.landed_cost_sal.ids)],
+                    'landed_cost_price':order.landed_cost_price,
                     })
         return res
 
@@ -153,6 +155,8 @@ class sale_advance_payment_inv(osv.osv_memory):
             val[1].update({'invoice_from_sale':True,
                            'part_inv_id':sale.partner_invoice_id.id,
                            'part_ship_id':sale.partner_shipping_id.id,
+                           'landed_cost':[(6, 0, sale.landed_cost_sal.ids)],
+                           'landed_cost_price':sale.landed_cost_price,
                            })
         return res
 
