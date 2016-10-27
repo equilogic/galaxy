@@ -37,10 +37,14 @@ class report_print_tax_invoice(report_sxw.rml_parse):
         })
 
     def _get_cost(self,landed_cost):
-        str=''
+        lines=[]
         for cost in landed_cost:
-            str += cost.name + ','
-        return str
+            vals={
+                  'name':cost.name,
+                  'amount':cost.amount,
+                  }
+            lines.append(vals)
+        return lines
     
     def _amount_to_text(self, amount,currency):
         # Currency complete name is not available in res.currency model

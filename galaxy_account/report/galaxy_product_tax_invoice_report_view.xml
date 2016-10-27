@@ -96,14 +96,14 @@
 						<div class="oe_structure" />
 						<table width="100%">
 							<tr>
-								<td width="60%"  class="text-right">
+								<td width="61%"  class="text-right">
 									<span>GST REG NO. </span>
 									<t t-if="o.company_id.gst_no">
 										<span class="text-center" t-field="o.company_id.gst_no" />
 									</t>
 								</td>
-								<td width="10%"></td>
-								<td width="10%" class="text-right">
+								<td width="9%"></td>
+								<td width="15%" class="text-right">
 									<span ><b>INVOICE NO :</b></span>
 								</td>
 								<td width="15%">
@@ -111,10 +111,10 @@
 								</td>
 							</tr>
 							<tr>
-								<td width="60%">
+								<td width="61%">
 									<span class="text-right"></span>
 								</td>
-								<td width="10%"></td>
+								<td width="9%"></td>
 								<td width="15%" class="text-right">
 									<span ><b>DATE : </b></span>
 								</td>
@@ -219,6 +219,10 @@
 										<div>
 											<span>======================================</span>
 											<div>TERMS : <span t-field="o.payment_term" /></div>
+											<div>Landed Cost : </div>
+											<div  t-foreach="get_cost(o.landed_cost)" t-as="cost">
+												<span t-esc="cost['name']"/>&amp;nbsp;&amp;nbsp;:&amp;nbsp;&amp;nbsp;<span t-esc="cost['amount']"/>
+											</div>
 											<div>LESS CREDIT NO :</div>
 											<span>=======================================</span>
 										</div>
@@ -288,10 +292,6 @@
 									</tr>
 									<tr>
 										<td width="25%">
-											Landed Cost:
-											<t t-if="o.landed_cost">
-												<span t-esc="get_cost(o.landed_cost)"/>
-											</t>
 										</td>
 										<td width="15%">
 											
@@ -305,7 +305,6 @@
 											<span t-field="o.currency_id.name" /><span t-field="o.currency_id.symbol" /><span t-field="o.landed_cost_price" />
 										</td>
 									</tr>
-																		
 									</table>
 								<table>
 									<tr>
