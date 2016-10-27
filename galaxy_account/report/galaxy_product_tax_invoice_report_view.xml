@@ -212,10 +212,10 @@
 								</tr>
 								</tbody>
 							</table>
-							<table>
+							<table width="100%">
 								<tr>
-									<td></td>
-									<td>
+									<td width="10%"></td>
+									<td width="90%">
 										<div>
 											<span>======================================</span>
 											<t t-if="o.payment_term">
