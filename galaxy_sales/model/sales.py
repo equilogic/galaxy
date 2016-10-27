@@ -97,7 +97,7 @@ class sale_order(models.Model):
     @api.model
     def create(self, vals):
         if vals.get('name', '/') == '/':
-            vals['name'] = self.env['ir.sequence'].get('sale.order') or '/'
+            vals['name'] = self.env['ir.sequence'].get('sale_order_new') or '/'
         res = super(sale_order, self).create(vals)
         
         return res

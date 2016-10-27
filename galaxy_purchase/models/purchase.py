@@ -119,8 +119,29 @@ class purchase_order(models.Model):
         res = super(purchase_order,self)._prepare_inv_line(cr, uid, account_id, order_line, context=context)
         res.update({'origin_ids':order_line.origin_ids.id,'no_origin':order_line.no_origin})
         return res
+    @api.v7
+    def _prepare_invoice(self, cr, uid, order, line_ids, context=None):
+        """Prepare the dict of values to create the new invoice for a
+           purchase order. This method may be overridden to implement custom
+           invoice generation (making sure to call super() to establish
+           a clean extension chain).
 
-
+           :param browse_record order: purchase.order record to invoice
+           :param list(int) line_ids: list of invoice line IDs that must be
+                                      attached to the invoice
+           :return: dict of value to create() the invoice
+        """
+        
+        res = super(purchase_order,self)._prepare_invoice(cr, uid, order, line_ids, context=context)
+        res.update({
+                    'part_inv_id': order.partner_inv_id.id,
+                    'part_ship_id':order.partner_ship_id.id,
+                    'attn_inv':order.attn_pur.id,
+                    'landed_cost':[(6,0,order.landed_cost_pur.ids)],
+                    'landed_cost_price':order.total_cost_price,
+                    
+                    })
+        return res
 
 
 

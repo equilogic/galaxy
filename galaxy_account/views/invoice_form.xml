@@ -104,12 +104,16 @@
 			<field name="model">account.invoice</field>
 			<field name="inherit_id" ref="account.invoice_supplier_form" />
 			<field name="arch" type="xml">
+				<xpath expr="//field[@name='partner_id']" position="attributes">
+					<attribute name="context">{'search_default_supplier':1, 'show_address': 1,'default_type':'invoice'}</attribute>
+					<attribute name="options">{'always_reload': True}</attribute>
+				</xpath>
 				<xpath expr="//field[@name='partner_id']" position="after">
 					<field name="part_inv_id"
-						context="{'search_default_customer':1, 'show_address': 1,'default_type':'invoice'}"
+						context="{'search_default_supplier':1, 'show_address': 1,'default_type':'invoice'}"
 						options="{'always_reload': True}" />
 					<field name="part_ship_id"
-						context="{'search_default_customer':1, 'show_address': 1,'default_type':'delivery'}"
+						context="{'search_default_supplier':1, 'show_address': 1,'default_type':'delivery'}"
 						options="{'always_reload': True}" />
 				</xpath>
 				<xpath expr="//field[@name='fiscal_position']" position="after">
