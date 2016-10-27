@@ -218,10 +218,11 @@
 										<t t-if="o.payment_term">
 										<div>
 											<span>======================================</span>
-											<div>TERMS : <span t-field="o.payment_term" /></div>
-											<div>Landed Cost : </div>
-											<div  t-foreach="get_cost(o.landed_cost)" t-as="cost">
-												<span t-esc="cost['name']"/>&amp;nbsp;&amp;nbsp;:&amp;nbsp;&amp;nbsp;<span t-esc="cost['amount']"/>
+											<div>TERMS : <span style="text-transform:uppercase;" t-field="o.payment_term" /></div>
+											<div>LANDED COST : 
+												<div  t-foreach="get_cost(o.landed_cost)" t-as="cost">
+													<span style="text-transform:uppercase;" t-esc="cost['name']"/>&amp;nbsp;&amp;nbsp;:&amp;nbsp;&amp;nbsp;<span t-esc="cost['amount']"/>
+												</div>
 											</div>
 											<div>LESS CREDIT NO :</div>
 											<span>=======================================</span>
