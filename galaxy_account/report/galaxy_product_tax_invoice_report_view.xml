@@ -46,7 +46,7 @@
 							<span t-field="o.company_id.company_registry" />
 						</div>
 						<div>
-							<h3>TAX INVOICE</h3>
+							<h3><b>TAX INVOICE</b></h3>
 						</div>
 					</div>
 				</div>
@@ -75,7 +75,6 @@
 							</center>
 						</td>
 					</tr>
-					
 				</table>
 			</div>
 		</template>
@@ -106,7 +105,7 @@
 								<td width="15%" class="text-right">
 									<span ><b>INVOICE NO :</b></span>
 								</td>
-								<td width="15%">
+								<td width="15%">&amp;nbsp;&amp;nbsp;
 										<b><span t-field="o.number" /></b>
 								</td>
 							</tr>
@@ -118,7 +117,7 @@
 								<td width="15%" class="text-right">
 									<span ><b>DATE : </b></span>
 								</td>
-								<td width="15%">
+								<td width="15%">&amp;nbsp;&amp;nbsp;
 									<b><span t-field="o.date_invoice" t-field-options='{"format": "dd-MM-Y"}' /></b>
 								</td>
 							</tr>
@@ -126,12 +125,12 @@
 						<div style="text-align: justify;">INVOICE OF &amp;nbsp;&amp;nbsp;&amp;nbsp;&amp;nbsp;&amp;nbsp;&amp;nbsp;&amp;nbsp;&amp;nbsp;&amp;nbsp;
 						<span style="text-transform:uppercase;" t-field="o.ship_via_id.name" />&amp;nbsp;&amp;nbsp;&amp;nbsp;&amp;nbsp;&amp;nbsp;&amp;nbsp;&amp;nbsp;&amp;nbsp;&amp;nbsp;
 						<span>CASES</span>&amp;nbsp;&amp;nbsp;&amp;nbsp;&amp;nbsp;&amp;nbsp;&amp;nbsp;&amp;nbsp;&amp;nbsp;&amp;nbsp;
-						<span style="text-transform:uppercase;" t-field="o.cases_id.name" />
+						<span style="text-transform:uppercase;" t-field="o.cases_id.name" />&amp;nbsp;&amp;nbsp;&amp;nbsp;
 						<span> SHIPPED IN GOOD ORDER AND CONDITION BY GALAXY ENTERPRISE PTE PER 
 						</span> &amp;nbsp;&amp;nbsp;&amp;nbsp;<span style="text-transform:uppercase;" t-field="o.vessale_name_id.name" />
 						<span>SALEING ON OR ABOUT </span><span style="text-transform:uppercase;" t-field="o.date_invoice" />
-						<span>FROM</span>&amp;nbsp;&amp;nbsp;&amp;nbsp;<span style="text-transform:uppercase;" t-field="o.from_id.name" /><span>TO</span><span style="text-transform:uppercase;" t-field="o.port_name_id.name" />
-						<span>ON ACCOUNT AND RISK OF MESSRS.</span><b><span t-field="o.partner_id.name" /></b></div>
+						<span>FROM</span>&amp;nbsp;&amp;nbsp;&amp;nbsp;<span style="text-transform:uppercase;" t-field="o.from_id.name" />&amp;nbsp;&amp;nbsp;<span>TO</span>&amp;nbsp;&amp;nbsp;<span style="text-transform:uppercase;" t-field="o.port_name_id.name" />
+						<span>ON ACCOUNT AND RISK OF MESSRS.</span>&amp;nbsp;<b><span t-field="o.partner_id.name" /></b></div>
 						<table width="100%">
 							<tr>
 								<th >
@@ -141,8 +140,21 @@
 							<tr>						
 								<th >
 									<span t-field="o.partner_id.street" />
-									<span t-field="o.partner_id.phone" />
-									<span t-field="o.partner_id.fax" />
+									<t t-if="o.partner_id.street2">
+										,<span t-field="o.partner_id.street2" />
+									</t>
+									<t t-if="o.partner_id.city">
+										,<span t-field="o.partner_id.city" />
+									</t>
+									<t t-if="o.partner_id.state_id">
+										,<span t-field="o.partner_id.state_id" />
+									</t>
+									<t t-if="o.partner_id.zip">
+										-<span t-field="o.partner_id.zip" />
+									</t>
+									<t t-if="o.partner_id.country_id">
+										<span t-field="o.partner_id.country_id" />
+									</t>
 								</th>
 							</tr>
 						</table>
@@ -180,7 +192,8 @@
 							<thead>
 								<tr>
 									<th class="text-left line" width="10%">QUANTITY</th>
-									<th class="text-center line" width="25%">DESCRIPTION</th>
+									<th width="5%"></th>
+									<th class="text-center line" width="20%">DESCRIPTION</th>
 									<th class="text left line" width="15%">ORIGIN</th>
 									<th class="text-right line" width="25%">U.PRICE</th>
 									<th class="text-right line" width="25%">AMOUNT</th>
@@ -189,7 +202,12 @@
 							<tbody>
 								<tr t-foreach="o.invoice_line" t-as="line">
 									<td class="text-left" width="10%"> 
-										<span t-esc="get_qty(line.quantity)" />&amp;nbsp;&amp;nbsp;&amp;nbsp;&amp;nbsp;&amp;nbsp;pc
+										<span t-esc="get_qty(line.quantity)" />
+									</td>
+									<td width="5%">
+										<t t-if="get_qty(line.quantity)">
+											pc
+										</t>
 									</td>
 									<td class="text-left line" width="25%">
 										<t
@@ -215,9 +233,10 @@
 							<table width="100%" style="page-break-inside: avoid; ">
 								<tr>
 									<td width="10%"></td>
-									<td width="90%">
+									<td width="5%"></td>
+									<td width="20%">
 										<div>
-											<span>======================================</span>
+											<span>=============================</span>
 											<t t-if="o.payment_term">
 												<div>TERMS : <span style="text-transform:uppercase;" t-field="o.payment_term" /></div>
 											</t>
@@ -228,39 +247,39 @@
 												</div>
 											</div></t>
 											<div>LESS CREDIT NO :</div>
-											<span>=======================================</span>
+											<span>=============================</span>
 										</div>
 										
 									</td>
-									<td></td>
-									<td></td>
-									<td></td>
-
+									<td width="15%"></td>
+									<td width="25%"></td>
+									<td width="25%"></td>
 								</tr>
 							</table>
 						<br/><br/><br/><br/><br/>
-						<div class="row"> 
-							<div style="position:absolute;bottom:xxpx;page-break-inside: avoid; ">
+						<div class="row" style="page-break-inside: avoid;"> 
+							<div style="position:absolute;bottom:xxpx;page-break-inside: avoid;">
 								<table style="border-top:1px solid;"
 									width="100%">
+									<br/>
 									<tr>
-										<td width="30%">SUB-TOTAL :
+										<td width="30%">SUB-TOTAL : &amp;nbsp;
 										 	<span class="text-left" t-field="o.currency_id.name" />
 											<span class="text-left" t-field="o.currency_id.symbol" />
 											<span class="text-left" t-field="o.amount_untaxed" />
 										</td>
 										<td width="15%">
-											RATE: <span t-field="o.currency_rate" />
+											RATE = &amp;nbsp; <span t-field="o.currency_rate" />
 										</td >
 										<td width="25%" style="padding:5px">
 											<t t-if="o.partner_id.country_id.id == '199'">
-												<span>7%GST= </span>
+												<span>7%GST = </span>&amp;nbsp; 
 												<span t-field="o.currency_id.name" />
 												<span t-field="o.currency_id.symbol" />
 												<span>0.00</span>												
 											</t>
 											<t t-if="o.partner_id.country_id.id != '199'">
-												<span>0%GST= </span>
+												<span>0%GST = </span>&amp;nbsp; 
 												<span t-field="o.currency_id.name" />
 												<span t-field="o.currency_id.symbol" />
 												<span>0.0</span>													
@@ -308,30 +327,40 @@
 											<span t-field="o.currency_id.name" /><span t-field="o.currency_id.symbol" /><span t-field="o.landed_cost_price" />
 										</td>
 									</tr>
+									<br/>
 									</table>
 								<table>
 									<tr>
 										<td width="20%"><b>AMOUNT IN WORDS:</b></td>
-										<td width="80%">
+										<td width="50%">
 											<span t-esc="amount_to_text(o.amount_total,o.currency_id) or ''" />
 										</td>
+										<td width="30%"></td>
 									</tr>
 								</table>
 								<table style="border-bottom:1px solid ;" width="100%">
 									<tr>
 										<td width="70%"></td>
 										<td width="20%" class="text-left" >
-											TOTAL 
+											<b>TOTAL</b> 
 										</td>
 										<td width="10%" class="text-left">
 											<b><span t-field="o.currency_id.name" /><span t-field="o.currency_id.symbol" /><span t-field="o.amount_total" /></b>
 										</td>
 									</tr>
+									<tr>
+										<td width="70%" style="color:white">11</td>
+										<td width="20%" style="color:white" >11
+										</td>
+										<td width="10%" style="color:white">11
+										</td>
+									</tr>
 								</table>
+								<br/>
 								<div class="text-right">
-									<span class="text-right">GALAXY ENTERPRISE PTE LTD </span>
-								</div>
-								<br/><br/>
+									<span class="text-right"><b>GALAXY ENTERPRISE PTE LTD</b> </span>
+								</div >
+								<br/><br/><br/><br/>
 								<div >
 									<table width="100%" >
 										<tr >
