@@ -68,7 +68,7 @@
 					position='after'>
 					<field name="price_unit" />
 					<field name="price_subtotal" />
-					<field name="tax_id" />
+					<field name="tax_id" widget="many2many_tags" domain="[('parent_id','=',False),('type_tax_use','&lt;&gt;','purchase')]"/>
 				</xpath>
 
 				<field name="pricelist_id" position="after">

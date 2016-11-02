@@ -83,7 +83,7 @@ class sale_order(models.Model):
         cur_obj = self.env['res.currency']
         for order in self:
             val = val1 = val2 = 0.0
-            cur = self.pricelist_id.currency_id
+            cur = order.pricelist_id.currency_id
             for line in order.order_line:
                 val1 += line.price_subtotal
                 val += self._amount_line_tax(line)

@@ -38,8 +38,8 @@
 					<page string="Landed Cost Details">
 						<field name="landed_cost">
 							<tree editable="bottom">
-								<field name="name"/>
-								<field name="amount"/>
+								<field name="name" />
+								<field name="amount" />
 							</tree>
 						</field>
 					</page>
@@ -82,7 +82,9 @@
 				<xpath
 					expr="//page[@string='Invoice Lines']/field[@name='invoice_line']/tree[@string='Invoice Lines']/field[@name='price_subtotal']"
 					position='replace'>
-					<field name="invoice_line_tax_id" />
+					<field name="invoice_line_tax_id" widget="many2many_tags"
+						context="{'type':parent.type}"
+						domain="[('parent_id','=',False),('company_id', '=', parent.company_id)]" />
 				</xpath>
 
 				<xpath
@@ -92,8 +94,8 @@
 				</xpath>
 
 				<xpath expr="//field[@name='amount_untaxed']" position="after">
-					<field name="landed_cost_price" readonly="1"
-					widget="monetary" options="{'currency_field': 'currency_id'}" />
+					<field name="landed_cost_price" readonly="1" widget="monetary"
+						options="{'currency_field': 'currency_id'}" />
 				</xpath>
 			</field>
 		</record>
@@ -105,7 +107,8 @@
 			<field name="inherit_id" ref="account.invoice_supplier_form" />
 			<field name="arch" type="xml">
 				<xpath expr="//field[@name='partner_id']" position="attributes">
-					<attribute name="context">{'search_default_supplier':1, 'show_address': 1,'default_type':'invoice'}</attribute>
+					<attribute name="context">{'search_default_supplier':1,
+						'show_address': 1,'default_type':'invoice'}</attribute>
 					<attribute name="options">{'always_reload': True}</attribute>
 				</xpath>
 				<xpath expr="//field[@name='partner_id']" position="after">
@@ -147,15 +150,15 @@
 					<page string="Landed Cost Details">
 						<field name="landed_cost">
 							<tree editable="bottom">
-								<field name="name"/>
-								<field name="amount"/>
+								<field name="name" />
+								<field name="amount" />
 							</tree>
 						</field>
 					</page>
 				</xpath>
 				<xpath expr="//field[@name='amount_untaxed']" position="after">
-					<field name="landed_cost_price" readonly="1"
-					widget="monetary" options="{'currency_field': 'currency_id'}" />
+					<field name="landed_cost_price" readonly="1" widget="monetary"
+						options="{'currency_field': 'currency_id'}" />
 				</xpath>
 			</field>
 		</record>

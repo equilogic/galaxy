@@ -42,7 +42,7 @@
 							<span t-field="o.company_id.fax" />
 						</div>
 						<div>
-							<span>CO. REG. NO. </span>
+							<span>Company Reg No. </span>
 							<span t-field="o.company_id.company_registry" />
 						</div>
 						<div>
@@ -97,7 +97,7 @@
 						<table width="100%">
 							<tr>
 								<td width="61%"  class="text-right">
-									<span>GST REG NO. </span>
+									<span>GST Reg No : </span>
 									<t t-if="o.company_id.gst_no">
 										<span class="text-center" t-field="o.company_id.gst_no" />
 									</t>
@@ -167,9 +167,9 @@
 						<table width="100%">
 							<tr>
 								<td width="50%">
-									<span>INSURENCE COVERED WITH :</span>
+									<span>INSURENCE COVERED WITH /</span>
 									<t t-if="o.insurence_covered_id">
-										<span t-field="o.insurence_covered_id.name" />
+										 &amp;nbsp; &amp;nbsp; &amp;nbsp; &amp;nbsp; &amp;nbsp;<span t-field="o.insurence_covered_id.name" />
 									</t>
 								</td>
 								<td width="50%"></td>
@@ -189,7 +189,7 @@
 							<tbody>
 								<tr t-foreach="o.invoice_line" t-as="line">
 									<td class="text-left" width="10%"> 
-										<span t-esc="get_qty(line.quantity)" /> pc
+										<span t-esc="get_qty(line.quantity)" />&amp;nbsp;&amp;nbsp;&amp;nbsp;&amp;nbsp;&amp;nbsp;pc
 									</td>
 									<td class="text-left line" width="25%">
 										<t
@@ -212,7 +212,7 @@
 								</tr>
 								</tbody>
 							</table>
-							<table width="100%">
+							<table width="100%" style="page-break-inside: avoid; ">
 								<tr>
 									<td width="10%"></td>
 									<td width="90%">
@@ -240,7 +240,7 @@
 							</table>
 						<br/><br/><br/><br/><br/>
 						<div class="row"> 
-							<div style="position:absolute;bottom:xxpx; page-break-inside: avoid;">
+							<div style="position:absolute;bottom:xxpx;page-break-inside: avoid; ">
 								<table style="border-top:1px solid;"
 									width="100%">
 									<tr>

@@ -74,6 +74,7 @@ class account_invoice(models.Model):
 
     landed_cost = fields.Many2many('landed.cost',string='Landed Cost')
     landed_cost_price = fields.Float(compute='_compute_amount',store=True,string='Landed Amount')
+    
     @api.multi
     def onchange_partner_id(self, type, partner_id, date_invoice=False,
             payment_term=False, partner_bank_id=False, company_id=False):
@@ -88,6 +89,7 @@ class account_invoice(models.Model):
                              'part_ship_id':res_ship,
                              })
         return res
+    
     
     @api.one
     @api.depends('invoice_line.price_subtotal', 'tax_line.amount','landed_cost')
@@ -198,7 +200,7 @@ class account_invoice(models.Model):
         # First, set the invoices as cancelled and detach the move ids
         self.write({'state': 'cancel', 'move_id': False})
         self._log_event(-1.0, 'Cancel Invoice')
-        picking_rec = self.env['stock.picking'].search([('account_id', '=', self.ids[0]), ('active', '=', False)])
+        picking_rec = self.env['stock.picking'].search([('account_id', '=', self.ids[0])])
         if picking_rec:
             return_line = []
             for move_rec in picking_rec.move_lines:
@@ -213,7 +215,7 @@ class account_invoice(models.Model):
             picking_rec.write({'state': 'cancel'})
             pick_obj = self.env['stock.picking'].browse(new_picking)
             pick_obj.do_transfer()
-            sale_rec = self.env['sale.order'].search([('account_id', '=', self.ids[0]), ('active', '=', False)])
+            sale_rec = self.env['sale.order'].search([('account_id', '=', self.ids[0])])
             if sale_rec:
                 sale_rec.action_invoice_cancel()
        
