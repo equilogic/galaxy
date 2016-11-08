@@ -23,6 +23,7 @@ import time
 from openerp.report import report_sxw
 from openerp import models,api,_,fields
 from openerp.tools.amount_to_text_en import amount_to_text
+from openerp.tools import ustr
 
 
 class report_print_tax_invoice(report_sxw.rml_parse):
@@ -36,12 +37,12 @@ class report_print_tax_invoice(report_sxw.rml_parse):
             'get_cost':self._get_cost,
         })
 
-    def _get_cost(self,landed_cost):
+    def _get_cost(self,landed_cost,currency):
         lines=[]
         for cost in landed_cost:
             vals={
                   'name':cost.name,
-                  'amount':cost.amount,
+                  'amount':currency.name +currency.symbol+ustr(cost.amount),
                   }
             lines.append(vals)
         return lines
