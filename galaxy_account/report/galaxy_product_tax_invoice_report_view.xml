@@ -83,8 +83,7 @@
 		<template id="galaxy_account_tax_invoice_template">
 			<style type="text/css">
 				td.line , span.line ,th.line {
-				font-family:times new
-				roman;
+				font-family:Helvetica;
 				}
 				
 			</style>
@@ -178,7 +177,7 @@
 						<br/>
 						<table width="100%">
 							<tr>
-								<td width="50%">
+								<td width="50%" style="padding:5px">
 									<span>INSURENCE COVERED WITH /</span>
 									<t t-if="o.insurence_covered_id">
 										 &amp;nbsp; &amp;nbsp; &amp;nbsp; &amp;nbsp; &amp;nbsp;<span t-field="o.insurence_covered_id.name" />
@@ -187,48 +186,48 @@
 								<td width="50%"></td>
 							</tr>
 						</table>
-						<table class="table table-condensed" style="border-top:1px solid black"
+						<table style="border-top:1px solid black"
 							width="100%">
 							<thead>
-								<tr>
-									<th class="text-left line" width="10%">QUANTITY</th>
-									<th width="5%"></th>
-									<th class="text-center line" width="20%">DESCRIPTION</th>
-									<th class="text left line" width="15%">
+								<tr style="border-bottom:1px solid black"> 
+									<th class="text-left line" width="10%" style="padding:5px">QUANTITY</th>
+									<th width="5%" style="padding:5px"></th>
+									<th class="text-center line" width="35%" style="padding:5px">DESCRIPTION</th>
+									<th class="text left line" width="10%" style="padding:5px">
 									<t t-if="o.partner_id.country_id.name != 'Singapore'">
 									ORIGIN</t></th>
-									<th class="text-right line" width="25%">U.PRICE</th>
-									<th class="text-right line" width="25%">AMOUNT</th>
+									<th class="text-right line" width="20%" style="padding:5px">U.PRICE</th>
+									<th class="text-right line" width="20%" style="padding:5px">AMOUNT</th>
 								</tr>
 							</thead>
 							<tbody>
 								<tr t-foreach="o.invoice_line" t-as="line">
-									<td class="text-left" width="10%"> 
+									<td class="text-right" width="10%" style="padding:5px;"> 
 										<span t-esc="get_qty(line.quantity)" />
 									</td>
-									<td width="5%">
+									<td width="5%" style="padding:5px;">
 										<t t-if="get_qty(line.quantity)">
 											pc
 										</t>
 									</td>
-									<td class="text-left line" width="25%">
+									<td class="text-left line" width="35%">
 										<t
 											t-if="o.partner_id.country_id.name == 'Singapore' and o.currency_id.name == 'SGD'">
 											<span style="text-transform:uppercase;" t-field="line.prod_desc" />
 										</t>
 										<t t-if="o.partner_id.country_id.name != 'Singapore'">
-											<span style="text-transform:uppercase;" t-field="line.name" />
+											<div width="25%" style="text-transform:uppercase;" t-field="line.name" />
 										</t>
 									</td>
-									<td class="text-left line" width="15%">
+									<td class="text-left line" width="10%">
 										<t t-if="o.partner_id.country_id.name != 'Singapore'">
 											<span style="text-transform:uppercase;"  t-esc="origin(line)" />
 										</t>
 									</td>
-									<td class="text-right line" width="25%">
+									<td class="text-right line" width="20%">
 										<span t-field="o.currency_id.name" /><span t-field="o.currency_id.symbol" /><span t-field="line.price_unit" />
 									</td>
-									<td class="text-right line" width="25%">
+									<td class="text-right line" width="20%">
 										<span t-field="o.currency_id.name" /><span t-field="o.currency_id.symbol" /><span t-field="line.price_subtotal" />
 									</td>
 								</tr>
@@ -238,45 +237,45 @@
 								<tr>
 									<td width="10%"></td>
 									<td width="5%"></td>
-									<td width="20%">========================================</td>
-									<td width="15%"></td>
-									<td width="25%"></td>
-									<td width="25%"></td>
+									<td width="35%">========================================</td>
+									<td width="10%"></td>
+									<td width="20%"></td>
+									<td width="20%"></td>
 								</tr>
 								<tr>
 									<td width="10%"></td>
 									<td width="5%"></td>
-									<td width="20%">
+									<td width="35%">
 										<t t-if="o.payment_term">
 											<div>TERMS : <span style="text-transform:uppercase;" t-field="o.payment_term" /></div>
 										</t>
 									</td>
-									<td width="15%"></td>
-									<td width="25%"></td>
-									<td width="25%"></td>
+									<td width="10%"></td>
+									<td width="20%"></td>
+									<td width="20%"></td>
 								</tr>
 								<tr>
 									<td width="10%"></td>
 									<td width="5%"></td>
-									<td width="20%">
+									<td width="35%">
 										<t t-if="o.landed_cost">
 									LANDED COST :</t></td>
-									<td width="15%"></td>
-									<td width="25%"></td>
-									<td width="25%"></td>
+									<td width="10%"></td>
+									<td width="20%"></td>
+									<td width="20%"></td>
 								</tr>
 								<tr>
 									<td width="10%"></td>
 									<td width="5%"></td>
-									<td width="20%">
+									<td width="35%">
 										<t t-if="o.landed_cost">
 										<div  t-foreach="get_cost(o.landed_cost,o.currency_id)" t-as="cost">
 											<span style="text-transform:uppercase;" t-esc="cost['name']"/>
 										</div></t>
 									</td>
-									<td width="15%"></td>
-									<td width="25%"></td>
-									<td width="25%" class="text-right">
+									<td width="10%"></td>
+									<td width="20%"></td>
+									<td width="20%" class="text-right">
 										<t t-if="o.landed_cost">
 										<div  t-foreach="get_cost(o.landed_cost,o.currency_id)" t-as="cost">
 											<span t-esc="cost['amount']"/>
@@ -286,18 +285,18 @@
 								<tr>
 									<td width="10%"></td>
 									<td width="5%"></td>
-									<td width="20%">LESS CREDIT NO:</td>
-									<td width="15%"></td>
-									<td width="25%"></td>
-									<td width="25%"></td>
+									<td width="35%">LESS CREDIT NO:</td>
+									<td width="10%"></td>
+									<td width="20%"></td>
+									<td width="20%"></td>
 								</tr>
 								<tr>
 									<td width="10%"></td>
 									<td width="5%"></td>
-									<td width="20%">========================================</td>
-									<td width="15%"></td>
-									<td width="25%"></td>
-									<td width="25%"></td>
+									<td width="25%">========================================</td>
+									<td width="10%"></td>
+									<td width="20%"></td>
+									<td width="20%"></td>
 								</tr>
 							</table>
 						<br/><br/><br/><br/><br/>
@@ -307,22 +306,20 @@
 									width="100%">
 									<br/>
 									<tr>
-										<td width="30%">SUB-TOTAL : &amp;nbsp;
-										 	<span class="text-left" t-field="o.currency_id.name" />
-											<span class="text-left" t-field="o.currency_id.symbol" />
-											<span class="text-left" t-field="o.amount_untaxed" />
+										<td width="30%">Sub-Total : &amp;nbsp;
+										 	<span class="text-left" t-field="o.currency_id.name" /><span class="text-left" t-field="o.currency_id.symbol" /><span class="text-left" t-field="o.amount_untaxed" />
 										</td>
 										<td width="15%">
-											RATE = &amp;nbsp; <span t-field="o.currency_rate" />
+											Rate = &amp;nbsp; <span t-field="o.currency_rate" />
 										</td >
 										<td width="25%" style="padding:5px">
-											<t t-if="o.partner_id.country_id.id == '199'">
+											<t t-if="o.partner_id.country_id.name == 'Singapore'">
 												<span>7%GST = </span>&amp;nbsp; 
 												<span t-field="o.currency_id.name" />
 												<span t-field="o.currency_id.symbol" />
-												<span>0.00</span>												
+												<span t-field="o.amount_tax"></span>												
 											</t>
-											<t t-if="o.partner_id.country_id.id != '199'">
+											<t t-if="o.partner_id.country_id.name != 'Singapore'">
 												<span>0%GST = </span>&amp;nbsp; 
 												<span t-field="o.currency_id.name" />
 												<span t-field="o.currency_id.symbol" />
@@ -344,16 +341,16 @@
 										<td width="25%">
 										</td>
 										<td width="15%" >
-											<t t-if="o.partner_id.country_id == '199'">
+											<t t-if="o.partner_id.country_id.name == 'Singapore'">
 												<span>7% GST </span>
-												<span t-field="o.partner_id.country_id" />
+												
 											</t>
-											<t t-if="not o.partner_id.country_id.id == '199'">
+											<t t-if="o.partner_id.country_id.name != 'Singapore'">
 												<span>GST @0% </span>
 											</t>											
 										</td>
 										<td width="20%" class="text-left">
-											<span t-field="o.currency_id.name" /><span t-field="o.currency_id.symbol" /><span>0.0</span>
+											<span t-field="o.currency_id.name" /><span t-field="o.currency_id.symbol" /><span t-field="o.amount_tax"></span>
 										</td>
 									</tr>
 									<tr>
@@ -410,7 +407,7 @@
 										<tr >
 											<td width="70%"></td>
 											<td class="text-right" style="border-top:2 px solid black" width="30%" >
-											<span style="color:white;">1111111111111111111111111</span>
+											<span style="color:white;">&amp;nbsp;&amp;nbsp;&amp;nbsp;&amp;nbsp;&amp;nbsp;</span>
 											</td>
 										</tr>
 									</table>

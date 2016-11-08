@@ -42,7 +42,7 @@ class report_print_tax_invoice(report_sxw.rml_parse):
         for cost in landed_cost:
             vals={
                   'name':cost.name,
-                  'amount':currency.name +currency.symbol+ustr(cost.amount),
+                  'amount':currency.name +currency.symbol+ustr("{:0,.2f}".format(cost.amount))
                   }
             lines.append(vals)
         return lines
@@ -54,7 +54,7 @@ class report_print_tax_invoice(report_sxw.rml_parse):
         return amount_to_text(amount,currency=currency.name)
 
     def _get_qty(self,qty):
-        return int(qty)
+        return "{:0,}".format(int(qty))
     
     def _get_origin(self, line):
         origin =''
