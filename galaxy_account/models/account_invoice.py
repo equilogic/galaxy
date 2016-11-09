@@ -151,7 +151,7 @@ class account_invoice(models.Model):
     def invoice_validate(self):
         prefix = ''
         cr,uid,context = self.env.args
-        if self.partner_id:
+        if self.partner_id and self.type == 'out_invoice':
             
             country = self.partner_id.country_id.name
             if self.number:
