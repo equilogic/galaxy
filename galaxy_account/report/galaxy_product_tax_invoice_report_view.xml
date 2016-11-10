@@ -89,8 +89,7 @@
 			</style>
 			<t t-call="report.html_container">
 				<t t-call="galaxy_account.external_layout_galaxy_account_tax_invoice">
-					<div class="page" style="font-family:times new
-				roman;font-size:12px">
+					<div class="page" style="font-family:Helvetica;font-size:12px">
 						<div class="oe_structure" />
 						<table width="100%">
 							<tr>

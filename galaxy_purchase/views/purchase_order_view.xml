@@ -20,6 +20,14 @@
 						options="{'always_reload': True}" />
 				</xpath>
 
+				<xpath expr="//field[@name='picking_type_id']" position="after">
+					<field name="sup_inv_num" attrs="{'readonly': [('state','not in',('draft','sent'))]}" />
+				</xpath>
+				
+				<xpath expr="//field[@name='dest_address_id']" position="attributes">
+					<attribute name="attrs">{'required': [('related_usage','=', 'customer')]}</attribute>
+				</xpath>
+				
 				<xpath expr="//field[@name='currency_id']" position="after">
 					<field name="attn_pur"
 						domain="[('type','=','contact'),('parent_id','=',partner_id)]"
@@ -30,8 +38,8 @@
 					expr="//page[@string='Products']/field[@name='order_line']/tree[@string='Purchase Order Lines']/field[@name='name']"
 					position='after'>
 					<field name="origin_ids" widget="many2many_tags"
-						attrs="{ 'readonly':[('no_origin', '=', True)]}" />
-					<field name="no_origin" />
+						attrs="{ 'readonly':[('no_origin', '=', True)]}" invisible="1"  />
+					<field name="no_origin" invisible="1" />
 				</xpath>
 
 				<xpath

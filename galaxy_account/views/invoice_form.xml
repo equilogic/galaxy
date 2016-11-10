@@ -6,13 +6,26 @@
 			<field name="model">account.invoice</field>
 			<field name="inherit_id" ref="account.invoice_form" />
 			<field name="arch" type="xml">
+				<xpath expr="//field[@name='partner_id']" position="attributes">
+					<attribute name="context">{'search_default_customer':1, 'default_type':'invoice'}</attribute>
+				</xpath>
 				<xpath expr="//field[@name='partner_id']" position="after">
+					<label string=''/>
+					<field name="cust_add" nolabel="1" options="{'always_reload': True}"
+					/>
 					<field name="part_inv_id"
-						context="{'search_default_customer':1, 'show_address': 1,'default_type':'invoice'}"
+						context="{'search_default_customer':1, 'default_type':'invoice'}"
 						options="{'always_reload': True}" />
+					<label string=''/>
+					<field name="part_inv_add" nolabel="1" options="{'always_reload': True}"
+					/>
+
 					<field name="part_ship_id"
-						context="{'search_default_customer':1, 'show_address': 1,'default_type':'delivery'}"
+						context="{'search_default_customer':1,'default_type':'delivery'}"
 						options="{'always_reload': True}" />
+					<label string=''/>
+					<field name="part_ship_add" nolabel="1" options="{'always_reload': True}"
+					/>
 				</xpath>
 				<xpath expr="//field[@name='fiscal_position']" position="after">
 					<field name="attn_inv"
@@ -61,8 +74,8 @@
 					expr="//page[@string='Invoice Lines']/field[@name='invoice_line']/tree[@string='Invoice Lines']/field[@name='quantity']"
 					position='after'>
 					<field name="origin_ids" widget="many2many_tags"
-						attrs="{ 'readonly':[('no_origin', '=', True)]}" />
-					<field name="no_origin" />
+						attrs="{ 'readonly':[('no_origin', '=', True)]}" invisible="1" />
+					<field name="no_origin" invisible="1"/>
 				</xpath>
 
 				<field name="account_id" position='after'>
@@ -115,6 +128,7 @@
 					<field name="part_inv_id"
 						context="{'search_default_supplier':1, 'show_address': 1,'default_type':'invoice'}"
 						options="{'always_reload': True}" />
+					
 					<field name="part_ship_id"
 						context="{'search_default_supplier':1, 'show_address': 1,'default_type':'delivery'}"
 						options="{'always_reload': True}" />
@@ -128,8 +142,8 @@
 					expr="//page[@string='Invoice']/field[@name='invoice_line']/tree[@string='Invoice lines']/field[@name='quantity']"
 					position='after'>
 					<field name="origin_ids" widget="many2many_tags"
-						attrs="{ 'readonly':[('no_origin', '=', True)]}" />
-					<field name="no_origin" />
+						attrs="{ 'readonly':[('no_origin', '=', True)]}" invisible="1" />
+					<field name="no_origin" invisible="1" />
 				</xpath>
 				<xpath expr="//page[@string='Payments']" position="after">
 					<page string="Transport Details">
@@ -188,7 +202,7 @@
 			<field name="inherit_id" ref="base.view_partner_form" />
 			<field name="arch" type="xml">
 				<xpath expr="//field[@name='website']" position="after">
-					<field name="cust_code" attrs="{ 'invisible':[('customer', '=', False)]}" />
+					<field name="cust_code" />
 				</xpath>
 			</field>
 		</record>

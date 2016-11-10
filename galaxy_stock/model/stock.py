@@ -38,3 +38,28 @@ class stock_picking(models.Model):
 
     prod_uom_qty = fields.Float('Quantity', compute="_compute_move_qty")
     active = fields.Boolean('Active', default=True, help="If the active field is set to False, it will allow you to hide the picking without removing it.")
+    
+
+
+class stock_move(models.Model):
+    _inherit = "stock.move"
+    
+    item_desc = fields.Char('Item Description')
+    
+    @api.multi
+    def onchange_product_id(self, prod_id=False, loc_id=False, loc_dest_id=False, partner_id=False):
+        """ On change of product id, if finds UoM, UoS, quantity and UoS quantity.
+        @param prod_id: Changed Product id
+        @param loc_id: Source location id
+        @param loc_dest_id: Destination location id
+        @param partner_id: Address id of partner
+        @return: Dictionary of values
+        """
+        res={}
+        if prod_id:
+            prod=self.env['product.product'].browse(prod_id)
+            res = super(stock_move,self).onchange_product_id(prod_id=prod_id, loc_id=loc_id, loc_dest_id=loc_dest_id, partner_id=partner_id)
+            res['value'].update({'item_desc':prod.name})
+        return res
+    
+    

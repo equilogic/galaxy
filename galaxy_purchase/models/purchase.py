@@ -57,6 +57,7 @@ class purchase_order(models.Model):
     
     _inherit = 'purchase.order'
     
+    account_id = fields.Many2one('account.invoice', 'Invoice')
     amount_untaxed = fields.Float(compute="_amount_all", store=True,
                                   string='Untaxed Amount',
                                   help="The amount without tax")
@@ -78,6 +79,8 @@ class purchase_order(models.Model):
                                    help="Delivery address for current sales order.")
 
     attn_pur = fields.Many2one('res.partner','ATTN')
+    
+    sup_inv_num = fields.Char('Supplier Invoice Number')
 
     landed_cost_pur = fields.Many2many('landed.cost',string='Landed Cost')
     @api.multi
@@ -117,7 +120,7 @@ class purchase_order(models.Model):
     @api.v7
     def _prepare_inv_line(self, cr, uid, account_id, order_line, context=None):
         res = super(purchase_order,self)._prepare_inv_line(cr, uid, account_id, order_line, context=context)
-        res.update({'origin_ids':order_line.origin_ids.id,'no_origin':order_line.no_origin})
+        res.update({'origin_ids':order_line.origin_ids.ids,'no_origin':order_line.no_origin})
         return res
     @api.v7
     def _prepare_invoice(self, cr, uid, order, line_ids, context=None):
@@ -134,6 +137,7 @@ class purchase_order(models.Model):
         
         res = super(purchase_order,self)._prepare_invoice(cr, uid, order, line_ids, context=context)
         res.update({
+                    'invoice_from_purchase':True,
                     'part_inv_id': order.partner_inv_id.id,
                     'part_ship_id':order.partner_ship_id.id,
                     'attn_inv':order.attn_pur.id,

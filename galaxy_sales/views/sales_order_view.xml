@@ -22,8 +22,8 @@
 				<xpath
 					expr="//page[@string='Order Lines']/field[@name='order_line']/tree[@string='Sales Order Lines']/field[@name='product_uom_qty']"
 					position='after'>
-					<field name="origin_ids" widget="many2many_tags" />
-					<field name="no_origin" />
+					<field name="origin_ids" widget="many2many_tags" invisible="1" />
+					<field name="no_origin" invisible="1" />
 				</xpath>
 
 				<xpath expr="/form/sheet/group/group/field[@name='partner_invoice_id']"

@@ -96,7 +96,6 @@ class wiz_galaxy_prod_import_xls(models.TransientModel):
                                             elif header_l == 'Price':
                                                 vals.update({'list_price': rec_value or ''})
                             if vals:
-                                print "vals=======",vals
                                 self.env['product.product'].create(vals)
         po_create_wiz_id = self.env['ir.model.data'].get_object_reference('galaxy_purchase', 'wiz_galaxy_create_po_form')[1]
         return {

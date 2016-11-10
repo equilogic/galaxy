@@ -55,6 +55,7 @@ class account_invoice(models.Model):
     container_name = fields.Char('Container Name')
     container_place_area_code = fields.Char('Container Place Area Code')
     invoice_from_sale = fields.Boolean('Invoice From Sale')
+    invoice_from_purchase = fields.Boolean('Invoice From Purchase')
     ship_via_id = fields.Many2one('ship.via', 'Ship Via')
     cases_id = fields.Many2one('cases.loc', 'Cases')
     from_id = fields.Many2one('from.loc', 'From')
@@ -67,6 +68,11 @@ class account_invoice(models.Model):
     part_inv_id = fields.Many2one('res.partner', 'Invoice Address', readonly=True, required=True,
                                   states={'draft': [('readonly', False)], 'sent': [('readonly', False)]},
                                   help="Invoice address for current sales order.")
+    cust_add = fields.Text('Customer Address')
+    part_inv_add = fields.Text('Invoice Address')
+    part_ship_add = fields.Text('Delivery Address')
+    
+
     part_ship_id = fields.Many2one('res.partner', 'Delivery Address', readonly=True, required=True,
                                    states={'draft': [('readonly', False)], 'sent': [('readonly', False)]},
                                    help="Delivery address for current sales order.")
@@ -78,6 +84,12 @@ class account_invoice(models.Model):
     @api.multi
     def onchange_partner_id(self, type, partner_id, date_invoice=False,
             payment_term=False, partner_bank_id=False, company_id=False):
+        inv_add_list=[]
+        ship_add_list=[]
+        cust_add_list=[]
+        inv_address=''
+        ship_address=''
+        cust_address=''
         res = super(account_invoice, self).onchange_partner_id(type=type, partner_id=partner_id,
                                     date_invoice=date_invoice, payment_term=payment_term,
                                     partner_bank_id=partner_bank_id, company_id=company_id)
@@ -85,12 +97,68 @@ class account_invoice(models.Model):
         part = self.env['res.partner'].browse(partner_id)
         res_inv = part.address_get(adr_pref=['delivery', 'invoice', 'contact']).get('invoice')
         res_ship = part.address_get(adr_pref=['delivery', 'invoice', 'contact']).get('delivery')
+        
+        
+        if part.street:
+            cust_add_list.append(part.street +'\n')
+        if part.street2:
+            cust_add_list.append(part.street2 +'\n')
+        if part.city:
+            cust_add_list.append(part.city +'\n')
+        if part.state_id:
+            cust_add_list.append(part.state_id.code +' ')
+        if part.zip:
+            cust_add_list.append(part.zip +'\n')
+        if part.country_id:
+            cust_add_list.append(part.country_id.name +' ')
+
+        for cust_add in cust_add_list:
+            cust_address += cust_add
+        part_inv = self.env['res.partner'].browse(res_inv)
+        if part_inv.street:
+            inv_add_list.append(part_inv.street +'\n')
+        if part_inv.street2:
+            inv_add_list.append(part_inv.street2 +'\n')
+        if part_inv.city:
+            inv_add_list.append(part_inv.city +'\n')
+        if part_inv.state_id:
+            inv_add_list.append(part_inv.state_id.code +' ')
+        if part_inv.zip:
+            inv_add_list.append(part_inv.zip +'\n')
+        if part_inv.country_id:
+            inv_add_list.append(part_inv.country_id.name +' ')
+        
+        
+        for inv_add in inv_add_list:
+            inv_address += inv_add
+            
+        ship_inv = self.env['res.partner'].browse(res_ship)
+       
+        if ship_inv.street:
+            ship_add_list.append(ship_inv.street +'\n')
+        if ship_inv.street2:
+            ship_add_list.append(ship_inv.street2 +'\n')
+        if ship_inv.city:
+            ship_add_list.append(ship_inv.city +'\n')
+        if ship_inv.state_id:
+            ship_add_list.append(ship_inv.state_id.code +' ')
+        if ship_inv.zip:
+            ship_add_list.append(ship_inv.zip +'\n')
+        if ship_inv.country_id:
+            ship_add_list.append(ship_inv.country_id.name +' ')
+        
+        
+        for ship_add in ship_add_list:
+            ship_address += ship_add
+
         res['value'].update({'part_inv_id':res_inv,
                              'part_ship_id':res_ship,
+                             'cust_add':cust_address,
+                             'part_inv_add':inv_address,
+                             'part_ship_add':ship_address
                              })
         return res
-    
-    
+
     @api.one
     @api.depends('invoice_line.price_subtotal', 'tax_line.amount','landed_cost')
     def _compute_amount(self):
@@ -104,11 +172,18 @@ class account_invoice(models.Model):
         
 
     @api.multi
-    def prepare_sale_order_line(self):
+    def prepare_order_line(self):
         cr, uid, context = self.env.args
         so_obj = self.env['sale.order']
         so_line_obj = self.env['sale.order.line']
+        po_obj = self.env['purchase.order']
+        po_line_obj = self.env['purchase.order.line']
         acc_vou = self.env['account.voucher']
+
+        loc_id = self.env['stock.location'].search([('location_id','!=',False),('location_id.name','ilike','WH'),
+                    ('company_id.id','=',self.company_id.id),('usage','=','internal')])
+    
+        
         
         if self.type == "out_invoice" and not self.invoice_from_sale:
             order_vals = {
@@ -146,20 +221,63 @@ class account_invoice(models.Model):
                     pick_id.active = True
                     pick_id.account_id = self._ids
                     pick_id.do_transfer()
-       
+        if self.type == "in_invoice" and not self.invoice_from_purchase:
+            order_vals = {
+                          'partner_id': self.partner_id.id,
+                          'partner_inv_id':self.part_inv_id.id,
+                          'partner_ship_id':self.part_ship_id.id,
+                          'invoice_method':'picking',
+                          'partner_ref':self.reference,
+                          'date_order': self.date_invoice,
+                          'pricelist_id': self.partner_id.property_product_pricelist.id,
+                          'invoiced':True,
+                          'active': True,
+                          'currency_id':self.currency_id.id,
+                          'account_id': self._ids,
+                          'location_id' : loc_id.id,#self.partner_id.property_stock_supplier.id,
+                          'attn_pur':self.attn_inv.id,
+                          'landed_cost_pur':[(6,0,self.landed_cost.ids)],
+                          'total_cost_price':self.landed_cost_price,
+                          'invoice_ids':[(4, self.ids)]
+                          }
+            po_res = po_obj.create(order_vals)
+            for line in self.invoice_line:
+                vals = {
+                        'product_id' : line.product_id.id,
+                        'name' : line.name,
+                        'date_planned':self.date_invoice,
+                        'product_qty' : line.quantity,
+                        'product_uom' :line.uos_id.id,
+                        'price_unit':line.price_unit,
+                        'taxes_id': [(6, 0, [x.id for x in line.invoice_line_tax_id])],
+                        'discount':line.discount,
+                        'price_subtotal':line.price_subtotal,
+                        'origin_ids': [(6, 0, line.origin_ids.ids)],
+                        'no_origin':line.no_origin,
+                        'order_id':po_res.id,
+                        }
+                po_res1 = po_line_obj.create(vals)
+            po_obj._amount_all()
+            po_res.signal_workflow('purchase_confirm')
+            
+            if po_res.picking_ids:
+                for pick_id in po_res.picking_ids:
+                    pick_id.active = True
+                    pick_id.account_id = self._ids
+                    pick_id.do_transfer()
     @api.multi
     def invoice_validate(self):
         prefix = ''
         cr,uid,context = self.env.args
-        if self.partner_id and self.type == 'out_invoice':
-            
+        if self.partner_id and self.number:
             country = self.partner_id.country_id.name
-            if self.number:
+            if self.type=='out_invoice':
                 if country and country == 'Singapore': 
                     self.number = self.env['ir.sequence'].get('invoice_local')
                 else:
                     if not self.partner_id.cust_code:
-                        raise except_orm(_('Error!'), _('Please Enter Customer code'))
+                        if self.type=="out_invoice":
+                            raise except_orm(_('Error!'), _('Please Enter Customer code'))
                     cust_code = str(self.partner_id.cust_code)
                     prefix = cust_code[:3].upper()
 
@@ -181,7 +299,9 @@ class account_invoice(models.Model):
                         sq_type=self.env['ir.sequence.type'].create(seq_type)
                         sq = self.env['ir.sequence'].create(seq)
                     self.number = self.env['ir.sequence'].get('invoice_export_'+cust_code)
-        self.prepare_sale_order_line()
+            if self.type=='in_invoice':
+                self.number = self.env['ir.sequence'].get('sup_inv')
+        self.prepare_order_line()
         return self.write({'state': 'open'})
 
     @api.multi
@@ -189,6 +309,8 @@ class account_invoice(models.Model):
         moves = self.env['account.move']
         quant_obj = self.env["stock.quant"]
         uom_obj = self.env['product.uom']
+        sale_rec=''
+        purchase_rec=''
         for inv in self:
             if inv.move_id:
                 moves += inv.move_id
@@ -215,16 +337,20 @@ class account_invoice(models.Model):
             picking_rec.write({'state': 'cancel'})
             pick_obj = self.env['stock.picking'].browse(new_picking)
             pick_obj.do_transfer()
-            sale_rec = self.env['sale.order'].search([('account_id', '=', self.ids[0])])
+            if self.type=="out_invoice":
+                sale_rec = self.env['sale.order'].search([('account_id', '=', self.ids[0])])
+            if self.type=="in_invoice":
+                purchase_rec = self.env['purchase.order'].search([('account_id', '=', self.ids[0])])
             if sale_rec:
                 sale_rec.action_invoice_cancel()
-       
+            if purchase_rec:
+                purchase_rec.action_invoice_cancel()
         return True
 
 class res_partner(models.Model):
     _inherit = 'res.partner'
     
-    cust_code = fields.Char('Customer Code')
+    cust_code = fields.Char('Code')
     
     _sql_constraints = [
         ('cust_code_unique', 'unique(cust_code)', 'Please Enter Unique Customer Code'),
