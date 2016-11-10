@@ -344,7 +344,7 @@ class account_invoice(models.Model):
             if sale_rec:
                 sale_rec.action_invoice_cancel()
             if purchase_rec:
-                purchase_rec.action_invoice_cancel()
+                purchase_rec.write({'state':'except_invoice'})
         return True
 
 class res_partner(models.Model):
