@@ -84,6 +84,7 @@
 			<style type="text/css">
 				td.line , span.line ,th.line {
 				font-family:Helvetica;
+				font-size:12px;
 				}
 				
 			</style>
@@ -93,29 +94,27 @@
 						<div class="oe_structure" />
 						<table width="100%">
 							<tr>
-								<td width="61%"  class="text-right">
+								<td width="30%"></td>
+								<td width="40%"  class="text-center">
 									<span>GST Reg No : </span>
 									<t t-if="o.company_id.gst_no">
 										<span class="text-center" t-field="o.company_id.gst_no" />
 									</t>
 								</td>
-								<td width="9%"></td>
+								
 								<td width="15%" class="text-right">
 									<span ><b>INVOICE NO :</b></span>
 								</td>
-								<td width="15%">&amp;nbsp;&amp;nbsp;
+								<td width="20%">&amp;nbsp;&amp;nbsp;
 										<b><span t-field="o.number" /></b>
 								</td>
 							</tr>
 							<tr>
-								<td width="61%">
-									<span class="text-right"></span>
-								</td>
-								<td width="9%"></td>
+								<td width="70%" colspan="2"></td>
 								<td width="15%" class="text-right">
 									<span ><b>DATE : </b></span>
 								</td>
-								<td width="15%">&amp;nbsp;&amp;nbsp;
+								<td width="20%">&amp;nbsp;&amp;nbsp;
 									<b><span t-field="o.date_invoice" t-field-options='{"format": "dd-MM-Y"}' /></b>
 								</td>
 							</tr>

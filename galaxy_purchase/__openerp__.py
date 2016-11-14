@@ -37,6 +37,9 @@
              'wizard/wiz_scrap_prod_report_view_xls.xml',
              'wizard/wiz_scrap_prod_report_view_xls.xml',
              'wizard/item_register_detail.xml',
+             'report/purchase_order_report_view.xml',
+             'report/report_view.xml',
+             
     ],
     'installable': True,
     'application': False,

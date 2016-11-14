@@ -1,0 +1,266 @@
+<?xml version="1.0" encoding="utf-8"?>
+<openerp>
+	<data>
+		<!-- Template for Headre and Footer -->
+		<template id="external_layout_galaxy_purchase_order">
+			<!-- Multicompany -->
+			<t t-if="o and 'company_id' in o">
+				<t t-set="company" t-value="o.company_id"></t>
+			</t>
+			<t t-if="not o or not 'company_id' in o">
+				<t t-set="company" t-value="res_company"></t>
+			</t>
+
+			<t t-call="galaxy_purchase.external_layout_header_galaxy_purchase_order" />
+			<t t-raw="0" />
+			<t t-call="galaxy_purchase.external_layout_footer_galaxy_purchase_order" />
+		</template>
+
+		<!-- Report Header -->
+		<template id="external_layout_header_galaxy_purchase_order">
+			<div class="header">
+				<div class="text-center">
+					<div t-if="o.company_id">
+						<div>
+							<h3>
+								<strong>
+									<span t-field="o.company_id.name"></span>
+								</strong>
+							</h3>
+						</div>
+						<div>
+							<span t-field="o.company_id.street" />
+							<span t-field="o.company_id.city" />
+							<span t-field="o.company_id.state_id" />
+							<span t-field="o.company_id.country_id" />
+						</div>
+						<div>
+							<span>Tel :</span>
+							<span t-field="o.company_id.phone" />
+
+							<span>Fax :</span>
+							<span t-field="o.company_id.fax" />
+						</div>
+						<div>
+							<span>Company Reg No. </span>
+							<span t-field="o.company_id.company_registry" />
+						</div>
+						<div>
+							<h3><b>Purchase Order</b></h3>
+						</div>
+						<div>
+							<span>GST Reg No : </span>
+							<t t-if="o.company_id.gst_no">
+								<span class="text-center" t-field="o.company_id.gst_no" />
+							</t>
+						</div>
+					</div>
+				</div>
+				<table width="100%"  style="border:none">
+					<tr>
+						<td width="50%"  >
+							<b>To :</b>
+						</td>
+						<td width="10%" ></td>
+						<td width="20%" class="text-right" >
+						</td>
+						<td width="20%" >&amp;nbsp;&amp;nbsp;
+						</td>
+					</tr>
+					<tr>
+						<td width="50%" >
+							<t t-if="o.partner_id">
+								<span t-field="o.partner_id.name"></span> 
+							</t>
+						</td>
+						<td width="10%" ></td>
+						<td width="20%" class="text-right">
+							<span ><b>Purchase No. :</b></span>
+						</td>
+						<td width="20%" >&amp;nbsp;&amp;nbsp;
+							<span t-field="o.name" />
+						</td>
+					</tr>
+					<tr>
+						<td width="50%" >
+							<t t-if="o.partner_id">
+								<span t-field="o.partner_id.street"></span>
+								<span t-field="o.partner_id.city"></span>
+								<span t-field="o.partner_id.zip"></span>
+								<span t-field="o.partner_id.country_id"></span> 
+							</t>
+						</td>
+						<td width="10%" ></td>
+						<td width="20%" class="text-right" >
+							<span ><b>DATE : </b></span>
+						</td>
+						<td width="20%" >&amp;nbsp;&amp;nbsp;
+							<span t-field="o.date_order" t-field-options='{"format": "dd-MM-Y"}' />
+						</td>
+					</tr>
+					<tr>
+						<td width="50%" >
+						</td>
+						<td width="10%" ></td>
+						<td width="20%" class="text-right" >
+						</td>
+						<td width="20%" >&amp;nbsp;&amp;nbsp;
+						</td>
+					</tr>
+					<tr>
+						<td width="50%" >
+							<span><b>ATTN : </b></span>
+							<t t-if="o.attn_pur">
+								<span t-field="o.attn_pur" />
+							</t>
+						</td>
+						<td width="10%" ></td>
+						<td width="20%" class="text-right" >
+							<span ><b>Page : </b></span>
+						</td>
+						<td width="20%" >&amp;nbsp;&amp;nbsp;
+							<span class="page" />
+						</td>
+					</tr>
+				</table>
+				
+			</div>
+		</template>
+		<!-- Report Footer -->
+		<template id="external_layout_footer_galaxy_purchase_order">
+			<div class="footer">
+				<table width="100%">
+					<div class="text-right">
+						<span class="text-right"><b>GALAXY ENTERPRISE PTE LTD</b> </span>
+					</div >
+					<br/><br/><br/><br/>
+					<div >
+						<table width="100%" >
+							<tr >
+								<td width="70%"></td>
+								<td class="text-right" style="border-top:2 px solid black" width="30%" >
+								<span style="color:white;">&amp;nbsp;&amp;nbsp;&amp;nbsp;&amp;nbsp;&amp;nbsp;</span>
+								</td>
+							</tr>
+						</table>
+					</div>
+				</table>
+			</div>
+		</template>
+
+		<!-- Reports Template -->
+		<template id="galaxy_purchase_order_template">
+			<style type="text/css">
+				td.line , span.line ,th.line {
+				font-family:Helvetica;
+				font-size:12px;
+				}
+			</style>
+			<t t-call="report.html_container">
+				<t t-call="galaxy_purchase.external_layout_galaxy_purchase_order">
+						<div class="page" style="font-family:Helvetica;font-size:12px">
+							<div class="oe_structure" />
+							<div class="row">
+							
+							<table width="100%"  class="table-condensed" >
+								<style>
+									table {
+									    border: 2px solid black;
+									}
+									table td, table th {
+									    border-left: 1px solid black;
+									    border-right: 1px solid black;
+									}
+								</style>
+								<thead>
+									<tr>
+										<th class="text-center line" width="10%" style="padding:10px;border-bottom:1px solid black">QTY.</th>
+										<th class="text-center line" width="10%" style="padding:5px;border-bottom:1px solid black">UNIT</th>
+										<th class="text-left line" width="35%" style="padding:10px;border-bottom:1px solid black">DESCRIPTION</th>
+										<th class="text-left line" width="20%" style="padding:10px;border-bottom:1px solid black">UNIT PRICE</th>
+										<th class="text-center line" width="20%" style="padding:10px;border-bottom:1px solid black">AMOUNT</th>
+									</tr>
+								</thead>
+								<tbody>
+								<tr t-foreach="o.order_line" t-as="line">
+									<td class="text-center" width="10%" style="padding:10px;"> 
+										<span t-esc="get_qty(line.product_qty)" />
+									</td>
+									<td width="10%" style="padding:10px;" class="text-center" >
+										<t t-if="get_qty(line.product_qty)">
+											pc
+										</t>
+									</td>
+									<td class="text-left line" width="35%" style="padding:10px;">
+										<span style="text-transform:uppercase;" t-field="line.name" />
+									</td>
+									<td class="text-center line" width="20%" style="padding:10px;">
+										<span t-field="o.currency_id.name" /><span t-esc="get_price_subtotal(line.price_unit)" 
+										  />
+									</td>
+									<td class="text-center line" width="20%" style="padding:10px;">
+										<span t-field="o.currency_id.name" /><span t-esc="get_price_subtotal(line.price_subtotal)"/>
+										
+									</td>
+								</tr>
+								
+								<tr >
+									<td class="text-center" width="10%" style="padding:10px;"> 
+									</td>
+									<td width="10%" style="padding:10px;" class="text-center" >
+									</td>
+									<td class="text-left line" width="35%" style="padding:10px;">
+										<t t-if="o.payment_term_id">
+										<span>========================================</span>
+										<span>TERMS : </span><span t-field="o.payment_term_id"/> 
+										</t>
+									</td>
+									<td class="text-center line" width="20%" style="padding:10px;">
+									</td>
+									<td class="text-center line" width="20%" style="padding:10px;">
+									</td>
+								</tr>
+							</tbody>
+							<tfoot>
+								<tr>
+									<td class="text-center" width="10%" style="padding:10px;"> 
+									</td>
+									<td width="10%" style="padding:10px;" class="text-center" >
+									</td>
+									<td class="text-left line" width="35%" style="padding:10px;">
+									</td>
+									<td class="text-center line" width="20%" style="padding:10px;">
+									</td>
+									<td class="text-center line" width="20%" style="padding:10px;">
+									</td>
+								</tr>
+								
+							</tfoot>
+							</table>
+							<table style="border:none;" width="100%">
+								<tr>
+									<td width="60%" style="padding:10px;border:none" ></td>
+									<td width="20%" class="text-right" style="padding:10px;border:none" ><b>Total</b></td>
+									<td width="20%" class="text-center" style="padding:10px;border:none" ><b><span t-field="o.currency_id.name" /><span t-field="o.amount_total"/></b></td>
+								</tr>
+								<tr>
+									<td width="100%" colspan="3" style="border-bottom:1px solid black;border-top:none;border-left:none;border-right:none" >
+									</td>
+								</tr>
+							</table>
+							</div>
+						</div>
+					</t>
+			</t>
+		</template>
+
+		<template id="report_galaxy_purchase_order_report">
+			<t t-call="report.html_container">
+				<t t-foreach="doc_ids" t-as="doc_id">-->
+					<t
+						t-raw="translate_doc(doc_id, doc_model, 'partner_id.lang', 'galaxy_purchase.galaxy_purchase_order_template')" />
+				</t>
+			</t>
+		</template>
+	</data>
+</openerp>

@@ -1,0 +1,25 @@
+<openerp>
+	<data>
+		<!-- Purchase Order Qweb Report -->
+		<report id="galaxy_purchase_purchase_order" model="purchase.order" string="Purchase Order report"
+			report_type="qweb-pdf" name="galaxy_purchase.report_galaxy_purchase_order_report"
+			file="galaxy_purchase.report_galaxy_purchase_order_report" />
+
+
+		<record id="paperformat_euro_lowmargin_galaxy_purchase" model="report.paperformat">
+			<field name="name">European A4 low margin</field>
+			<field name="default" eval="True" />
+			<field name="format">A4</field>
+			<field name="orientation">Portrait</field>
+			<field name="margin_top">95</field>
+			<field name="margin_bottom">40</field>
+			<field name="margin_left">10</field>
+			<field name="margin_right">10</field>
+			<field name="header_line" eval="False" />
+			<field name="header_spacing">85</field>
+			<field name="dpi">100</field>
+			<field name="report_ids"
+				eval="[(4, ref('galaxy_purchase.galaxy_purchase_purchase_order'))]" /> 
+		</record>
+	</data>
+</openerp>
