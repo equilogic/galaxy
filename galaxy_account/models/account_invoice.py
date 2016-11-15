@@ -63,7 +63,7 @@ class account_invoice(models.Model):
     insurence_covered_id = fields.Many2one('insurence.covered', 'Insurance Covered')
     vessale_name_id = fields.Many2one('vessale.name', 'Vessale')
     bank = fields.Char('Bank')
-    currency_rate = fields.Float(related="currency_id.rate_silent", string='Currency rate')
+    currency_rate = fields.Float(string='Currency rate')
     
     part_inv_id = fields.Many2one('res.partner', 'Invoice Address', readonly=True, required=True,
                                   states={'draft': [('readonly', False)], 'sent': [('readonly', False)]},

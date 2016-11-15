@@ -145,6 +145,9 @@
 						attrs="{ 'readonly':[('no_origin', '=', True)]}" invisible="1" />
 					<field name="no_origin" invisible="1" />
 				</xpath>
+				<field name="currency_id" position="after">
+					<field name="currency_rate"/>
+				</field>
 				<xpath expr="//page[@string='Payments']" position="after">
 					<page string="Transport Details">
 						<group col="4">
