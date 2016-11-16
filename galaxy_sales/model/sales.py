@@ -65,7 +65,7 @@ class sale_order(models.Model):
     currency_rate = fields.Float(related="pricelist_id.currency_id.rate_silent", string='Currency rate')
     active = fields.Boolean('Active', default=True, help="If the active field is set to False, it will allow you to hide the sale order without removing it.")
     attn_sal = fields.Many2one('res.partner', 'ATTN')
-    landed_cost_sal = fields.Many2many('landed.cost', string="Landed Cost")
+    
     landed_cost_price = fields.Float(compute='_amount_all', string='Landed Amount', help="landed cost price", store=True)
     
     amount_untaxed = fields.Float(compute="_amount_all", store=True,
@@ -76,6 +76,8 @@ class sale_order(models.Model):
                               help="The tax amount")
     amount_total = fields.Float(compute="_amount_all",
                                 store=True, string='Total')
+    account_id = fields.Many2one('account.invoice', 'Invoice')
+    landed_cost_sal = fields.One2many('landed.cost.invoice','acc_sal_id',string='Landed Cost')
     
     @api.multi
     @api.depends('order_line', 'landed_cost_sal')

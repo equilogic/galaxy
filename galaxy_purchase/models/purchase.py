@@ -82,7 +82,7 @@ class purchase_order(models.Model):
     
     sup_inv_num = fields.Char('Supplier Invoice Number')
 
-    landed_cost_pur = fields.Many2many('landed.cost',string='Landed Cost')
+    landed_cost_pur = fields.One2many('landed.cost.invoice','acc_pur_id',string='Landed Cost')
     @api.multi
     def onchange_partner_id(self,partner_id):
         res = super(purchase_order,self).onchange_partner_id(partner_id)

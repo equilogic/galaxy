@@ -41,7 +41,7 @@ class report_print_tax_invoice(report_sxw.rml_parse):
         lines=[]
         for cost in landed_cost:
             vals={
-                  'name':cost.name,
+                  'name':cost.landed_id.name,
                   'amount':currency.name +currency.symbol+ustr("{:0,.2f}".format(cost.amount))
                   }
             lines.append(vals)

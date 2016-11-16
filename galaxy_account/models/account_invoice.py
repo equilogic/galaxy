@@ -78,7 +78,7 @@ class account_invoice(models.Model):
                                    help="Delivery address for current sales order.")
     attn_inv = fields.Many2one('res.partner', 'ATTN')
 
-    landed_cost = fields.Many2many('landed.cost',string='Landed Cost')
+    landed_cost = fields.One2many('landed.cost.invoice','acc_inv_id',string='Landed Cost')
     landed_cost_price = fields.Float(compute='_compute_amount',store=True,string='Landed Amount')
     
     @api.multi
@@ -392,6 +392,26 @@ class vessale_name(models.Model):
     
     name = fields.Char('Name')
     
+class landed_cost_invoice(models.Model):
+    _name='landed.cost.invoice'
+    
+    name = fields.Char('Name')
+    acc_inv_id = fields.Many2one('account.invoice','Invoice')
+    landed_id = fields.Many2one('landed.cost','Name')
+    amount = fields.Float('Amount')
+    acc_sal_id = fields.Many2one('sale.order','Sale Order')
+    acc_pur_id = fields.Many2one('purchase.order','Sale Order')
+    
+    @api.onchange('landed_id')
+    def onchange_landed_id(self):
+        for rec in self:
+            rec.amount=rec.landed_id.amount
 
+    
+class landed_cost(models.Model):
+    _name='landed.cost'
+    
+    name = fields.Char('Name')
+    amount = fields.Float('Amount')
 
 # vim:expandtab:smartindent:tabstop=4:softtabstop=4:shiftwidth=4:

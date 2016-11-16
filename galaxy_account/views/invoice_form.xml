@@ -51,7 +51,7 @@
 					<page string="Landed Cost Details">
 						<field name="landed_cost">
 							<tree editable="bottom">
-								<field name="name" />
+								<field name="landed_id" />
 								<field name="amount" />
 							</tree>
 						</field>
@@ -167,7 +167,7 @@
 					<page string="Landed Cost Details">
 						<field name="landed_cost">
 							<tree editable="bottom">
-								<field name="name" />
+								<field name="landed_id" />
 								<field name="amount" />
 							</tree>
 						</field>
@@ -209,5 +209,30 @@
 				</xpath>
 			</field>
 		</record>
+		
+		 <!-- Landed Cost tree View -->
+        <record id="landed_cost_tree_view" model="ir.ui.view" >
+            <field name="name">landed.cost.tree.view</field>
+            <field name="model">landed.cost</field>
+            <field name="arch" type="xml">
+                <tree string="Landed Cost">
+	                <field name="name" />
+	                <field name="amount"/>
+				</tree>
+            </field>
+        </record>
+		
+		
+		<!-- Landed Cost Action -->
+        <record id="landed_cost_list_action" model="ir.actions.act_window" >
+            <field name="name">Landed Cost</field>
+            <field name="res_model">landed.cost</field>
+            <field name="view_type">form</field>
+            <field name="view_mode">tree,form</field>
+        </record>
+        
+        <!-- Menu for Landed cost -->
+        <menuitem id="landed_cost_menu" parent="base.menu_product"
+                  action="landed_cost_list_action"/>
 	</data>
 </openerp>

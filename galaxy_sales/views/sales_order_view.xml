@@ -84,7 +84,7 @@
 					<page string="Landed Cost Details">
 						<field name="landed_cost_sal">
 							<tree editable="bottom">
-								<field name="name"/>
+								<field name="landed_id"/>
 								<field name="amount"/>
 							</tree>
 						</field>

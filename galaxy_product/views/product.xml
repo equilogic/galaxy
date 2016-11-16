@@ -185,19 +185,5 @@
             <field name="view_id" ref="product.product_template_tree_view"/>
             <field name="context">{"search_default_filter_to_sell":1}</field>
         </record>
-
-		<!-- Landed Cost Action -->
-        <record id="landed_cost_list_action" model="ir.actions.act_window" >
-            <field name="name">Landed Cost</field>
-            <field name="res_model">landed.cost</field>
-            <field name="view_type">form</field>
-            <field name="view_mode">tree,form</field>
-        </record>
-        
-        <!-- Menu for Landed cost -->
-        <menuitem id="landed_cost_menu" parent="base.menu_product"
-                  action="landed_cost_list_action"/>
-	   
-            
 	</data>
 </openerp>

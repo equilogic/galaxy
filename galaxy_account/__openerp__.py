@@ -28,7 +28,7 @@
     'description': """
                 manage account related information
     """,
-    'depends': ['sg_account_odoo','galaxy_sales','galaxy_product', 'account_cancel','galaxy_stock'],
+    'depends': ['sg_account_odoo','galaxy_product', 'account_cancel','galaxy_stock'],
     'demo': [],
     'data': [
             'views/invoice_form.xml',

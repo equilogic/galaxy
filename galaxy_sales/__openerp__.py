@@ -22,7 +22,7 @@
 {
     "name": "Galaxy Sales",
     "version": "1.0",
-    "depends": ['sale','galaxy_product'],
+    "depends": ['sale','galaxy_product','galaxy_account'],
     "author" :"Serpent Consulting Services Pvt. Ltd.",
     "website" : "http://www.serpentcs.com",
     "category":"sale",
