@@ -21,5 +21,6 @@
 ##############################################################################
 
 import wiz_import_products
+import wiz_import_customer_supplier
 
 # vim:expandtab:smartindent:tabstop=4:softtabstop=4:shiftwidth=4:

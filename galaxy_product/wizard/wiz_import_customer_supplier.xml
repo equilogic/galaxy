@@ -1,0 +1,40 @@
+<openerp>
+    <data>
+        <!-- Form view of Import Customers and Suppliers -->
+        
+        <record id="view_import_cust_supp_form" model="ir.ui.view">
+            <field name="name">wiz.import.cust.supp.form</field>
+            <field name="model">wiz.import.cust.supp</field>
+            <field name="type">form</field>
+            <field name="arch" type="xml">
+                <form string="Import File">
+                    <group col="4" colspan="4">
+                        <label string="Only Import .xls or .xlsx Extension File." colspan="4" />
+                        <field name="name" invisible="1" />
+                        <field name="file" filename="name" nolabel="1" />
+                    </group>
+                    <footer>
+                        <button name="import_customers_suppliers" string="Import" type="object" class="oe_highlight"/>
+                        or
+                        <button special="cancel" string="Cancel" class="oe_link"/>
+                    </footer>
+                </form>
+            </field>
+        </record>
+        
+        <!-- Action view of Import Customers and Suppliers -->
+        <record id="action_import_cust_supp" model="ir.actions.act_window">
+            <field name="name">Import Customers/Suppliers</field>
+            <field name="type">ir.actions.act_window</field>
+            <field name="res_model">wiz.import.cust.supp</field>
+            <field name="view_type">form</field>
+            <field name="view_mode">form</field>
+            <field name="target">new</field>
+        </record>
+        
+        <!-- Menuitem of Import Customers and Suppliers -->
+        <menuitem id="menu_import_cust_supp"
+            name="Import Customers/Suppliers" action="action_import_cust_supp"
+            parent="base.menu_product" sequence="11"/>
+    </data>
+</openerp>
