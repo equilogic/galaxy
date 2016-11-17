@@ -394,8 +394,8 @@ class vessale_name(models.Model):
     
 class landed_cost_invoice(models.Model):
     _name='landed.cost.invoice'
+    _rec_name = 'landed_id'
     
-    name = fields.Char('Name')
     acc_inv_id = fields.Many2one('account.invoice','Invoice')
     landed_id = fields.Many2one('landed.cost','Name')
     amount = fields.Float('Amount')
