@@ -352,10 +352,35 @@ class res_partner(models.Model):
     
     cust_code = fields.Char('Code')
     
-    _sql_constraints = [
-        ('cust_code_unique', 'unique(cust_code)', 'Please Enter Unique Customer Code'),
-    ]
+#     _sql_constraints = [
+#         ('cust_code_unique', 'unique(cust_code)', 'Please Enter Unique Customer Code.'),
+#     ]
 
+    @api.v7
+    def _check_cust_code_unique(self, cr, uid, ids, context=None):
+        for partner in self.browse(cr, uid, ids, context=context):
+            if partner.customer == True and partner.cust_code:
+                partners = self.search(cr, uid, [('cust_code', '=', partner.cust_code),
+                                                 ('customer','=', True)])
+                if partners and len(partners) > 1:
+                    return False
+        return True
+
+    @api.v7
+    def _check_supp_code_unique(self, cr, uid, ids, context=None):
+        for partner in self.browse(cr, uid, ids, context=context):
+            if partner.supplier == True and partner.cust_code:
+                partners = self.search(cr, uid, [('cust_code', '=', partner.cust_code),
+                                                 ('supplier','=', True)])
+                if partners and len(partners) > 1:
+                    return False
+        return True
+
+    _constraints = [
+        (_check_cust_code_unique, 'Please Enter Unique Customer Code.', ['cust_code']),
+        (_check_supp_code_unique, 'Please Enter Unique Supplier Code.', ['cust_code']),
+    ]
+    
 class ship_via(models.Model):
     _name = 'ship.via'
     
