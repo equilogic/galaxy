@@ -123,14 +123,14 @@ class wiz_import_cust_supp(models.TransientModel):
                                         mobile = ''
                                         if rec_value:
                                             split_mobile = str(rec_value).split('.')
-                                            if split_mobile and split_mobile[1] == '0':
+                                            if split_mobile:
                                                 mobile = split_mobile and split_mobile[0]
                                         partner_vals.update({'mobile': mobile or ''})
                                     elif header_l == 'Fax':
                                         fax = ''
                                         if rec_value:
                                             split_fax = str(rec_value).split('.')
-                                            if split_fax and split_fax[1] == '0':
+                                            if split_fax:
                                                 fax = split_fax and split_fax[0]
                                         partner_vals.update({'fax': fax or ''})
                                     elif header_l == 'Email':
@@ -169,8 +169,8 @@ class wiz_import_cust_supp(models.TransientModel):
                                         partner_vals.update({'user_id': user})
                                     elif header_l == 'Contact Reference':
                                         partner_vals.update({'ref': rec_value or ''})
-                                    elif header_l == 'Date':
-                                        partner_vals.update({'date': rec_value or ''})
+#                                    elif header_l == 'Date':
+#                                        partner_vals.update({'date': rec_value or ''})
                                     elif header_l == 'Contacts':
                                         if rec_value:
                                             for contact in ustr(rec_value).split(','):

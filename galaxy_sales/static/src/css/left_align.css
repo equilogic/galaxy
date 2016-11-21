@@ -6,7 +6,7 @@
      text-align:left !important;
 }
 
-/* .openerp .oe_leftbar {
+.openerp .oe_leftbar {
 	background: #28384d;
 }
 
@@ -35,7 +35,7 @@
   margin-left: 8px;
   color: #dee360;
 }
-*/
+
 tr [data-field="price_unit"]{
     width:80px !important;
 }
@@ -48,4 +48,26 @@ tr [data-field="price_unit"]{
     color:#eee !important;
 }
 
-} 
+}
+
+
+ .openerp .oe_list_content > tbody > tr:nth-child(odd) {
+  background-color: #A9A9A9;
+  background-color: #cd0033;
+  background-image: -webkit-gradient(linear, left top, left bottom, from(#fd1818), to(#cd0033));
+  background-image: -webkit-linear-gradient(top, #fd1818, #cd0033);
+  background-image: -moz-linear-gradient(top, #fd1818, #cd0033);
+  background-image: -ms-linear-gradient(top, #fd1818, #cd0033);
+  background-image: -o-linear-gradient(top, #fd1818, #cd0033);
+  background-image: linear-gradient(to bottom, #fd1818, #cd0033);
+}
+.openerp .oe_list_content > tbody > tr:nth-child(even) {
+  background-color: #f0f0fa;
+  background-color: #f0f0fa;
+  background-image: -webkit-gradient(linear, left top, left bottom, from(#f0f0fa), to(#f0f0fa));
+  background-image: -webkit-linear-gradient(top, #f0f0fa, #f0f0fa);
+  background-image: -moz-linear-gradient(top, #f0f0fa, #f0f0fa);
+  background-image: -ms-linear-gradient(top, #f0f0fa, #f0f0fa);
+  background-image: -o-linear-gradient(top, #f0f0fa, #f0f0fa);
+  background-image: linear-gradient(to bottom, #f0f0fa, #f0f0fa);
+}
