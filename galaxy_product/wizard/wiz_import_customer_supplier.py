@@ -176,30 +176,41 @@ class wiz_import_cust_supp(models.TransientModel):
                                             for contact in ustr(rec_value).split(','):
                                                 contact_ids.append(partner_obj.create({'name': ustr(contact) or ''}))
                                 if partner_vals:
-                                    if partner_vals.get('customer', False) and partner_vals.get('currency', False):
+                                    if partner_vals.get('currency', False):
                                         currency = currency_obj.search([('name', '=', ustr(partner_vals['currency']))])
                                         if currency:
-                                            pricelist_ids = pricelist_obj.search([('currency_id','=', currency.ids[0]), ('type','=', 'sale')])
-                                            if pricelist_ids:
-                                                partner_vals.update({'property_product_pricelist': pricelist_ids.ids[0]})
-                                            else:
-                                                new_pricelist_id = pricelist_obj.create({'name': partner_vals['currency'] + ' Sale Pricelist',
-                                                                   'active': True,
-                                                                   'currency_id': currency.ids[0],
-                                                                   'type': 'sale'})
-                                                partner_vals.update({'property_product_pricelist': new_pricelist_id.id})
-                                    if partner_vals.get('supplier', False) and partner_vals.get('currency', False):
-                                        currency = currency_obj.search([('name', '=', ustr(partner_vals['currency']))])
-                                        if currency:
-                                            pricelist_ids = pricelist_obj.search([('currency_id','=', currency.ids[0]), ('type','=', 'purchase')])
-                                            if pricelist_ids:
-                                                partner_vals.update({'property_product_pricelist_purchase': pricelist_ids.ids[0]})
-                                            else:
-                                                new_pricelist_id = pricelist_obj.create({'name': partner_vals['currency'] + ' Purchase Pricelist',
-                                                                   'active': True,
-                                                                   'currency_id': currency.ids[0],
-                                                                   'type': 'purchase'})
-                                                partner_vals.update({'property_product_pricelist_purchase': new_pricelist_id.id})
+                                            pricelist_sale_ids = pricelist_obj.search([('currency_id','=', currency.ids[0]), ('type','=', 'sale')])
+                                            pricelist_purchase_ids = pricelist_obj.search([('currency_id','=', currency.ids[0]), ('type','=', 'purchase')])
+                                            if not pricelist_sale_ids:
+                                                pricelist_obj.create({'name': partner_vals['currency'] + ' Sale Pricelist',
+                                                                       'active': True,
+                                                                       'currency_id': currency.ids[0],
+                                                                       'type': 'sale'})
+                                            if not pricelist_purchase_ids:
+                                                pricelist_obj.create({'name': partner_vals['currency'] + ' Purchase Pricelist',
+                                                                       'active': True,
+                                                                       'currency_id': currency.ids[0],
+                                                                       'type': 'purchase'})
+                                            if partner_vals.get('customer', False):
+                                                pricelist_sale_ids = pricelist_obj.search([('currency_id','=', currency.ids[0]), ('type','=', 'sale')])
+                                                if pricelist_sale_ids:
+                                                    partner_vals.update({'property_product_pricelist': pricelist_sale_ids.ids[0]})
+                                                else:
+                                                    new_pricelist_sale_id = pricelist_obj.create({'name': partner_vals['currency'] + ' Sale Pricelist',
+                                                                       'active': True,
+                                                                       'currency_id': currency.ids[0],
+                                                                       'type': 'sale'})
+                                                    partner_vals.update({'property_product_pricelist': new_pricelist_sale_id.id})
+                                            if partner_vals.get('supplier', False):
+                                                pricelist_purchase_ids = pricelist_obj.search([('currency_id','=', currency.ids[0]), ('type','=', 'purchase')])
+                                                if pricelist_purchase_ids:
+                                                    partner_vals.update({'property_product_pricelist_purchase': pricelist_purchase_ids.ids[0]})
+                                                else:
+                                                    new_pricelist_purchase_id = pricelist_obj.create({'name': partner_vals['currency'] + ' Purchase Pricelist',
+                                                                       'active': True,
+                                                                       'currency_id': currency.ids[0],
+                                                                       'type': 'purchase'})
+                                                    partner_vals.update({'property_product_pricelist_purchase': new_pricelist_purchase_id.id})
                                     partner_vals.pop('currency')
                                     new_partner_id = partner_obj.create(partner_vals)
                                     if contact_ids and new_partner_id:
