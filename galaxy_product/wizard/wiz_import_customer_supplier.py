@@ -23,6 +23,8 @@ class wiz_import_cust_supp(models.TransientModel):
         country_obj = self.env['res.country']
         title_obj = self.env['res.partner.title']
         user_obj = self.env['res.users']
+        currency_obj = self.env['res.currency']
+        pricelist_obj = self.env['product.pricelist']
         for wiz_rec in self:
             datafile = wiz_rec.file
             if not datafile:
@@ -49,6 +51,7 @@ class wiz_import_cust_supp(models.TransientModel):
                             final_data_dict = dict(zip(header_list, record_data_l))
                             if record_data_l and final_data_dict:
                                 partner_vals = {}
+                                contact_ids = []
                                 for header_l in final_data_dict:
                                     rec_value = final_data_dict.get(header_l, False) or False
                                     if header_l == 'Name':
@@ -77,6 +80,16 @@ class wiz_import_cust_supp(models.TransientModel):
                                         if rec_value:
                                             active = True
                                         partner_vals.update({'active': active or ''})
+                                    elif header_l == 'Is a Company':
+                                        is_company = False
+                                        if rec_value:
+                                            is_company = True
+                                        partner_vals.update({'is_company': is_company or ''})
+                                    elif header_l == 'Currency':
+                                        currency = False
+                                        if rec_value:
+                                            currency = ustr(rec_value)
+                                        partner_vals.update({'currency': currency or False})
                                     elif header_l == 'Street':
                                         partner_vals.update({'street': rec_value or ''})
                                     elif header_l == 'Street2':
@@ -158,8 +171,40 @@ class wiz_import_cust_supp(models.TransientModel):
                                         partner_vals.update({'ref': rec_value or ''})
                                     elif header_l == 'Date':
                                         partner_vals.update({'date': rec_value or ''})
+                                    elif header_l == 'Contacts':
+                                        if rec_value:
+                                            for contact in ustr(rec_value).split(','):
+                                                contact_ids.append(partner_obj.create({'name': ustr(contact) or ''}))
                                 if partner_vals:
-                                    partner_obj.create(partner_vals)
+                                    if partner_vals.get('customer', False) and partner_vals.get('currency', False):
+                                        currency = currency_obj.search([('name', '=', ustr(partner_vals['currency']))])
+                                        if currency:
+                                            pricelist_ids = pricelist_obj.search([('currency_id','=', currency.ids[0]), ('type','=', 'sale')])
+                                            if pricelist_ids:
+                                                partner_vals.update({'property_product_pricelist': pricelist_ids.ids[0]})
+                                            else:
+                                                new_pricelist_id = pricelist_obj.create({'name': partner_vals['currency'] + ' Sale Pricelist',
+                                                                   'active': True,
+                                                                   'currency_id': currency.ids[0],
+                                                                   'type': 'sale'})
+                                                partner_vals.update({'property_product_pricelist': new_pricelist_id.id})
+                                    if partner_vals.get('supplier', False) and partner_vals.get('currency', False):
+                                        currency = currency_obj.search([('name', '=', ustr(partner_vals['currency']))])
+                                        if currency:
+                                            pricelist_ids = pricelist_obj.search([('currency_id','=', currency.ids[0]), ('type','=', 'purchase')])
+                                            if pricelist_ids:
+                                                partner_vals.update({'property_product_pricelist_purchase': pricelist_ids.ids[0]})
+                                            else:
+                                                new_pricelist_id = pricelist_obj.create({'name': partner_vals['currency'] + ' Purchase Pricelist',
+                                                                   'active': True,
+                                                                   'currency_id': currency.ids[0],
+                                                                   'type': 'purchase'})
+                                                partner_vals.update({'property_product_pricelist_purchase': new_pricelist_id.id})
+                                    partner_vals.pop('currency')
+                                    new_partner_id = partner_obj.create(partner_vals)
+                                    if contact_ids and new_partner_id:
+                                        for contact in contact_ids:
+                                            contact.write({'parent_id': new_partner_id.id, 'use_parent_address': True})
             else:
                 raise Warning(_("Please select (.xls or .xlsx) extension"
                                 " file to import."))
