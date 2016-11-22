@@ -227,7 +227,8 @@ class wiz_import_cust_supp(models.TransientModel):
                                                                        'currency_id': currency.ids[0],
                                                                        'type': 'purchase'})
                                                     partner_vals.update({'property_product_pricelist_purchase': new_pricelist_purchase_id.id})
-                                    partner_vals.pop('currency')
+                                    if 'currency' in partner_vals.keys():
+                                        partner_vals.pop('currency')
                                     new_partner_id = partner_obj.create(partner_vals)
                                     if contact_ids and new_partner_id:
                                         for contact in contact_ids:
