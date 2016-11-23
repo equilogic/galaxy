@@ -15,7 +15,7 @@ class wiz_import_products(models.TransientModel):
     
     @api.multi
     def import_products(self):
-        prod_obj = self.env['product.product']
+        prod_obj = self.env['product.template']
         for wiz_rec in self:
             datafile = wiz_rec.file
             if not datafile:
@@ -46,12 +46,12 @@ class wiz_import_products(models.TransientModel):
                                 for header_l in header_list:
                                     rec_value = final_product_dict.get(header_l, False) or False
                                     if header_l == 'Item Name':
-                                        if rec_value:
-                                            products_ids = prod_obj.search([('name', '=', ustr(rec_value))])
+#                                        if rec_value:
+#                                            products_ids = prod_obj.search([('name', '=', ustr(rec_value))])
                                         product_vals.update({'name': rec_value or ''})
-                                    elif header_l == 'Internal Reference':
-#                                         if rec_value:
-#                                             products = prod_obj.search([('default_code', '=', ustr(rec_value))])
+                                    if header_l == 'Internal Reference':
+                                        if rec_value:
+                                            products_ids = prod_obj.search([('default_code', '=', ustr(rec_value))])
                                         product_vals.update({'default_code': rec_value or ''})
                                     elif header_l == 'Sale Price':
                                         product_vals.update({'list_price': rec_value or 0.0})
