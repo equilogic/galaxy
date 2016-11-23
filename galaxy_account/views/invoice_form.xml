@@ -234,5 +234,29 @@
         <!-- Menu for Landed cost -->
         <menuitem id="landed_cost_menu" parent="base.menu_product"
                   action="landed_cost_list_action"/>
+                  
+		 <!-- Ship Via View -->
+        <record id="landed_cost_tree_view" model="ir.ui.view" >
+            <field name="name">ship.via.tree.view</field>
+            <field name="model">ship.via</field>
+            <field name="arch" type="xml">
+                <tree string="Ship Via">
+	                <field name="name" />
+				</tree>
+            </field>
+        </record>
+		
+		
+		<!-- Landed Cost Action -->
+        <record id="ship_via_action" model="ir.actions.act_window" >
+            <field name="name">Ship Via</field>
+            <field name="res_model">ship.via</field>
+            <field name="view_type">form</field>
+            <field name="view_mode">tree,form</field>
+        </record>
+        
+        <!-- Menu for Landed cost -->
+        <menuitem id="ship_vai_menu" parent="base.menu_product"
+                  action="ship_via_action"/>                  
 	</data>
 </openerp>
