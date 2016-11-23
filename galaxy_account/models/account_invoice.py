@@ -80,6 +80,8 @@ class account_invoice(models.Model):
 
     landed_cost = fields.One2many('landed.cost.invoice','acc_inv_id',string='Landed Cost')
     landed_cost_price = fields.Float(compute='_compute_amount',store=True,string='Landed Amount')
+    customer_po = fields.Char(string="Customer PO")
+    delivery_status =fields.Char(string="Delivery Status")
     
     @api.multi
     def onchange_partner_id(self, type, partner_id, date_invoice=False,
