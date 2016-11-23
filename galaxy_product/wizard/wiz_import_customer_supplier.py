@@ -118,7 +118,7 @@ class wiz_import_cust_supp(models.TransientModel):
                                             zip_code = rec_value
                                         partner_vals.update({'zip': zip_code})
                                     elif header_l == 'Country' and not already_exist_partner_flag:
-                                        countrys = country_obj.search([('name','=', ustr(rec_value))])
+                                        countrys = country_obj.search([('name','=', ustr(rec_value).title())])
                                         country = False
                                         if countrys:
                                             country = countrys.ids[0]
