@@ -31,6 +31,7 @@
     'depends': ['purchase','galaxy_product','galaxy_sales','galaxy_stock'],
     'demo': [],
     'data': [
+             'data/purchase_order_sequence.xml',
              'views/purchase_order_view.xml',
              'wizard/wiz_galaxy_prod_import_xls.xml',
              'wizard/purchase_register_report_wizard.xml',

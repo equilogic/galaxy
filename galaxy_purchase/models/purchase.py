@@ -93,6 +93,13 @@ class purchase_order(models.Model):
                              'partner_ship_id':res_shipping})
         return res
 
+    @api.model
+    def create(self, vals):
+        if vals.get('name', '/') == '/':
+            vals['name'] = self.env['ir.sequence'].get('purchase_order_new') or '/'
+        res = super(purchase_order, self).create(vals)
+        
+        return res
     @api.depends('order_line','landed_cost_pur')
     def _amount_all(self):
         line_obj = self.env['purchase.order.line']

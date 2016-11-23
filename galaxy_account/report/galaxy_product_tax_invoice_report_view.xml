@@ -13,6 +13,7 @@
 
 			<t t-call="galaxy_account.external_layout_header_galaxy_account_tax_invoice" />
 			<t t-raw="0" />
+			<t t-call="galaxy_account.external_layout_footer_galaxy_account_tax_invoice_ft" />
 			<t t-call="galaxy_account.external_layout_footer_galaxy_account_tax_invoice" />
 		</template>
 
@@ -22,52 +23,84 @@
 				<div class="text-center">
 					<div t-if="o.company_id">
 						<div>
-							<h3>
-								<strong>
-									<span t-field="o.company_id.name"></span>
-								</strong>
-							</h3>
+							<b>
+								<span style="font-family:Helvetica;font-size:20px;" class="text-center"
+									t-field="o.company_id.name" />
+							</b>
 						</div>
 						<div>
-							<span t-field="o.company_id.street" />
-							<span t-field="o.company_id.city" />
-							<span t-field="o.company_id.state_id" />
-							<span t-field="o.company_id.country_id" />
+							<span style="font-family:Helvetica;font-size:12px;" t-field="o.company_id.street" />
+							<span style="font-family:Helvetica;font-size:12px;" t-field="o.company_id.city" />
+							<span style="font-family:Helvetica;font-size:12px;" t-field="o.company_id.state_id" />
+							<span style="font-family:Helvetica;font-size:12px;" t-field="o.company_id.country_id" />
 						</div>
-						<div>
+						<div style="font-family:Helvetica;font-size:12px;">
 							<span>Tel :</span>
 							<span t-field="o.company_id.phone" />
 
 							<span>Fax :</span>
 							<span t-field="o.company_id.fax" />
 						</div>
-						<div>
+						
+						<div style="font-family:Helvetica;font-size:12px;">
 							<span>Company Reg No. </span>
 							<span t-field="o.company_id.company_registry" />
 						</div>
-						<div>
-							<h3><b>TAX INVOICE</b></h3>
-						</div>
 					</div>
 				</div>
+				<table width="100%">
+					<tr>
+						<th colspan="4" width="100%" class="text-center"
+							style="font-family:Helvetica;font-size:18px;">
+							TAX INVOICE
+						</th>
+					</tr>
+					<tr>
+						<td width="30%"></td>
+						<td width="40%" class="text-center" style="font-family:Helvetica;font-size:12px;">
+							<span>GST Reg No : </span>
+							<t t-if="o.company_id.gst_no">
+								<span class="text-center" t-field="o.company_id.gst_no" />
+							</t>
+						</td>
+
+						<td width="15%" class="text-right">
+							<span style="font-family:Helvetica;font-size:13px;">
+								<b>INVOICE NO :</b>
+							</span>
+						</td>
+						<td width="20%" style="font-family:Helvetica;font-size:13px;">
+							&amp;nbsp;&amp;nbsp;
+							<b>
+								<span t-field="o.number" />
+							</b>
+						</td>
+					</tr>
+					<tr>
+						<td width="70%" colspan="2"></td>
+						<td width="15%" class="text-right">
+							<span style="font-family:Helvetica;font-size:12px;">
+								<b>DATE : </b>
+							</span>
+						</td>
+						<td width="20%" style="font-family:Helvetica;font-size:12px;">
+							&amp;nbsp;&amp;nbsp;
+							<b>
+								<span t-field="o.date_invoice" t-field-options='{"format": "dd-MM-Y"}' />
+							</b>
+						</td>
+					</tr>
+				</table>
 			</div>
+		</template>
+		<template id="external_layout_footer_galaxy_account_tax_invoice_ft">
+			<span><h3>Hello</h3></span>
 		</template>
 		<!-- Report Footer -->
 		<template id="external_layout_footer_galaxy_account_tax_invoice">
+			
 			<div class="footer">
 				<table width="100%">
-					<tr>
-						<ul class="list-inline" style='text-align:right'>
-							<li>Page:</li>
-							<li>
-								<span class="page" />
-							</li>
-							<li>/</li>
-							<li>
-								<span class="topage" />
-							</li>
-						</ul>
-					</tr>
 					<tr>
 						<td class="text center">
 							<center>
@@ -86,68 +119,66 @@
 				font-family:Helvetica;
 				font-size:12px;
 				}
-				
+
 			</style>
 			<t t-call="report.html_container">
 				<t t-call="galaxy_account.external_layout_galaxy_account_tax_invoice">
 					<div class="page" style="font-family:Helvetica;font-size:12px">
 						<div class="oe_structure" />
+
+						<div style="text-align: justify;">INVOICE
+							OF
+							&amp;nbsp;&amp;nbsp;&amp;nbsp;&amp;nbsp;&amp;nbsp;&amp;nbsp;&amp;nbsp;&amp;nbsp;&amp;nbsp;
+							<span style="text-transform:uppercase;" t-field="o.ship_via_id.name" />
+							&amp;nbsp;&amp;nbsp;&amp;nbsp;&amp;nbsp;&amp;nbsp;&amp;nbsp;&amp;nbsp;&amp;nbsp;&amp;nbsp;
+							<span>CASES</span>
+							&amp;nbsp;&amp;nbsp;&amp;nbsp;&amp;nbsp;&amp;nbsp;&amp;nbsp;&amp;nbsp;&amp;nbsp;&amp;nbsp;
+							<span style="text-transform:uppercase;" t-field="o.cases_id.name" />
+							&amp;nbsp;&amp;nbsp;&amp;nbsp;
+							<span> SHIPPED IN GOOD ORDER AND CONDITION BY GALAXY ENTERPRISE
+								PTE PER
+							</span>
+							&amp;nbsp;&amp;nbsp;&amp;nbsp;
+							<span style="text-transform:uppercase;" t-field="o.vessale_name_id.name" />
+							<span>SALEING ON OR ABOUT </span>
+							<span style="text-transform:uppercase;" t-field="o.date_invoice" />
+							<span>FROM</span>
+							&amp;nbsp;&amp;nbsp;&amp;nbsp;
+							<span style="text-transform:uppercase;" t-field="o.from_id.name" />
+							&amp;nbsp;&amp;nbsp;
+							<span>TO</span>
+							&amp;nbsp;&amp;nbsp;
+							<span style="text-transform:uppercase;" t-field="o.port_name_id.name" />
+							<span>ON ACCOUNT AND RISK OF MESSRS.</span>
+							&amp;nbsp;
+							<b>
+								<span t-field="o.partner_id.name" />
+							</b>
+						</div>
 						<table width="100%">
 							<tr>
-								<td width="30%"></td>
-								<td width="40%"  class="text-center">
-									<span>GST Reg No : </span>
-									<t t-if="o.company_id.gst_no">
-										<span class="text-center" t-field="o.company_id.gst_no" />
-									</t>
-								</td>
-								
-								<td width="15%" class="text-right">
-									<span ><b>INVOICE NO :</b></span>
-								</td>
-								<td width="20%">&amp;nbsp;&amp;nbsp;
-										<b><span t-field="o.number" /></b>
-								</td>
+								<th>
+									<span t-field="o.partner_id.name">,</span>
+								</th>
 							</tr>
 							<tr>
-								<td width="70%" colspan="2"></td>
-								<td width="15%" class="text-right">
-									<span ><b>DATE : </b></span>
-								</td>
-								<td width="20%">&amp;nbsp;&amp;nbsp;
-									<b><span t-field="o.date_invoice" t-field-options='{"format": "dd-MM-Y"}' /></b>
-								</td>
-							</tr>
-						</table>
-						<div style="text-align: justify;">INVOICE OF &amp;nbsp;&amp;nbsp;&amp;nbsp;&amp;nbsp;&amp;nbsp;&amp;nbsp;&amp;nbsp;&amp;nbsp;&amp;nbsp;
-						<span style="text-transform:uppercase;" t-field="o.ship_via_id.name" />&amp;nbsp;&amp;nbsp;&amp;nbsp;&amp;nbsp;&amp;nbsp;&amp;nbsp;&amp;nbsp;&amp;nbsp;&amp;nbsp;
-						<span>CASES</span>&amp;nbsp;&amp;nbsp;&amp;nbsp;&amp;nbsp;&amp;nbsp;&amp;nbsp;&amp;nbsp;&amp;nbsp;&amp;nbsp;
-						<span style="text-transform:uppercase;" t-field="o.cases_id.name" />&amp;nbsp;&amp;nbsp;&amp;nbsp;
-						<span> SHIPPED IN GOOD ORDER AND CONDITION BY GALAXY ENTERPRISE PTE PER 
-						</span> &amp;nbsp;&amp;nbsp;&amp;nbsp;<span style="text-transform:uppercase;" t-field="o.vessale_name_id.name" />
-						<span>SALEING ON OR ABOUT </span><span style="text-transform:uppercase;" t-field="o.date_invoice" />
-						<span>FROM</span>&amp;nbsp;&amp;nbsp;&amp;nbsp;<span style="text-transform:uppercase;" t-field="o.from_id.name" />&amp;nbsp;&amp;nbsp;<span>TO</span>&amp;nbsp;&amp;nbsp;<span style="text-transform:uppercase;" t-field="o.port_name_id.name" />
-						<span>ON ACCOUNT AND RISK OF MESSRS.</span>&amp;nbsp;<b><span t-field="o.partner_id.name" /></b></div>
-						<table width="100%">
-							<tr>
-								<th >
-									<span t-field="o.partner_id.name" >,</span>
-								</th>	
-							</tr>
-							<tr>						
-								<th >
+								<th>
 									<span t-field="o.partner_id.street" />
 									<t t-if="o.partner_id.street2">
-										,<span t-field="o.partner_id.street2" />
+										,
+										<span t-field="o.partner_id.street2" />
 									</t>
 									<t t-if="o.partner_id.city">
-										,<span t-field="o.partner_id.city" />
+										,
+										<span t-field="o.partner_id.city" />
 									</t>
 									<t t-if="o.partner_id.state_id">
-										,<span t-field="o.partner_id.state_id" />
+										,
+										<span t-field="o.partner_id.state_id" />
 									</t>
 									<t t-if="o.partner_id.zip">
-										-<span t-field="o.partner_id.zip" />
+										-
+										<span t-field="o.partner_id.zip" />
 									</t>
 									<t t-if="o.partner_id.country_id">
 										<span t-field="o.partner_id.country_id" />
@@ -155,14 +186,16 @@
 								</th>
 							</tr>
 						</table>
-						
+
 						<table width="100%">
 							<tr>
 								<td width="10%">
 									<span>TERMS:</span>
 								</td>
 								<td width="30%">
-									<t t-if="o.payment_term"><span t-field="o.payment_term" /></t>
+									<t t-if="o.payment_term">
+										<span t-field="o.payment_term" />
+									</t>
 								</td>
 								<td width="60%">
 									<span>BANK:</span>
@@ -172,35 +205,39 @@
 								</td>
 							</tr>
 						</table>
-						<br/>
+						<br />
 						<table width="100%">
 							<tr>
 								<td width="50%" style="padding:5px">
 									<span>INSURENCE COVERED WITH /</span>
 									<t t-if="o.insurence_covered_id">
-										 &amp;nbsp; &amp;nbsp; &amp;nbsp; &amp;nbsp; &amp;nbsp;<span t-field="o.insurence_covered_id.name" />
+										&amp;nbsp; &amp;nbsp; &amp;nbsp; &amp;nbsp; &amp;nbsp;
+										<span t-field="o.insurence_covered_id.name" />
 									</t>
 								</td>
 								<td width="50%"></td>
 							</tr>
 						</table>
-						<table style="border-top:1px solid black"
+						<table style="border-top:1px solid black" class="table-condensed"
 							width="100%">
 							<thead>
-								<tr style="border-bottom:1px solid black"> 
+								<tr style="border-bottom:1px solid black">
 									<th class="text-left line" width="10%" style="padding:5px">QUANTITY</th>
 									<th width="5%" style="padding:5px"></th>
-									<th class="text-center line" width="35%" style="padding:5px">DESCRIPTION</th>
+									<th class="text-center line" width="35%" style="padding:5px">DESCRIPTION
+									</th>
 									<th class="text left line" width="10%" style="padding:5px">
-									<t t-if="o.partner_id.country_id.name != 'Singapore'">
-									ORIGIN</t></th>
+										<t t-if="o.partner_id.country_id.name != 'Singapore'">
+											ORIGIN
+										</t>
+									</th>
 									<th class="text-right line" width="20%" style="padding:5px">U.PRICE</th>
 									<th class="text-right line" width="20%" style="padding:5px">AMOUNT</th>
 								</tr>
 							</thead>
 							<tbody>
 								<tr t-foreach="o.invoice_line" t-as="line">
-									<td class="text-right" width="10%" style="padding:5px;"> 
+									<td class="text-right" width="10%" style="padding:5px;">
 										<span t-esc="get_qty(line.quantity)" />
 									</td>
 									<td width="5%" style="padding:5px;">
@@ -214,202 +251,234 @@
 											<span style="text-transform:uppercase;" t-field="line.prod_desc" />
 										</t>
 										<t t-if="o.partner_id.country_id.name != 'Singapore'">
-											<div width="25%" style="text-transform:uppercase;" t-field="line.name" />
+											<div width="25%" style="text-transform:uppercase;"
+												t-field="line.name" />
 										</t>
 									</td>
 									<td class="text-left line" width="10%">
 										<t t-if="o.partner_id.country_id.name != 'Singapore'">
-											<span style="text-transform:uppercase;"  t-esc="origin(line)" />
+											<span style="text-transform:uppercase;" t-esc="origin(line)" />
 										</t>
 									</td>
 									<td class="text-right line" width="20%">
-										<span t-field="o.currency_id.name" /><span t-field="o.currency_id.symbol" /><span t-field="line.price_unit" />
+										<span t-field="o.currency_id.name" />
+										<span t-field="o.currency_id.symbol" />
+										<span t-field="line.price_unit" />
 									</td>
 									<td class="text-right line" width="20%">
-										<span t-field="o.currency_id.name" /><span t-field="o.currency_id.symbol" /><span t-field="line.price_subtotal" />
+										<span t-field="o.currency_id.name" />
+										<span t-field="o.currency_id.symbol" />
+										<span t-field="line.price_subtotal" />
 									</td>
 								</tr>
-								</tbody>
-							</table>
-							<table width="100%" style="page-break-inside: avoid; ">
+							</tbody>
+						</table>
+						<table width="100%" style="page-break-inside: avoid; ">
+							<tr>
+								<td width="10%"></td>
+								<td width="5%"></td>
+								<td width="35%">========================================</td>
+								<td width="10%"></td>
+								<td width="20%"></td>
+								<td width="20%"></td>
+							</tr>
+							<tr>
+								<td width="10%"></td>
+								<td width="5%"></td>
+								<td width="35%">
+									<t t-if="o.payment_term">
+										<div>
+											TERMS :
+											<span style="text-transform:uppercase;" t-field="o.payment_term" />
+										</div>
+									</t>
+								</td>
+								<td width="10%"></td>
+								<td width="20%"></td>
+								<td width="20%"></td>
+							</tr>
+							<tr>
+								<td width="10%"></td>
+								<td width="5%"></td>
+								<td width="35%">
+									<t t-if="o.landed_cost">
+										LANDED COST :
+									</t>
+								</td>
+								<td width="10%"></td>
+								<td width="20%"></td>
+								<td width="20%"></td>
+							</tr>
+							<tr>
+								<td width="10%"></td>
+								<td width="5%"></td>
+								<td width="35%">
+									<t t-if="o.landed_cost">
+										<div t-foreach="get_cost(o.landed_cost,o.currency_id)"
+											t-as="cost">
+											<span style="text-transform:uppercase;" t-esc="cost['name']" />
+										</div>
+									</t>
+								</td>
+								<td width="10%"></td>
+								<td width="20%"></td>
+								<td width="20%" class="text-right">
+									<t t-if="o.landed_cost">
+										<div t-foreach="get_cost(o.landed_cost,o.currency_id)"
+											t-as="cost">
+											<span t-esc="cost['amount']" />
+										</div>
+									</t>
+								</td>
+							</tr>
+							<tr>
+								<td width="10%"></td>
+								<td width="5%"></td>
+								<td width="35%">LESS CREDIT NO:</td>
+								<td width="10%"></td>
+								<td width="20%"></td>
+								<td width="20%"></td>
+							</tr>
+							<tr>
+								<td width="10%"></td>
+								<td width="5%"></td>
+								<td width="25%">========================================</td>
+								<td width="10%"></td>
+								<td width="20%"></td>
+								<td width="20%"></td>
+							</tr>
+						</table>
+						<br/><br/><br/><br/><br/><br/><br/><br/>
+						<div style="bottom:xxpx; page-break-inside: avoid;">
+							<table
+								style="border-top:1px solid;font-family:Helvetica;font-size:12px;"
+								width="100%">
+								<br />
 								<tr>
-									<td width="10%"></td>
-									<td width="5%"></td>
-									<td width="35%">========================================</td>
-									<td width="10%"></td>
-									<td width="20%"></td>
-									<td width="20%"></td>
-								</tr>
-								<tr>
-									<td width="10%"></td>
-									<td width="5%"></td>
-									<td width="35%">
-										<t t-if="o.payment_term">
-											<div>TERMS : <span style="text-transform:uppercase;" t-field="o.payment_term" /></div>
+									<td width="30%">Sub-Total
+										: &amp;nbsp;
+										<span class="text-left" t-field="o.currency_id.name" /><span class="text-left" t-field="o.currency_id.symbol" /><span class="text-left" t-field="o.amount_untaxed" />
+									</td>
+									<td width="15%">
+										Rate = &amp;nbsp;
+										<span t-field="o.currency_rate" />
+									</td>
+									<td width="25%" style="padding:5px">
+										<t t-if="o.partner_id.country_id.name == 'Singapore'">
+											<span>7%GST = </span>
+											&amp;nbsp;
+											<span t-field="o.currency_id.name" />
+											<span t-field="o.currency_id.symbol" />
+											<span t-field="o.amount_tax"></span>
+										</t>
+										<t t-if="o.partner_id.country_id.name != 'Singapore'">
+											<span>0%GST = </span>
+											&amp;nbsp;
+											<span t-field="o.currency_id.name" />
+											<span t-field="o.currency_id.symbol" />
+											<span>0.0</span>
 										</t>
 									</td>
-									<td width="10%"></td>
-									<td width="20%"></td>
-									<td width="20%"></td>
-								</tr>
-								<tr>
-									<td width="10%"></td>
-									<td width="5%"></td>
-									<td width="35%">
-										<t t-if="o.landed_cost">
-									LANDED COST :</t></td>
-									<td width="10%"></td>
-									<td width="20%"></td>
-									<td width="20%"></td>
-								</tr>
-								<tr>
-									<td width="10%"></td>
-									<td width="5%"></td>
-									<td width="35%">
-										<t t-if="o.landed_cost">
-										<div  t-foreach="get_cost(o.landed_cost,o.currency_id)" t-as="cost">
-											<span style="text-transform:uppercase;" t-esc="cost['name']"/>
-										</div></t>
+									<td width="15%" class="text-left">
+										SUB-TOTAL
 									</td>
-									<td width="10%"></td>
-									<td width="20%"></td>
-									<td width="20%" class="text-right">
-										<t t-if="o.landed_cost">
-										<div  t-foreach="get_cost(o.landed_cost,o.currency_id)" t-as="cost">
-											<span t-esc="cost['amount']"/>
-										</div></t>
+									<td width="20%" class="text-left">
+										<span t-field="o.currency_id.name" />
+										<span t-field="o.currency_id.symbol" />
+										<span t-field="o.amount_untaxed" />
 									</td>
 								</tr>
 								<tr>
-									<td width="10%"></td>
-									<td width="5%"></td>
-									<td width="35%">LESS CREDIT NO:</td>
-									<td width="10%"></td>
-									<td width="20%"></td>
-									<td width="20%"></td>
+									<td width="30%">
+									</td>
+									<td width="15%">
+									</td>
+									<td width="25%">
+									</td>
+									<td width="15%">
+										<t t-if="o.partner_id.country_id.name == 'Singapore'">
+											<span>7% GST </span>
+
+										</t>
+										<t t-if="o.partner_id.country_id.name != 'Singapore'">
+											<span>GST @0% </span>
+										</t>
+									</td>
+									<td width="20%" class="text-left">
+										<span t-field="o.currency_id.name" /><span t-field="o.currency_id.symbol" /><span t-field="o.amount_tax"></span>
+									</td>
 								</tr>
 								<tr>
-									<td width="10%"></td>
-									<td width="5%"></td>
-									<td width="25%">========================================</td>
-									<td width="10%"></td>
-									<td width="20%"></td>
-									<td width="20%"></td>
+									<td width="25%">
+									</td>
+									<td width="15%">
+
+									</td>
+									<td width="25%">
+									</td>
+									<td width="20%">
+										<span>Landed Amount </span>
+									</td>
+									<td width="20%" class="text-left">
+										<span t-field="o.currency_id.name" /><span t-field="o.currency_id.symbol" /><span t-field="o.landed_cost_price" />
+									</td>
+								</tr>
+								<br />
+							</table>
+							<table style="font-family:Helvetica;font-size:12px">
+								<tr>
+									<td width="20%">
+										<b>AMOUNT IN WORDS:</b>
+									</td>
+									<td width="50%">
+										<span t-esc="amount_to_text(o.amount_total,o.currency_id) or ''" />
+									</td>
+									<td width="30%"></td>
 								</tr>
 							</table>
-						<br/><br/><br/><br/><br/>
-						<div class="row" style="page-break-inside: avoid;"> 
-							<div style="position:absolute;bottom:xxpx;page-break-inside: avoid;">
-								<table style="border-top:1px solid;"
-									width="100%">
-									<br/>
-									<tr>
-										<td width="30%">Sub-Total : &amp;nbsp;
-										 	<span class="text-left" t-field="o.currency_id.name" /><span class="text-left" t-field="o.currency_id.symbol" /><span class="text-left" t-field="o.amount_untaxed" />
-										</td>
-										<td width="15%">
-											Rate = &amp;nbsp; <span t-field="o.currency_rate" />
-										</td >
-										<td width="25%" style="padding:5px">
-											<t t-if="o.partner_id.country_id.name == 'Singapore'">
-												<span>7%GST = </span>&amp;nbsp; 
-												<span t-field="o.currency_id.name" />
-												<span t-field="o.currency_id.symbol" />
-												<span t-field="o.amount_tax"></span>												
-											</t>
-											<t t-if="o.partner_id.country_id.name != 'Singapore'">
-												<span>0%GST = </span>&amp;nbsp; 
-												<span t-field="o.currency_id.name" />
-												<span t-field="o.currency_id.symbol" />
-												<span>0.0</span>													
-											</t>
-										</td>
-										<td width="15%" class="text-left" >
-											SUB-TOTAL
-										</td>
-										<td width="20%" class="text-left">
-											<span t-field="o.currency_id.name" /><span t-field="o.currency_id.symbol" /><span t-field="o.amount_untaxed" />
-										</td>
-									</tr>
-									<tr>
-										<td width="30%">
-										</td>
-										<td width="15%">
-										</td >
-										<td width="25%">
-										</td>
-										<td width="15%" >
-											<t t-if="o.partner_id.country_id.name == 'Singapore'">
-												<span>7% GST </span>
-												
-											</t>
-											<t t-if="o.partner_id.country_id.name != 'Singapore'">
-												<span>GST @0% </span>
-											</t>											
-										</td>
-										<td width="20%" class="text-left">
-											<span t-field="o.currency_id.name" /><span t-field="o.currency_id.symbol" /><span t-field="o.amount_tax"></span>
-										</td>
-									</tr>
-									<tr>
-										<td width="25%">
-										</td>
-										<td width="15%">
-											
-										</td >
-										<td width="25%">
-										</td>
-										<td width="20%" >
-											<span>Landed Amount </span>
-										</td>
-										<td width="20%" class="text-left">
-											<span t-field="o.currency_id.name" /><span t-field="o.currency_id.symbol" /><span t-field="o.landed_cost_price" />
-										</td>
-									</tr>
-									<br/>
-									</table>
-								<table>
-									<tr>
-										<td width="20%"><b>AMOUNT IN WORDS:</b></td>
-										<td width="50%">
-											<span t-esc="amount_to_text(o.amount_total,o.currency_id) or ''" />
-										</td>
-										<td width="30%"></td>
-									</tr>
-								</table>
-								<table style="border-bottom:1px solid ;" width="100%">
+							<table
+								style="border-bottom:1px solid ;font-family:Helvetica;font-size:12px;"
+								width="100%">
+								<tr>
+									<td width="70%"></td>
+									<td width="20%" class="text-left">
+										<b>TOTAL</b>
+									</td>
+									<td width="10%" class="text-left">
+										<b>
+											<span t-field="o.currency_id.name" /><span t-field="o.currency_id.symbol" /><span t-field="o.amount_total" />
+										</b>
+									</td>
+								</tr>
+								<tr>
+									<td width="70%" style="color:white">11</td>
+									<td width="20%" style="color:white">11
+									</td>
+									<td width="10%" style="color:white">11
+									</td>
+								</tr>
+							</table>
+							<br />
+							<div class="text-right">
+								<span class="text-right">
+									<b>GALAXY ENTERPRISE PTE LTD</b>
+								</span>
+							</div>
+							<br />
+							<br />
+							<br />
+							<br />
+							<div>
+								<table width="100%">
 									<tr>
 										<td width="70%"></td>
-										<td width="20%" class="text-left" >
-											<b>TOTAL</b> 
-										</td>
-										<td width="10%" class="text-left">
-											<b><span t-field="o.currency_id.name" /><span t-field="o.currency_id.symbol" /><span t-field="o.amount_total" /></b>
-										</td>
-									</tr>
-									<tr>
-										<td width="70%" style="color:white">11</td>
-										<td width="20%" style="color:white" >11
-										</td>
-										<td width="10%" style="color:white">11
+										<td class="text-right" style="border-top:2 px solid black"
+											width="30%">
+											<span style="color:white;">&amp;nbsp;&amp;nbsp;&amp;nbsp;&amp;nbsp;&amp;nbsp;
+											</span>
 										</td>
 									</tr>
 								</table>
-								<br/>
-								<div class="text-right">
-									<span class="text-right"><b>GALAXY ENTERPRISE PTE LTD</b> </span>
-								</div >
-								<br/><br/><br/><br/>
-								<div >
-									<table width="100%" >
-										<tr >
-											<td width="70%"></td>
-											<td class="text-right" style="border-top:2 px solid black" width="30%" >
-											<span style="color:white;">&amp;nbsp;&amp;nbsp;&amp;nbsp;&amp;nbsp;&amp;nbsp;</span>
-											</td>
-										</tr>
-									</table>
-								</div>
 							</div>
 						</div>
 					</div>
