@@ -48,7 +48,7 @@
 					<field name="amt"/>
 					<field name="amt_due"/>
 					<field name="state"/>
-					<field name="received"/>
+					<!-- <field name="received"/> -->
 				</tree>
 			</field>
 		</record>
