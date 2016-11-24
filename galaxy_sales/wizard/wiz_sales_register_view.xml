@@ -41,15 +41,12 @@
 			<field name="model">sale.register.report.list.new</field>
 			<field name="arch" type="xml">
 				<tree string="Sale Register Report" create="false">
-					<field name="sl_no"/>
 					<field name="date"/>
-					<field name="sales_invoice_no"/>
+					<field name="invoice_no"/>
 					<field name="customer_po_no"/>
 					<field name="customer_name"/>
-					<field name="amt_in_actual_currency"/>
-					<field name="tax_amt"/>
-					<field name="amt_in_sgd"/>
-					<field name="tax_amt_in_sgd"/>
+					<field name="amount"/>
+					<field name="amount_due"/>
 				</tree>
 			</field>
 		</record>

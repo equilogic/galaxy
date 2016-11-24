@@ -26,7 +26,7 @@ from openerp.tools.sql import drop_view_if_exists
 from openerp import tools
 
 class wiz_sale_register_report(models.TransientModel):
-    _name = "wiz.sale.register.report.list"
+    _name = "wiz.sale.register.report"
     
     
     start_date = fields.Date('Start Date',required=True ,default=datetime.now().date().strftime("%Y-%m-01"))
@@ -40,13 +40,13 @@ class wiz_sale_register_report(models.TransientModel):
         return {
                 'type':'ir.actions.act_window',
                 'name':'Sale Register Report',
-                'res_model':'sale.register.report.list.new',
+                'res_model':'sale.register.report.new',
                 'view_type':'form',
                 'view_mode':'tree,form',
             }
 
 class sale_register_report(models.Model):
-    _name='sale.register.report.list.new'
+    _name='sale.register.report.new'
     _auto=False
     
     date = fields.Date('Date',readonly=True)
@@ -54,7 +54,7 @@ class sale_register_report(models.Model):
     customer_po_no = fields.Char('Customer Po #.',readonly=True)
     customer_name = fields.Char('Customer Name',readonly=True)
     total_amount = fields.Float('Amount',readonly=True)
-    residual_amount = fields.Float('Amount Due',readonly=True)
+#     residual_amount = fields.Float('Amount Due',readonly=True)
 
     _order = "date"
 
@@ -63,8 +63,7 @@ class sale_register_report(models.Model):
         cr.execute("""create or replace view sale_register_report_new as
             (SELECT so.id,inv.number as sales_invoice_no,so.date_order as date,
                 so.amount_tax as tax_amt,so.amount_tax as tax_amt_in_sgd,rp.name as customer_name,
-                so.amount_total as amt_in_actual_currency,so.amount_total as amt_in_SGD, 
-                sol.sequence as sl_no,sol.product_id as customer_po_no
+                so.amount_total as total_amount,sol.product_id as customer_po_no
                 FROM sale_order so
                 INNER JOIN res_partner rp ON rp.id = so.partner_id
                 INNER JOIN sale_order_line sol ON sol.order_id = so.id

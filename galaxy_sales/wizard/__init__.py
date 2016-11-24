@@ -22,6 +22,7 @@
 import wiz_galaxy_add_prod_in_so
 import wiz_sale_order_register
 import wiz_sale_register
+import wiz_sales_register
 import wiz_product_wise_sale_report_1
 import wiz_product_wise_sale_report_2
 

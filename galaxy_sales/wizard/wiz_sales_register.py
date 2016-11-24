@@ -25,8 +25,8 @@ from datetime import datetime
 from openerp.tools.sql import drop_view_if_exists
 from openerp import tools
 
-class wiz_sale_register_report(models.TransientModel):
-    _name = "wiz.sale.register.report"
+class wiz_sale_register_report_list(models.TransientModel):
+    _name = "wiz.sale.register.report.list"
     
     
     start_date = fields.Date('Start Date',required=True ,default=datetime.now().date().strftime("%Y-%m-01"))
@@ -39,40 +39,36 @@ class wiz_sale_register_report(models.TransientModel):
             domain = [("date", ">=", self.start_date), ("date", "<=", self.end_date)]
         return {
                 'type':'ir.actions.act_window',
-                'name':'Sale Register Report',
-                'res_model':'sale.register.report.new',
+                'name':'Sale Register',
+                'res_model':'sale.register.report.list.new',
                 'view_type':'form',
                 'view_mode':'tree,form',
             }
 
-class sale_register_report(models.Model):
-    _name='sale.register.report.new'
+class sale_register_report_new(models.Model):
+    _name='sale.register.report.list.new'
     _auto=False
     
-    sl_no = fields.Char('Sl.No.',readonly=True)
+    invoice_no = fields.Char('Invoice #',readonly=True)
     date = fields.Date('Date',readonly=True)
-    sales_invoice_no = fields.Char('Sales Invoice No.',readonly=True)
     customer_po_no = fields.Char('Customer Po No.',readonly=True)
     customer_name = fields.Char('Customer Name',readonly=True)
-    amt_in_actual_currency = fields.Float('Amount In Actual Currency',readonly=True)
-    tax_amt = fields.Float('Tax Amount',readonly=True)
-    amt_in_sgd = fields.Float('Amt In SGD',readonly=True)
-    tax_amt_in_sgd = fields.Float('Tax Amount In SGD',readonly=True)
+    amount = fields.Float('Amount',readonly=True)
+    amount_due = fields.Float('Amount Due',readonly=True)
+
 
     _order = "date"
 
     def init(self, cr):
-        tools.drop_view_if_exists(cr, 'sale_register_report_new')
-        cr.execute("""create or replace view sale_register_report_new as
-            (SELECT so.id,inv.number as sales_invoice_no,so.date_order as date,
-                so.amount_tax as tax_amt,so.amount_tax as tax_amt_in_sgd,rp.name as customer_name,
-                so.amount_total as amt_in_actual_currency,so.amount_total as amt_in_SGD, 
-                sol.sequence as sl_no,sol.product_id as customer_po_no
-                FROM sale_order so
-                INNER JOIN res_partner rp ON rp.id = so.partner_id
-                INNER JOIN sale_order_line sol ON sol.order_id = so.id
-                INNER JOIN sale_order_invoice_rel inv_rel ON inv_rel.order_id = so.id
-                INNER JOIN account_invoice inv ON inv.id = inv_rel.invoice_id
+        tools.drop_view_if_exists(cr, 'sale_register_report_list_new')
+        cr.execute("""create or replace view sale_register_report_list_new as
+            (SELECT inv.id,inv.number as invoice_no,inv.date_invoice as date,
+                inv.customer_po as customer_po_no, rp.name as customer_name,
+                inv.amount_total as amount, 
+                inv.residual as amount_due
+                FROM account_invoice inv
+                INNER JOIN res_partner rp ON rp.id = inv.partner_id
+                where inv.type = 'out_invoice'
                 )""")
 
 
