@@ -38,7 +38,6 @@
              "views/template.xml",
              "views/res_partner_view.xml",
              "views/sale_order_sequence.xml",
-             "views/reports_view.xml",
              "wizard/wiz_sale_order_register_view.xml",
              "wizard/wiz_sale_register_view.xml",
              "wizard/wiz_sales_register_view.xml",
