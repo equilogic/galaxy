@@ -1,0 +1,57 @@
+<?xml version="1.0" encoding="utf-8"?>
+<openerp>
+    <data>
+        <!-- Form view of Sale Register Reports Wizard-->
+        <record id="wizard_sale_register_report_list_form_view" model="ir.ui.view">
+            <field name="name">wiz.sale.register.report.list.form.view</field>
+            <field name="model">wiz.sale.register.report.list</field>
+            <field name="arch" type="xml">
+                <form string="Sale Register Report">
+                	<group col="4" colspan="4">
+                		<field name="start_date" />
+            			<field name="end_date"/>
+            		</group>
+                    <footer>
+                        <button name="print_report" type="object" string="Show Report"
+                            class="oe_highlight"/>
+                        Or
+                        <button string="Cancel" class="oe_link" special="cancel"/>
+                    </footer>
+                </form>
+            </field>
+        </record>
+
+        <!-- Action for Sale Register Report Wizard -->
+        <record model="ir.actions.act_window" id="sale_register_report_list_action">
+            <field name="name">Sales Register</field>
+            <field name="res_model">wiz.sale.register.report.list</field>
+            <field name="view_type">form</field>
+            <field name="view_mode">form</field>
+            <field name="target">new</field>
+            
+        </record>
+
+        <!-- Menu for Sale Register Report Wizard -->
+        <menuitem id="wiz_sale_reg_lst_rpt" parent="base.next_id_64"
+                  action="sale_register_report_list_action"/>
+
+		<!-- Tree view for sale Register report  -->
+		<record model="ir.ui.view" id="sale_register_tree_list_new_view">
+			<field name="name">sale.register.tree.view.list.new</field>
+			<field name="model">sale.register.report.list.new</field>
+			<field name="arch" type="xml">
+				<tree string="Sale Register Report" create="false">
+					<field name="sl_no"/>
+					<field name="date"/>
+					<field name="sales_invoice_no"/>
+					<field name="customer_po_no"/>
+					<field name="customer_name"/>
+					<field name="amt_in_actual_currency"/>
+					<field name="tax_amt"/>
+					<field name="amt_in_sgd"/>
+					<field name="tax_amt_in_sgd"/>
+				</tree>
+			</field>
+		</record>
+    </data>
+</openerp>

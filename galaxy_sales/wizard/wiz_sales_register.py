@@ -26,7 +26,7 @@ from openerp.tools.sql import drop_view_if_exists
 from openerp import tools
 
 class wiz_sale_register_report(models.TransientModel):
-    _name = "wiz.sale.register.report.list"
+    _name = "wiz.sale.register.report"
     
     
     start_date = fields.Date('Start Date',required=True ,default=datetime.now().date().strftime("%Y-%m-01"))
@@ -40,21 +40,24 @@ class wiz_sale_register_report(models.TransientModel):
         return {
                 'type':'ir.actions.act_window',
                 'name':'Sale Register Report',
-                'res_model':'sale.register.report.list.new',
+                'res_model':'sale.register.report.new',
                 'view_type':'form',
                 'view_mode':'tree,form',
             }
 
 class sale_register_report(models.Model):
-    _name='sale.register.report.list.new'
+    _name='sale.register.report.new'
     _auto=False
     
+    sl_no = fields.Char('Sl.No.',readonly=True)
     date = fields.Date('Date',readonly=True)
-    sales_invoice_no = fields.Char('Invoice #',readonly=True)
-    customer_po_no = fields.Char('Customer Po #.',readonly=True)
+    sales_invoice_no = fields.Char('Sales Invoice No.',readonly=True)
+    customer_po_no = fields.Char('Customer Po No.',readonly=True)
     customer_name = fields.Char('Customer Name',readonly=True)
-    total_amount = fields.Float('Amount',readonly=True)
-    residual_amount = fields.Float('Amount Due',readonly=True)
+    amt_in_actual_currency = fields.Float('Amount In Actual Currency',readonly=True)
+    tax_amt = fields.Float('Tax Amount',readonly=True)
+    amt_in_sgd = fields.Float('Amt In SGD',readonly=True)
+    tax_amt_in_sgd = fields.Float('Tax Amount In SGD',readonly=True)
 
     _order = "date"
 
