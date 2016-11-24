@@ -227,7 +227,7 @@
 									<th class="text-center line" width="35%" style="padding:5px">DESCRIPTION
 									</th>
 									<th class="text left line" width="10%" style="padding:5px">
-										<t t-if="o.partner_id.country_id.name != 'Singapore'">
+										<t t-if="o.currency_id.name != 'SGD'">
 											ORIGIN
 										</t>
 									</th>
@@ -256,7 +256,7 @@
 										</t>
 									</td>
 									<td class="text-left line" width="10%">
-										<t t-if="o.partner_id.country_id.name != 'Singapore'">
+										<t t-if="o.currency_id.name != 'SGD'">
 											<span style="text-transform:uppercase;" t-esc="origin(line)" />
 										</t>
 									</td>
@@ -383,9 +383,7 @@
 										SUB-TOTAL
 									</td>
 									<td width="20%" class="text-left">
-										<span t-field="o.currency_id.name" />
-										<span t-field="o.currency_id.symbol" />
-										<span t-field="o.amount_untaxed" />
+										<span t-field="o.currency_id.name" /><span t-field="o.currency_id.symbol" /><span t-field="o.amount_untaxed" />
 									</td>
 								</tr>
 								<tr>
