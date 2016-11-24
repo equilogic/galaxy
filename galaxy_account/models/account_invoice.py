@@ -249,7 +249,7 @@ class account_invoice(models.Model):
                         'name' : line.name,
                         'date_planned':self.date_invoice,
                         'product_qty' : line.quantity,
-                        'product_uom' :line.uos_id.id,
+                        'product_uom' :line.uos_id.id or 1,
                         'price_unit':line.price_unit,
                         'taxes_id': [(6, 0, [x.id for x in line.invoice_line_tax_id])],
                         'discount':line.discount,
