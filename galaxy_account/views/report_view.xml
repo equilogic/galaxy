@@ -7,12 +7,12 @@
 
 
 		<record id="paperformat_euro_lowmargin_galaxy" model="report.paperformat">
-			<field name="name">European A4 low margin</field>
+			<field name="name">European A4 low margin1</field>
 			<field name="default" eval="True" />
 			<field name="format">A4</field>
 			<field name="orientation">Portrait</field>
 			<field name="margin_top">55</field>
-			<field name="margin_bottom">15</field>
+			<field name="margin_bottom">10</field>
 			<field name="margin_left">10</field>
 			<field name="margin_right">10</field>
 			<field name="header_line" eval="False" />

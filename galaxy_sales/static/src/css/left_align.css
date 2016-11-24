@@ -7,7 +7,7 @@
 }
 
 .openerp .oe_leftbar {
-	background: #28384d;
+	background: #204e6b;
 }
 
 .openerp .nav-pills > li > a:hover, .openerp a.list-group-item > a:hover  {
@@ -15,14 +15,14 @@
 }
 
 .navbar-collapse {
-	background: grey;
+	background: #a24689;
 }
 
 #oe_main_menu_navbar li a, #oe_main_menu_navbar li button {
   padding: 10px 4px 10px 4px;
   margin-top: auto;
   margin-bottom: auto;
-  font-weight: normal;
+  font-weight: larger;
   font-size: 13px;
 }
 
@@ -31,7 +31,7 @@
 }
 
 .openerp .oe_secondary_menu_section {
-  font-weight: normal;
+  font-weight: larger;
   margin-left: 8px;
   color: #dee360;
 }
@@ -70,4 +70,16 @@ tr [data-field="price_unit"]{
   background-image: -ms-linear-gradient(top, #f0f0fa, #f0f0fa);
   background-image: -o-linear-gradient(top, #f0f0fa, #f0f0fa);
   background-image: linear-gradient(to bottom, #f0f0fa, #f0f0fa);
+}
+
+.openerp .oe_application a {
+    color: black;
+}
+
+.openerp .oe_form td.oe_form_group_cell_label label {
+    line-height: 18px;
+    display: block;
+    min-width: 150px;
+    font-weight: bolder;
+    font-size: larger;
 }

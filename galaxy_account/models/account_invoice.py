@@ -207,7 +207,7 @@ class account_invoice(models.Model):
                         'product_id' : line.product_id.id,
                         'name' : line.name,
                         'product_uom_qty' : line.quantity,
-                        'product_uom' :line.uos_id.id,
+                        'product_uom' :line.uos_id.id or 1,
                         'price_unit':line.price_unit,
                         'tax_id': [(6, 0, line.invoice_line_tax_id.ids)],
                         'discount':line.discount,
@@ -224,11 +224,18 @@ class account_invoice(models.Model):
                     pick_id.account_id = self._ids
                     pick_id.do_transfer()
         if self.type == "in_invoice" and not self.invoice_from_purchase:
+            product_ids = []
+            invoice_method='picking'
+            if self.invoice_line:
+                for line in self.invoice_line:
+                    product_ids.append(line.product_id.id)
+            if not product_ids or (len(product_ids) == 1 and product_ids[0] == False):
+                invoice_method='manual'
             order_vals = {
                           'partner_id': self.partner_id.id,
                           'partner_inv_id':self.part_inv_id.id,
                           'partner_ship_id':self.part_ship_id.id,
-                          'invoice_method':'picking',
+                          'invoice_method': invoice_method,
                           'partner_ref':self.reference,
                           'date_order': self.date_invoice,
                           'pricelist_id': self.partner_id.property_product_pricelist.id,
