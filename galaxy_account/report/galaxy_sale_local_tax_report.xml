@@ -1,0 +1,349 @@
+<?xml version="1.0" encoding="utf-8"?>
+<openerp>
+	<data>
+		<!-- Template for Header and Footer -->
+		<template id="external_layout_galaxy_account_local_tax_invoice">
+			<!-- Multi company -->
+			<t t-if="o and 'company_id' in o">
+				<t t-set="company" t-value="o.company_id"></t>
+			</t>
+			<t t-if="not o or not 'company_id' in o">
+				<t t-set="company" t-value="res_company"></t>
+			</t>
+
+			<t t-call="galaxy_account.external_layout_header_galaxy_account_local_tax_invoice"/>
+			<t t-raw="0"/>
+			<t t-call="galaxy_account.external_layout_footer_galaxy_account_local_tax_invoice"/>
+		</template>
+
+		<!-- Report Header -->
+		<template id="external_layout_header_galaxy_account_local_tax_invoice">
+			<div class="header">
+				<div class="text-center">
+					<div t-if="o.company_id">
+						<div>
+							<b><span style="font-family:Helvetica;font-size:25px;" class="text-center"
+								t-field="o.company_id.name"/></b>
+						</div>
+						<div>
+							<span style="font-family:Helvetica;font-size:12px;" t-field="					o.company_id.street"/>
+							<span style="font-family:Helvetica;font-size:12px;" t-field="
+								o.company_id.city"/>
+							<span style="font-family:Helvetica;font-size:12px;" t-field="					o.company_id.state_id"/>
+							<span style="font-family:Helvetica;font-size:12px;" t-field="					o.company_id.country_id"/>
+							<span style="font-family:Helvetica;font-size:12px;" t-field="
+								o.company_id.zip"/>
+						</div>
+
+						<div style="font-family:Helvetica;font-size:12px;">
+							<span>Tel :</span>
+							<span t-field="o.company_id.phone"/>
+								/
+							<span>Fax :</span>
+							<span t-field="o.company_id.fax"/>
+						</div>
+						
+						<div style="font-family:Helvetica;font-size:12px;">
+							<span>Company Reg No. </span>
+							<span t-field="o.company_id.company_registry" />
+						</div>
+					</div>
+					<br/>
+					<div class="text-center"
+						style="font-family:Helvetica;font-size:20px;">
+						<b>TAX INVOICE</b>
+					</div>
+
+					<div width="40%" class="text-center" style="font-family:Helvetica;font-size:12px;">
+						<span>GST Reg No : </span>
+						<t t-if="o.company_id.gst_no">
+							<span class="text-center" t-field="o.company_id.gst_no" />
+						</t>
+					</div>
+				</div>
+			</div>
+		</template>
+
+		<!-- Report Footer -->
+		<template id="external_layout_footer_galaxy_account_local_tax_invoice">
+			<div class="footer">
+				<table width="100%">
+					<tr>
+						<td class="text center">
+							<center>
+								<span>E &amp; O.E </span>
+							</center>
+						</td>
+					</tr>
+				</table>
+			</div>
+		</template>
+
+		<!-- Reports Template -->
+		<template id="galaxy_account_local_tax_invoice_template">
+			<style type="text/css">
+				td.line , span.line ,th.line {
+				font-family:Helvetica;
+				font-size:12px;
+				}
+
+			</style>
+			<t t-call="report.html_container">
+				<t t-call="galaxy_account.external_layout_galaxy_account_local_tax_invoice">
+					<div class="page" style="font-family:Helvetica;font-size:12px">
+						<div class="oe_structure"/>
+						<div class="row">
+							<div class="col-xs-8" style="font-size:12px">
+								<span><b>TO:</b></span>
+								<div t-if="o.partner_id ">
+									<div>
+										<span t-field="o.partner_id.name" />
+									</div>
+									<span t-field="o.partner_id.street" />
+									<span t-field="o.partner_id.city" />
+									<span t-field="o.partner_id.state_id" />
+									<span t-field="o.partner_id.country_id" />
+									<span t-field="o.partner_id.zip" />
+								</div>
+							</div>
+
+							<div class="col-xs-3 text-right">
+								<table style="align:right;" width="100%">
+									<tr>
+										<td width="50%"><b>Invoice No.</b></td>
+										<td width="50%"><span t-field="o.number"/></td>
+									</tr>
+									<tr>
+										<td width="50%"><b>Date</b></td>
+										<td width="50%"><span  t-field="o.date_invoice" t-field-options='{"format": "dd-MM-Y"}' /></td>
+									</tr>
+									<tr>
+										<td width="50%"><b>Term</b></td>
+										<td width="50%"><span t-field="o.payment_term" /></td>
+									</tr>
+								</table>
+								<!-- <div style="font-size:13px">
+                   					<span><b>Invoice No.</b></span>
+                   					<strong>
+                   						<span style="padding:20px" t-field="o.number"/>
+                   					</strong>
+                   				</div>
+                   				<div style="font-size:12px">
+                   					<span><b>Date</b></span>
+                   					<span style="padding:43px" t-field="o.date_invoice" t-field-options='{"format": "dd-MM-Y"}' />
+                   				</div> -->
+                   				<!-- <div style="font-size:12px">
+                   					<span><b>Terms</b></span>
+                   					<span style="padding:38px" t-field="o.payment_term" />
+                   				</div> -->
+							</div>
+						</div>
+						<br/><br/><br/><br/>
+						<table class="table-condensed" style="border-top:2px solid black;border-collapse: collapse;" width="105%">
+
+							<tr style="border-bottom:2px solid black">
+								<th class="text-left line" width="10%" style="padding:5px">
+									QUANTITY</th>
+								<th width="5%" style="padding:5px"></th>
+								<th class="text-center line" width="35%" style="padding:5px">          		DESCRIPTION
+								</th>
+								<th class="text-right line" width="20%" style="padding:5px">
+									U.PRICE
+								</th>
+								<th class="text-right line" width="20%" style="padding:5px">
+									AMOUNT
+								</th>
+							</tr>
+
+							<tr>
+								<td width="10%"></td>
+								<td width="5%"></td>
+								<td width="35%">YOUR P.O. NO :</td>
+								<td width="10%"></td>
+								<td width="20%"></td>
+								<td width="20%"></td>
+							</tr>
+							<tr>
+								<td width="10%"></td>
+								<td width="5%"></td>
+								<td width="25%">========================================</td>
+								<td width="10%"></td>
+								<td width="20%"></td>
+								<td width="20%"></td>
+							</tr>
+					
+							<tr t-foreach="o.invoice_line" t-as="line">
+<!-- 								<td>AAA</td>
+								<td>AAA</td>
+								<td>AAA</td>
+								<td>AAA</td>
+								<td>AAA</td>
+								<td>AAA</td> -->
+								<td class="text-right" width="10%" style="padding:5px;font-size:11px;">
+									<span t-esc="get_qty(line.quantity)" />
+								</td>
+								<td width="5%" style="padding:5px;font-size:12px;">
+									<t t-if="get_qty(line.quantity)">
+										pc
+									</t>
+								</td>
+								<td class="text-left line" width="35%" style="font-size:11px">
+									<t
+										t-if="o.partner_id.country_id.name == 'Singapore' and o.currency_id.name == 'SGD'">
+										<span style="text-transform:uppercase;" t-field="line.prod_desc" />
+									</t>
+									<t t-if="o.partner_id.country_id.name != 'Singapore'">
+										<div width="25%" style="text-transform:uppercase;"
+											t-field="line.name" />
+									</t>
+								</td>
+								<td class="text-right line" width="20%" style="font-size:11px">
+									<span t-field="o.currency_id.name" />
+									<span t-field="o.currency_id.symbol" />
+									<span t-field="line.price_unit" />
+								</td>
+								<td class="text-right line" width="20%" style="font-size:11px">
+									<span t-field="o.currency_id.name" />
+									<span t-field="o.currency_id.symbol" />
+									<span t-field="line.price_subtotal" />
+								</td>
+							</tr>
+
+						</table>
+
+						<div style="bottom:xxpx; page-break-inside: avoid;">
+							<table
+								style="border-top:2px solid;font-family:Helvetica;font-size:12px;"
+								width="100%">
+								<br />
+								<tr>
+									<td width="30%">Sub-Total
+										: &amp;nbsp;
+										<span class="text-left" t-field="o.currency_id.name" /><span class="text-left" t-field="o.currency_id.symbol" /><span class="text-left" t-field="o.amount_untaxed" />
+									</td>
+									<td width="15%">
+										Rate = &amp;nbsp;
+										<span t-field="o.currency_rate" />
+									</td>
+									<td width="25%" style="padding:5px">
+										<t t-if="o.partner_id.country_id.name == 'Singapore'">
+											<span>7%GST = </span>
+											&amp;nbsp;
+											<span t-field="o.currency_id.name" />
+											<span t-field="o.currency_id.symbol" />
+											<span t-field="o.amount_tax"></span>
+										</t>
+										<t t-if="o.partner_id.country_id.name != 'Singapore'">
+											<span>0%GST = </span>
+											&amp;nbsp;
+											<span t-field="o.currency_id.name" />
+											<span t-field="o.currency_id.symbol" />
+											<span>0.0</span>
+										</t>
+									</td>
+									<td width="15%" class="text-left">
+										SUB-TOTAL
+									</td>
+									<td width="20%" class="text-left">
+										<span t-field="o.currency_id.name" /><span t-field="o.currency_id.symbol" /><span t-field="o.amount_untaxed" />
+									</td>
+								</tr>
+								<tr>
+									<td width="30%">
+									</td>
+									<td width="15%">
+									</td>
+									<td width="25%">
+									</td>
+									<td width="15%">
+										<t t-if="o.partner_id.country_id.name == 'Singapore'">
+											<span>7% GST </span>
+
+										</t>
+										<t t-if="o.partner_id.country_id.name != 'Singapore'">
+											<span>GST @0% </span>
+										</t>
+									</td>
+									<td width="20%" class="text-left">
+										<span t-field="o.currency_id.name" /><span t-field="o.currency_id.symbol" /><span t-field="o.amount_tax"></span>
+									</td>
+								</tr>
+
+								<br />
+							</table>
+							<table style="font-family:Helvetica;font-size:12px">
+								<tr>
+									<td width="20%">
+										<span>AMOUNT IN WORDS:</span>
+									</td>
+									<td width="50%">
+										<span t-esc="amount_to_text(o.amount_total,o.currency_id) or ''" />
+									</td>
+									<td width="30%"></td>
+								</tr>
+							</table>
+							<table
+								style="border-bottom:2px solid ;font-family:Helvetica;font-size:12px;"
+								width="100%">
+								<tr>
+									<td width="70%"></td>
+									<td width="20%" class="text-left">
+										<b>TOTAL</b>
+									</td>
+									<td width="10%" class="text-left">
+										<b>
+											<span t-field="o.currency_id.name" /><span t-field="o.currency_id.symbol" /><span t-field="o.amount_total" />
+										</b>
+									</td>
+								</tr>
+								<tr>
+									<td width="70%" style="color:white">11</td>
+									<td width="20%" style="color:white">11
+									</td>
+									<td width="10%" style="color:white">11
+									</td>
+								</tr>
+							</table>
+							<br />
+							<div class="text-right">
+								<span class="text-right">
+									<b>GALAXY ENTERPRISE PTE LTD</b>
+								</span>
+							</div>
+							<div class="text-left">
+								<span class="text-left">
+									<h5><b>THESE GOODS FOR EXPORT ONLY. CANNOT SELL LOCALLY.</b></h5>
+								</span>
+								<table width="65%">
+									<th style="border-top:1 px solid black" width="65%"></th>
+								</table>
+							</div>
+							<br/><br/><br/>
+							<div>
+								<table width="100%">
+									<tr>
+										<td width="70%"></td>
+										<td class="text-right" style="border-top:2 px solid black"
+											width="30%">
+											<span style="color:white;">&amp;nbsp;&amp;nbsp;&amp;nbsp;&amp;nbsp;&amp;nbsp;
+											</span>
+										</td>
+									</tr>
+								</table>
+							</div>
+						</div>
+					</div>
+				</t>
+			</t>
+		</template>
+
+		<template id="report_galaxy_local_tax_invoice">
+			<t t-call="report.html_container">
+				<t t-foreach="doc_ids" t-as="doc_id">
+					<t
+						t-raw="translate_doc(doc_id, doc_model, 'partner_id.lang', 'galaxy_account.galaxy_account_local_tax_invoice_template')" />
+				</t>
+			</t>
+		</template>
+	</data>
+</openerp>
