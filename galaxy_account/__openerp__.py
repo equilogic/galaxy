@@ -36,6 +36,7 @@
             'views/account_invoice_sequence.xml',
             'report/galaxy_product_tax_invoice_report_view.xml',
             'report/galaxy_sale_local_tax_report.xml',
+            'report/galaxy_bank_invoice_report.xml',
             'wizard/update_currency_rates.xml',
     ],
     'installable': True,

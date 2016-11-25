@@ -23,40 +23,51 @@ import time
 from openerp.report import report_sxw
 from openerp import models,api,_,fields
 from openerp.tools.amount_to_text_en import amount_to_text
+from openerp.tools import ustr
 
 
-class report_print_tax_invoice(report_sxw.rml_parse):
+class report_print_bank_invoice(report_sxw.rml_parse):
     def __init__(self, cr, uid, name, context):
-        super(report_print_tax_invoice, self).__init__(cr, uid, name, context)
+        super(report_print_bank_invoice, self).__init__(cr, uid, name, context)
         self.localcontext.update({
             'time': time,
             'amount_to_text': self._amount_to_text,
             'get_qty':self._get_qty,
             'origin': self._get_origin,
+            'get_cost':self._get_cost,
         })
 
+    def _get_cost(self,landed_cost,currency):
+        lines=[]
+        for cost in landed_cost:
+            vals={
+                  'name':cost.landed_id.name,
+                  'amount':currency.name +currency.symbol+ustr("{:0,.2f}".format(cost.amount))
+                  }
+            lines.append(vals)
+        return lines
+    
+    def _amount_to_text(self, amount,currency):
+        # Currency complete name is not available in res.currency model
+        # Exceptions done here (EUR, USD, BRL) cover 75% of cases
+        # For other currencies, display the currency code
+        return amount_to_text(amount,currency=currency.name)
+
+    def _get_qty(self,qty):
+        return "{:0,}".format(int(qty))
+    
     def _get_origin(self, line):
         origin =''
         if line and line.origin_ids:
             for origin_name in line.origin_ids:
                 if origin:
-                    origin = origin + ',' + '['+str(origin_name.qty)+']'+origin_name.name.name
+                    origin = origin + ',' + origin_name.name.name
                 else:
-                    origin = '['+str(origin_name.qty)+']'+origin_name.name.name
+                    origin = origin_name.name.name
         return origin
-    
-    def _amount_to_text(self, amount):
-        # Currency complete name is not available in res.currency model
-        # Exceptions done here (EUR, USD, BRL) cover 75% of cases
-        # For other currencies, display the currency code
-        return amount_to_text(amount)
 
-    def _get_qty(self,qty):
-        return int(qty)
-
-
-class report_print_tax_invoice_extended(models.AbstractModel):
-    _name = 'report.galaxy_account.report_galaxy_product_tax_invoice'
+class report_print_bank_invoice_extended(models.AbstractModel):
+    _name = 'report.galaxy_account.report_galaxy_bank_invoice'
     _inherit = 'report.abstract_report'
-    _template = 'galaxy_account.report_galaxy_product_tax_invoice'
-    _wrapped_report_class = report_print_tax_invoice
+    _template = 'galaxy_account.report_galaxy_bank_invoice'
+    _wrapped_report_class = report_print_bank_invoice
