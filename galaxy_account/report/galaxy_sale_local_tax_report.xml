@@ -186,12 +186,6 @@
 						</table>
 					</div>
 				</div>
-			</div>
-		</template>
-
-		<!-- Report Footer -->
-		<template id="external_layout_footer_galaxy_account_local_tax_invoice_1">
-			<div class="footer">
 				<table width="100%">
 					<tr>
 						<td class="text center">

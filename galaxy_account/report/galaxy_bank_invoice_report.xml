@@ -14,7 +14,6 @@
 			<t t-call="galaxy_account.external_layout_header_galaxy_account_bank_invoice" />
 			<t t-raw="0" />
 			<t t-call="galaxy_account.external_layout_footer_galaxy_account_bank_invoice" />
-			<t t-call="galaxy_account.external_layout_footer_galaxy_account_bank_invoice_1"/>
 		</template>
 
 		<!-- Report Header -->
@@ -223,12 +222,6 @@
 						</table>
 					</div>
 				</div>
-			</div>
-		</template>
-		<!-- Report Footer -->
-		<template id="external_layout_footer_galaxy_account_bank_invoice_1">
-			
-			<div class="footer">
 				<table width="100%">
 					<tr>
 						<td class="text center">
