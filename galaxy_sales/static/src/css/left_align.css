@@ -60,6 +60,7 @@ tr [data-field="price_unit"]{
   background-image: -ms-linear-gradient(top, #fd1818, #cd0033);
   background-image: -o-linear-gradient(top, #fd1818, #cd0033);
   background-image: linear-gradient(to bottom, #fd1818, #cd0033);
+  color : black !important;
 }
 .openerp .oe_list_content > tbody > tr:nth-child(even) {
   background-color: #f0f0fa;
@@ -70,6 +71,7 @@ tr [data-field="price_unit"]{
   background-image: -ms-linear-gradient(top, #f0f0fa, #f0f0fa);
   background-image: -o-linear-gradient(top, #f0f0fa, #f0f0fa);
   background-image: linear-gradient(to bottom, #f0f0fa, #f0f0fa);
+  color : black !important;
 }
 
 .openerp .oe_application a {
@@ -82,4 +84,49 @@ tr [data-field="price_unit"]{
     min-width: 150px;
     font-weight: bolder;
     font-size: larger;
+}
+.openerp .oe_form_field_one2many .oe_list_content > tbody tr:nth-child(odd), .openerp .oe_form_field_many2many .oe_list_content > tbody tr:nth-child(odd) {
+    background: #f0f0fa !important;
+    color : black !important;
+}
+.openerp .oe_form_field_one2many .oe_list_content > tbody tr:nth-child(odd), .openerp .oe_form_field_many2many .oe_list_content > tbody tr:nth-child(even) {
+    background: #f0f0fa !important;
+    color : black !important;
+}
+/* 
+.openerp .oe_application .oe_form_sheetbg {
+    background: black;
+    border-bottom: 1px solid #ddd;
+} */
+
+.openerp{
+    color : black !important;
+}
+.openerp .oe_notebook > li > a {
+    color: black !important;
+    font-weight: bold !important;
+}
+.openerp .oe_notebook > li.ui-tabs-active > a{
+    color: black !important;
+    font-weight: bold !important;
+}
+.openerp .oe_list_content > thead{
+    color: black !important;
+    font-weight: bold !important;
+}
+.openerp .oe_list_content {
+    color: black !important;
+    font-weight: bold !important;
+}
+.openerp table {
+    color: black !important;
+    font-weight: bold !important;
+}
+.ui-widget-content{
+    color: black !important;
+    font-weight: bold !important;
+}
+.ui-widget{
+    color: black !important;
+    font-weight: bold !important;
 }
