@@ -62,4 +62,13 @@ class stock_move(models.Model):
             res['value'].update({'item_desc':prod.name})
         return res
     
+    @api.model  
+    def create(self, vals):
+        if not vals.get('item_desc'):
+            product_id = vals.get('product_id', False)
+            if product_id:
+                product_data =  self.env['product.product'].browse(product_id)
+                vals.update({'item_desc': product_data.name})
+        return super(stock_move, self).create(vals)
+    
     

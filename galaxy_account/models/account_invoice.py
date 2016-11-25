@@ -280,8 +280,9 @@ class account_invoice(models.Model):
         cr,uid,context = self.env.args
         if self.partner_id and self.number:
             country = self.partner_id.country_id.name
+            currency = self.currency_id.name
             if self.type=='out_invoice':
-                if country and country == 'Singapore': 
+                if currency and currency == 'SGD': 
                     self.number = self.env['ir.sequence'].get('invoice_local')
                 else:
                     if not self.partner_id.cust_code:
