@@ -66,7 +66,129 @@
 
 		<!-- Report Footer -->
 		<!-- <template id="external_layout_footer_galaxy_account_local_tax_invoice">
+		<template id="external_layout_footer_galaxy_account_local_tax_invoice">
 			<div class="footer">
+				<div class="last-page">
+					<table
+						style="border-top:2px solid;font-family:Helvetica;font-size:12px;"
+						width="100%">
+						<br />
+						<tr>
+							<td width="30%">Sub-Total
+								: &amp;nbsp;
+								<span class="text-left" t-field="o.currency_id.name" /><span class="text-left" t-field="o.currency_id.symbol" /><span class="text-left" t-field="o.amount_untaxed" />
+							</td>
+							<td width="15%">
+								Rate = &amp;nbsp;
+								<span t-field="o.currency_rate" />
+							</td>
+							<td width="25%" style="padding:5px">
+								<t t-if="o.partner_id.country_id.name == 'Singapore'">
+									<span>7%GST = </span>
+									&amp;nbsp;
+									<span t-field="o.currency_id.name" />
+									<span t-field="o.currency_id.symbol" />
+									<span t-field="o.amount_tax"></span>
+								</t>
+								<t t-if="o.partner_id.country_id.name != 'Singapore'">
+									<span>0%GST = </span>
+									&amp;nbsp;
+									<span t-field="o.currency_id.name" />
+									<span t-field="o.currency_id.symbol" />
+									<span>0.0</span>
+								</t>
+							</td>
+							<td width="15%" class="text-left">
+								SUB-TOTAL
+							</td>
+							<td width="20%" class="text-left">
+								<span t-field="o.currency_id.name" /><span t-field="o.currency_id.symbol" /><span t-field="o.amount_untaxed" />
+							</td>
+						</tr>
+						<tr>
+							<td width="30%">
+							</td>
+							<td width="15%">
+							</td>
+							<td width="25%">
+							</td>
+							<td width="15%">
+								<t t-if="o.partner_id.country_id.name == 'Singapore'">
+									<span>7% GST </span>
+
+								</t>
+								<t t-if="o.partner_id.country_id.name != 'Singapore'">
+									<span>GST @0% </span>
+								</t>
+							</td>
+							<td width="20%" class="text-left">
+								<span t-field="o.currency_id.name" /><span t-field="o.currency_id.symbol" /><span t-field="o.amount_tax"></span>
+							</td>
+						</tr>
+
+						<br />
+					</table>
+					<table style="font-family:Helvetica;font-size:12px">
+						<tr>
+							<td width="20%">
+								<span>AMOUNT IN WORDS:</span>
+							</td>
+							<td width="50%">
+								<span t-esc="amount_to_text(o.amount_total,o.currency_id) or ''" />
+							</td>
+							<td width="30%"></td>
+						</tr>
+					</table>
+					<table
+						style="border-bottom:2px solid ;font-family:Helvetica;font-size:12px;"
+						width="100%">
+						<tr>
+							<td width="70%"></td>
+							<td width="20%" class="text-left">
+								<b>TOTAL</b>
+							</td>
+							<td width="10%" class="text-left">
+								<b>
+									<span t-field="o.currency_id.name" /><span t-field="o.currency_id.symbol" /><span t-field="o.amount_total" />
+								</b>
+							</td>
+						</tr>
+						<tr>
+							<td width="70%" style="color:white">11</td>
+							<td width="20%" style="color:white">11
+							</td>
+							<td width="10%" style="color:white">11
+							</td>
+						</tr>
+					</table>
+					<br />
+					<div class="text-right">
+						<span class="text-right">
+							<b>GALAXY ENTERPRISE PTE LTD</b>
+						</span>
+					</div>
+					<div class="text-left">
+						<span class="text-left">
+							<h5><b>THESE GOODS FOR EXPORT ONLY. CANNOT SELL LOCALLY.</b></h5>
+						</span>
+						<table width="65%">
+							<th style="border-top:1 px solid black" width="65%"></th>
+						</table>
+					</div>
+					<br/><br/><br/>
+					<div>
+						<table width="100%">
+							<tr>
+								<td width="70%"></td>
+								<td class="text-right" style="border-top:2 px solid black"
+									width="30%">
+									<span style="color:white;">&amp;nbsp;&amp;nbsp;&amp;nbsp;&amp;nbsp;&amp;nbsp;
+									</span>
+								</td>
+							</tr>
+						</table>
+					</div>
+				</div>
 				<table width="100%">
 					<tr>
 						<td class="text center">
@@ -168,7 +290,7 @@
 								</table>
 							</div>
 						</div>
-						<br/><br/><br/><br/>
+						<br/><br/><br/>
 						<table class="table-condensed" style="border-top:2px solid black;border-collapse: collapse;" width="105%">
 
 							<tr style="border-bottom:2px solid black">
@@ -186,6 +308,7 @@
 							</tr>
 
 							<tr t-foreach="o.invoice_line" t-as="line">
+
 								<td class="text-right" width="10%" style="padding:5px;font-size:11px;">
 									<span t-esc="get_qty(line.quantity)" />
 								</td>
@@ -216,7 +339,6 @@
 								</td>
 							</tr>
 						</table>
-
 						<div class="last-page" style="bottom:xxpx; page-break-inside: avoid;">
 							<table
 								style="border-top:2px solid;font-family:Helvetica;font-size:12px;"
