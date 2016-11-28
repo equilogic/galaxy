@@ -287,13 +287,15 @@
 							</div>
 						</div>
 						<br/><br/><br/>
-						<table class="table-condensed" style="border-top:2px solid black;border-collapse: collapse;" width="105%">
+						<table class="table-condensed" style="border-top:2px solid black;border-collapse: collapse;" width="100%">
 
 							<tr style="border-bottom:2px solid black">
 								<th class="text-left line" width="10%" style="padding:5px">
-									QUANTITY</th>
+									QUANTITY
+								</th>
 								<th width="5%" style="padding:5px"></th>
-								<th class="text-center line" width="35%" style="padding:5px">          				DESCRIPTION
+								<th class="text-center line" width="35%" style="padding:5px"> 
+			         				DESCRIPTION
 								</th>
 								<th class="text-right line" width="20%" style="padding:5px">
 									U.PRICE
