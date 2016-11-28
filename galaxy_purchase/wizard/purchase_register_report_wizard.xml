@@ -45,8 +45,8 @@
 					<field name="pur_order"/>
 					<field name="sup_inv"/>
 					<field name="sup_name"/>
-					<field name="amt"/>
-					<field name="amt_due"/>
+					<field name="amt" sum="Total"/>
+					<field name="amt_due" sum="Total"/>
 					<field name="state"/>
 					<!-- <field name="received"/> -->
 				</tree>

@@ -46,7 +46,7 @@
 					<field name="sales_invoice_no"/>
 					<field name="customer_po_no"/>
 					<field name="customer_name"/>
-					<field name="total_amount"/>
+					<field name="total_amount" sum="Total"/>
 					<!-- <field name="residual_amount"/> -->
 					
 					<!-- <field name="amt_in_actual_currency"/> -->

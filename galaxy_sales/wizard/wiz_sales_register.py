@@ -50,6 +50,7 @@ class sale_register_report_new(models.Model):
     _auto=False
     
     invoice_no = fields.Char('Invoice #',readonly=True)
+    sales_no = fields.Char('Sales #',readonly=True)
     date = fields.Date('Date',readonly=True)
     customer_po_no = fields.Char('Customer Po No.',readonly=True)
     customer_name = fields.Char('Customer Name',readonly=True)
@@ -65,7 +66,9 @@ class sale_register_report_new(models.Model):
             (SELECT inv.id,inv.number as invoice_no,inv.date_invoice as date,
                 inv.customer_po as customer_po_no, rp.name as customer_name,
                 inv.amount_total as amount, 
-                inv.residual as amount_due
+                inv.residual as amount_due,
+                (SELECT string_agg(CAST(s_ord_rel.order_id as varchar), ',') FROM sale_order_invoice_rel s_ord_rel, sale_order s_ord where
+                inv.id = s_ord_rel.invoice_id and s_ord.id = s_ord_rel.order_id) as sales_no
                 FROM account_invoice inv
                 INNER JOIN res_partner rp ON rp.id = inv.partner_id
                 where inv.type = 'out_invoice'
