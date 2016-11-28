@@ -13,7 +13,7 @@
 
 			<t t-call="galaxy_account.external_layout_header_galaxy_account_local_tax_invoice"/>
 			<t t-raw="0"/>
-			<t t-call="galaxy_account.external_layout_footer_galaxy_account_local_tax_invoice"/>
+			<!-- <t t-call="galaxy_account.external_layout_footer_galaxy_account_local_tax_invoice"/> -->
 		</template>
 
 		<!-- Report Header -->
@@ -65,7 +65,7 @@
 		</template>
 
 		<!-- Report Footer -->
-		<template id="external_layout_footer_galaxy_account_local_tax_invoice">
+		<!-- <template id="external_layout_footer_galaxy_account_local_tax_invoice">
 			<div class="footer">
 				<table width="100%">
 					<tr>
@@ -77,8 +77,52 @@
 					</tr>
 				</table>
 			</div>
-		</template>
+		</template> -->
 
+		<template id="report.minimal_layout">
+            <t t-raw="'&lt;base href=%s&gt;' % base_url"/>
+            &lt;!DOCTYPE html&gt;
+                <html style="height: 0;">
+                    <head>
+                        <link href="/report/static/src/css/reset.min.css" rel="stylesheet"/>
+                        <link href="/web/static/lib/bootstrap/css/bootstrap.css" rel="stylesheet"/>
+                        <link href="/website/static/src/css/website.css" rel="stylesheet"/>
+                        <link href="/web/static/lib/fontawesome/css/font-awesome.css" rel="stylesheet"/>
+                        <style type='text/css'><t t-raw="css"/></style>
+                        <t t-if="subst is True">
+                            		        <script>
+                       function subst() {
+                           var vars = {};
+                           var x = document.location.search.substring(1).split('&amp;');
+                           for (var i in x) {
+                               var z = x[i].split('=', 2);
+                               vars[z[0]] = unescape(z[1]);
+                           }
+                           var x=['frompage', 'topage', 'page', 'webpage', 'section', 'subsection', 'subsubsection'];
+                           for (var i in x) {
+                               var y = document.getElementsByClassName(x[i]);
+                               for (var j=0; j&lt;y.length; ++j)
+                                   y[j].textContent = vars[x[i]];
+                           }
+                           var operations = {
+    							'last-page': function (elt) { elt.style.visibility = (vars.page === vars.topage) ? "visible" : "hidden"; },
+							};
+
+                           for (var klass in operations) {
+                               var y = document.getElementsByClassName(klass);
+                               for (var j=0; j&lt;y.length; ++j)
+                               operations[klass](y[j]);
+                           }
+                      }
+                  </script>
+                        </t>
+                    </head>
+                    <body class="container" onload="subst()">
+                        <t t-raw="body"/>
+                    </body>
+                </html>
+          </template>
+          
 		<!-- Reports Template -->
 		<template id="galaxy_account_local_tax_invoice_template">
 			<style type="text/css">
@@ -122,20 +166,6 @@
 										<td width="50%"><span t-field="o.payment_term" /></td>
 									</tr>
 								</table>
-								<!-- <div style="font-size:13px">
-                   					<span><b>Invoice No.</b></span>
-                   					<strong>
-                   						<span style="padding:20px" t-field="o.number"/>
-                   					</strong>
-                   				</div>
-                   				<div style="font-size:12px">
-                   					<span><b>Date</b></span>
-                   					<span style="padding:43px" t-field="o.date_invoice" t-field-options='{"format": "dd-MM-Y"}' />
-                   				</div> -->
-                   				<!-- <div style="font-size:12px">
-                   					<span><b>Terms</b></span>
-                   					<span style="padding:38px" t-field="o.payment_term" />
-                   				</div> -->
 							</div>
 						</div>
 						<br/><br/><br/><br/>
@@ -155,30 +185,7 @@
 								</th>
 							</tr>
 
-							<tr>
-								<td width="10%"></td>
-								<td width="5%"></td>
-								<td width="35%">YOUR P.O. NO :</td>
-								<td width="10%"></td>
-								<td width="20%"></td>
-								<td width="20%"></td>
-							</tr>
-							<tr>
-								<td width="10%"></td>
-								<td width="5%"></td>
-								<td width="25%">========================================</td>
-								<td width="10%"></td>
-								<td width="20%"></td>
-								<td width="20%"></td>
-							</tr>
-					
 							<tr t-foreach="o.invoice_line" t-as="line">
-<!-- 								<td>AAA</td>
-								<td>AAA</td>
-								<td>AAA</td>
-								<td>AAA</td>
-								<td>AAA</td>
-								<td>AAA</td> -->
 								<td class="text-right" width="10%" style="padding:5px;font-size:11px;">
 									<span t-esc="get_qty(line.quantity)" />
 								</td>
@@ -208,10 +215,9 @@
 									<span t-field="line.price_subtotal" />
 								</td>
 							</tr>
-
 						</table>
 
-						<div style="bottom:xxpx; page-break-inside: avoid;">
+						<div class="last-page" style="bottom:xxpx; page-break-inside: avoid;">
 							<table
 								style="border-top:2px solid;font-family:Helvetica;font-size:12px;"
 								width="100%">
@@ -297,10 +303,10 @@
 									</td>
 								</tr>
 								<tr>
-									<td width="70%" style="color:white">11</td>
-									<td width="20%" style="color:white">11
+									<td width="70%" style="color:white"></td>
+									<td width="20%" style="color:white">
 									</td>
-									<td width="10%" style="color:white">11
+									<td width="10%" style="color:white">
 									</td>
 								</tr>
 							</table>
