@@ -191,6 +191,7 @@
 				<field name="partner_id" position="after">
 					<field name="currency_id" />
 					<field name="date_invoice" />
+					<field name="customer_po"/>
 				</field>
 				<xpath expr="//search/group/filter[@string='Partner']"
 					position="after">

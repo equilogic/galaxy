@@ -48,7 +48,7 @@
 					<field name="amt" sum="Total"/>
 					<field name="amt_due" sum="Total"/>
 					<field name="state"/>
-					<!-- <field name="received"/> -->
+					<field name="received"/> 
 				</tree>
 			</field>
 		</record>
