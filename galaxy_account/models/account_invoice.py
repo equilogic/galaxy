@@ -294,7 +294,6 @@ class account_invoice(models.Model):
                             raise except_orm(_('Error!'), _('Please Enter Customer code'))
                     cust_code = str(self.partner_id.cust_code) + '/'
                     prefix = cust_code[:3].upper()
-                    print "prefix==========",prefix
                     cr.execute("select id from ir_sequence where name = %s",('Customer Invoice Export',))
                     res=cr.fetchone()
                     if res:                    
