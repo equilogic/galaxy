@@ -82,6 +82,7 @@ class account_invoice(models.Model):
     landed_cost_price = fields.Float(compute='_compute_amount',store=True,string='Landed Amount')
     customer_po = fields.Char(string="Customer PO")
     delivery_status =fields.Char(string="Delivery Status")
+    export = fields.Boolean('Export')
     
     @api.multi
     def onchange_partner_id(self, type, partner_id, date_invoice=False,
@@ -282,7 +283,7 @@ class account_invoice(models.Model):
             country = self.partner_id.country_id.name
             currency = self.currency_id.name
             if self.type=='out_invoice':
-                if currency and currency == 'SGD': 
+                if self.export == False: 
                     self.number = self.env['ir.sequence'].get('invoice_local')
                 else:
                     if not self.partner_id.cust_code:

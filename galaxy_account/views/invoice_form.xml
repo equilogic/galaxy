@@ -82,6 +82,7 @@
 
 				<field name="account_id" position='after'>
 					<field name="currency_rate" />
+					<field name="export" />
 				</field>
 
 				<xpath

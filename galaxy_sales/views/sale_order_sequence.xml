@@ -10,7 +10,7 @@
        <record id="seq_sale_order_seq" model="ir.sequence">
             <field name="name">Sales Order new</field>
             <field name="code">sale_order_new</field>
-            <field name="number_next">101</field>
+            <field name="number_next">105</field>
 			<field name="number_increment">1</field>
             <field name="padding">8</field>
             <field name="company_id" eval="False"/>
