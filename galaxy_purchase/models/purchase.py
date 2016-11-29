@@ -100,6 +100,8 @@ class purchase_order(models.Model):
         res = super(purchase_order, self).create(vals)
         
         return res
+    
+    @api.multi
     @api.depends('order_line','landed_cost_pur')
     def _amount_all(self):
         line_obj = self.env['purchase.order.line']
