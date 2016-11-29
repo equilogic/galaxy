@@ -62,7 +62,7 @@ class sale_order(models.Model):
 
 
     pricelist_id = fields.Many2one('product.pricelist', 'Currency', required=True, readonly=True, states={'draft': [('readonly', False)], 'sent': [('readonly', False)]}, help="Pricelist for current sales order.")
-    currency_rate = fields.Float(related="pricelist_id.currency_id.rate_silent", string='Currency rate')
+    currency_rate = fields.Float(string='Currency rate')
     active = fields.Boolean('Active', default=True, help="If the active field is set to False, it will allow you to hide the sale order without removing it.")
     attn_sal = fields.Many2one('res.partner', 'ATTN')
     
