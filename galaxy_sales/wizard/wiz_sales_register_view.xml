@@ -43,9 +43,10 @@
 				<tree string="Sale Register Report" create="false">
 					<field name="date"/>
 					<field name="invoice_no"/>
-					<field name="sales_no"/>
+					<!-- <field name="sales_no"/> -->
 					<field name="customer_po_no"/>
 					<field name="customer_name"/>
+					<field name="cur_sym_code"/>
 					<field name="amount" sum="Total"/>
 					<field name="amount_due" sum="Total"/>
 				</tree>

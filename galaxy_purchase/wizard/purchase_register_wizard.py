@@ -53,20 +53,22 @@ class purchase_register_report(models.Model):
     pur_order = fields.Char('PO #',readonly=True)
     sup_inv = fields.Char('Supplier Invoice #',readonly=True)
     sup_name = fields.Char('Supplier Name',readonly=True)
-    amt = fields.Char('Amount',readonly=True)
-    amt_due = fields.Char('Amount Due',readonly=True)
+    amt = fields.Float('Amount',readonly=True)
+    amt_due = fields.Float('Amount Due',readonly=True)
     state = fields.Char('Status',readonly=True)
     received = fields.Boolean('Received',readonly=True)
+    cur_sym_code = fields.Char('Currency', readonly=True)
     _order ="pdate"
     
     def init(self, cr):
         tools.drop_view_if_exists(cr, 'purchase_register_report')
         cr.execute("""create or replace view purchase_register_report as
             (SELECT in_inv.id,in_inv.number as pur_order,in_inv.date_invoice as pdate, 
-                concat(rc.name,rc.symbol,in_inv.amount_total)as amt,in_inv.state as state,rp.name as sup_name,
+                in_inv.amount_total as amt,in_inv.state as state,rp.name as sup_name,
                 in_inv.supplier_invoice_number as sup_inv,
-                concat(rc.name,rc.symbol,in_inv.residual) as amt_due,
-                in_inv.customer_po as received
+                in_inv.residual as amt_due,
+                in_inv.customer_po as received,
+                concat(rc.name,rc.symbol) as cur_sym_code
                 
                 FROM account_invoice in_inv
                 INNER JOIN res_partner rp ON rp.id = in_inv.partner_id
