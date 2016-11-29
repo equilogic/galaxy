@@ -292,27 +292,15 @@ class account_invoice(models.Model):
                     if not self.partner_id.cust_code:
                         if self.type=="out_invoice":
                             raise except_orm(_('Error!'), _('Please Enter Customer code'))
-                    cust_code = str(self.partner_id.cust_code)
+                    cust_code = str(self.partner_id.cust_code) + '/'
                     prefix = cust_code[:3].upper()
-
-                    seq_type={
-                              'name': cust_code,
-                              'code':'invoice_export_'+cust_code,
-                              }
-                    seq = {
-                        'name': cust_code,
-                        'code':'invoice_export_'+cust_code,
-                        'prefix': prefix+'/',
-                        'suffix':'/%(y)s',
-                        'number_next':8151,
-                        'number_increment': 1
-                        }
-                    cr.execute("select * from ir_sequence_type where code = %s",('invoice_export_'+cust_code,))
-                    res=cr.fetchall()
-                    if res == []:
-                        sq_type=self.env['ir.sequence.type'].create(seq_type)
-                        sq = self.env['ir.sequence'].create(seq)
-                    self.number = self.env['ir.sequence'].get('invoice_export_'+cust_code)
+                    print "prefix==========",prefix
+                    cr.execute("select id from ir_sequence where name = %s",('Customer Invoice Export',))
+                    res=cr.fetchone()
+                    if res:                    
+                        cr.execute("update ir_sequence set prefix = %s where id=%s",(cust_code,res[0]))
+                        seq_id = self.env['ir.sequence'].next_by_id(res[0])
+                        self.number = seq_id
             if self.type=='in_invoice':
                 self.number = self.env['ir.sequence'].get('sup_inv')
         self.prepare_order_line()
