@@ -195,12 +195,13 @@ class account_invoice(models.Model):
                           'partner_shipping_id':self.part_ship_id.id,
                           'date_order': self.date_invoice,
                           'pricelist_id': self.partner_id.property_product_pricelist.id,
-                          'invoiced':True,
+                          'invoiced': True,
                           'active': True,
                           'account_id': self._ids,
                           'attn_sal':self.attn_inv.id,
                           'landed_cost_sal':[(6,0,self.landed_cost.ids)],
                           'landed_cost_price':self.landed_cost_price,
+                          'currency_rate': self.currency_rate
                           }
             res = so_obj.create(order_vals)
             for line in self.invoice_line:
@@ -248,7 +249,9 @@ class account_invoice(models.Model):
                           'attn_pur':self.attn_inv.id,
                           'landed_cost_pur':[(6,0,self.landed_cost.ids)],
                           'total_cost_price':self.landed_cost_price,
-                          'invoice_ids':[(4, self.ids)]
+                          'invoice_ids':[(4, self.ids)],
+                          'currency_rate': self.currency_rate,
+                          'partner_ref': self.supplier_invoice_number,
                           }
             po_res = po_obj.create(order_vals)
             for line in self.invoice_line:

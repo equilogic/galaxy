@@ -69,7 +69,7 @@ class purchase_order(models.Model):
     
     total_cost_price = fields.Float(compute="_amount_all",string='Landed Amount', help="The total Landed Cost Price")
     
-    currency_rate = fields.Float(related="currency_id.rate_silent", string='Currency rate')
+    currency_rate = fields.Float(string='Currency rate')
 
     partner_inv_id = fields.Many2one('res.partner','Invoice Address',readonly=True,required=True,
                                   states={'draft': [('readonly', False)], 'sent': [('readonly', False)]},
