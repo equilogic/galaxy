@@ -23,19 +23,20 @@
 from openerp import models, fields, api
 from openerp.tools.translate import _
 from openerp import SUPERUSER_ID
+import openerp.addons.decimal_precision as dp
 
 class purchase_order_line(models.Model):
     _inherit = 'purchase.order.line'
 
-    origin_ids = fields.Many2many('origin.origin',string='Origin')
+    origin_ids = fields.Many2many('origin.origin', string='Origin')
     no_origin = fields.Boolean('No Origin')
 
     @api.multi
-    def onchange_product_id(self,pricelist_id, product_id, qty, uom_id,
+    def onchange_product_id(self, pricelist_id, product_id, qty, uom_id,
             partner_id, date_order=False, fiscal_position_id=False, date_planned=False,
             name=False, price_unit=False, state='draft', context=None):
 
-        res = super(purchase_order_line,self).onchange_product_id(pricelist_id, product_id, qty=qty, uom_id=uom_id,
+        res = super(purchase_order_line, self).onchange_product_id(pricelist_id, product_id, qty=qty, uom_id=uom_id,
             partner_id=partner_id, date_order=date_order, fiscal_position_id=fiscal_position_id, date_planned=date_planned,
             name=name, price_unit=price_unit, state='draft', context=context)
         
@@ -48,7 +49,7 @@ class purchase_order_line(models.Model):
             prod_tmpl_id = pro_env and pro_env.product_tmpl_id \
                             and pro_env.product_tmpl_id.id or False
             if prod_tmpl_id:
-                res['domain'].update({'origin_ids':[('product_id','in',[prod_tmpl_id])]})
+                res['domain'].update({'origin_ids':[('product_id', 'in', [prod_tmpl_id])]})
         return res
 
 
@@ -56,42 +57,29 @@ class purchase_order_line(models.Model):
 class purchase_order(models.Model):
     
     _inherit = 'purchase.order'
-    
+
     account_id = fields.Many2one('account.invoice', 'Invoice')
-    amount_untaxed = fields.Float(compute="_amount_all", store=True,
-                                  string='Untaxed Amount',
-                                  help="The amount without tax")
-    amount_tax = fields.Float(compute="_amount_all", store=True,
-                              string='Taxes',
-                              help="The tax amount")
-    amount_total = fields.Float(compute="_amount_all",
-                                store=True, string='Total')
-    
-    total_cost_price = fields.Float(compute="_amount_all",string='Landed Amount', help="The total Landed Cost Price")
-    
     currency_rate = fields.Float(string='Currency rate')
 
-    partner_inv_id = fields.Many2one('res.partner','Invoice Address',readonly=True,required=True,
+    partner_inv_id = fields.Many2one('res.partner', 'Invoice Address', readonly=True, required=True,
                                   states={'draft': [('readonly', False)], 'sent': [('readonly', False)]},
                                   help="Invoice address for current sales order.")
-    partner_ship_id = fields.Many2one('res.partner','Delivery Address',readonly=True,required=True,
+    partner_ship_id = fields.Many2one('res.partner', 'Delivery Address', readonly=True, required=True,
                                    states={'draft': [('readonly', False)], 'sent': [('readonly', False)]},
                                    help="Delivery address for current sales order.")
 
-    attn_pur = fields.Many2one('res.partner','ATTN')
+    attn_pur = fields.Many2one('res.partner', 'ATTN')
     
     sup_inv_num = fields.Char('Supplier Invoice Number')
 
-    landed_cost_pur = fields.One2many('landed.cost.invoice','acc_pur_id',string='Landed Cost')
-    @api.multi
-    def onchange_partner_id(self,partner_id):
-        res = super(purchase_order,self).onchange_partner_id(partner_id)
-        part = self.env['res.partner'].browse(partner_id)
-        res_invoice= part.address_get(adr_pref=['delivery', 'invoice', 'contact']).get('invoice')
-        res_shipping= part.address_get(adr_pref=['delivery', 'invoice', 'contact']).get('delivery')
-        res['value'].update({'partner_inv_id':res_invoice,
-                             'partner_ship_id':res_shipping})
-        return res
+    landed_cost_pur = fields.One2many('landed.cost.invoice', 'acc_pur_id', string='Landed Cost')
+
+
+from openerp.osv import osv,fields
+
+class purchase_order(osv.osv):
+
+    _inherit = 'purchase.order'
 
     @api.model
     def create(self, vals):
@@ -100,39 +88,80 @@ class purchase_order(models.Model):
         res = super(purchase_order, self).create(vals)
         
         return res
-    
+
+#    
     @api.multi
-    @api.depends('order_line','landed_cost_pur')
-    def _amount_all(self):
-        line_obj = self.env['purchase.order.line']
-        for order in self:
+    def onchange_partner_id(self,partner_id):
+        res = super(purchase_order, self).onchange_partner_id(partner_id)
+        part = self.env['res.partner'].browse(partner_id)
+        res_invoice = part.address_get(adr_pref=['delivery', 'invoice', 'contact']).get('invoice')
+        res_shipping = part.address_get(adr_pref=['delivery', 'invoice', 'contact']).get('delivery')
+        res['value'].update({'partner_inv_id':res_invoice,
+                             'partner_ship_id':res_shipping})
+        return res
+
+    def _amount_all(self, cr, uid, ids, field_name, arg, context=None):
+        res = {}
+        cur_obj=self.pool.get('res.currency')
+        line_obj = self.pool['purchase.order.line']
+        for order in self.browse(cr, uid, ids, context=context):
+            
+            res[order.id] = {
+                'amount_untaxed': 0.0,
+                'amount_tax': 0.0,
+                'amount_total': 0.0,
+                'total_cost_price':0.0,
+            }
             val = val1 =val2= 0.0
-            val3 = 0.0
             cur = order.pricelist_id.currency_id
+            for landed_cost in order.landed_cost_pur:
+                val2+=landed_cost.amount
             for line in order.order_line:
                 val1 += line.price_subtotal
-                line_price = line_obj._calc_line_base_price(line)
-                line_qty = line_obj._calc_line_quantity(line)
-
-                if line.taxes_id:
-                    for tax_t in line.taxes_id:
-                        for tax in tax_t.compute_all(line.price_unit, line.product_qty).get('taxes', {}):
-                            val += tax.get('amount', 0.0)
-            for landed_cost in order.landed_cost_pur:
-                val3+=landed_cost.amount
-            order.amount_tax = cur.round(val)
-            order.amount_untaxed = cur.round(val1)
-            order.total_cost_price = cur.round(val3)
-            order.amount_total = cur.round(val) + cur.round(val1)+cur.round(val3)
-        return True
-    
-    @api.v7
-    def _prepare_inv_line(self, cr, uid, account_id, order_line, context=None):
-        res = super(purchase_order,self)._prepare_inv_line(cr, uid, account_id, order_line, context=context)
-        res.update({'origin_ids':order_line.origin_ids.ids,'no_origin':order_line.no_origin})
+                line_price = line_obj._calc_line_base_price(cr, uid, line,
+                                                            context=context)
+                line_qty = line_obj._calc_line_quantity(cr, uid, line,
+                                                        context=context)
+                for c in self.pool['account.tax'].compute_all(
+                        cr, uid, line.taxes_id, line_price, line_qty,
+                        line.product_id, order.partner_id)['taxes']:
+                    val += c.get('amount', 0.0)
+            res[order.id]['amount_tax']=cur_obj.round(cr, uid, cur, val)
+            res[order.id]['amount_untaxed']=cur_obj.round(cr, uid, cur, val1)
+            res[order.id]['total_cost_price']=cur_obj.round(cr, uid, cur, val2)
+            res[order.id]['amount_total']=res[order.id]['amount_untaxed'] + res[order.id]['amount_tax'] \
+                                          +res[order.id]['total_cost_price']
         return res
-    @api.v7
-    def _prepare_invoice(self, cr, uid, order, line_ids, context=None):
+
+    def _get_order(self, cr, uid, ids, context=None):
+        result = {}
+        for line in self.pool.get('purchase.order.line').browse(cr, uid, ids, context=context):
+            result[line.order_id.id] = True
+        return result.keys()
+
+
+
+    _columns = {
+                
+            'amount_untaxed': fields.function(_amount_all, digits_compute=dp.get_precision('Purchase Price'), string='Untaxed Amount',
+                              store={'purchase.order.line': (_get_order, None, 10),}, multi="sums", help="The amount without tax", track_visibility='always'),
+            'amount_tax': fields.function(_amount_all, digits_compute=dp.get_precision('Purchase Price'), string='Taxes',
+                        store={'purchase.order.line': (_get_order, None, 10),}, multi="sums", help="The tax amount"),
+            'amount_total': fields.function(_amount_all, digits_compute=dp.get_precision('Purchase Price'), string='Total',
+                            store={'purchase.order.line': (_get_order, None, 10),}, multi="sums", help="The total amount"),
+            'total_cost_price': fields.function(_amount_all, digits_compute=dp.get_precision('Purchase Price'), string='Landed amount',
+                            store=True, multi="sums", help="The total Landed Cost Price"),
+                
+                }
+    @api.model
+    def _prepare_inv_line(self, account_id, order_line):
+        cr, uid, context = self.env.args
+        res = super(purchase_order, self)._prepare_inv_line(account_id, order_line)
+        res.update({'origin_ids':order_line.origin_ids.ids, 'no_origin':order_line.no_origin})
+        return res
+    
+    @api.model
+    def _prepare_invoice(self, order, line_ids):
         """Prepare the dict of values to create the new invoice for a
            purchase order. This method may be overridden to implement custom
            invoice generation (making sure to call super() to establish
@@ -144,20 +173,15 @@ class purchase_order(models.Model):
            :return: dict of value to create() the invoice
         """
         
-        res = super(purchase_order,self)._prepare_invoice(cr, uid, order, line_ids, context=context)
+        res = super(purchase_order, self)._prepare_invoice(order, line_ids)
         res.update({
                     'invoice_from_purchase':True,
                     'part_inv_id': order.partner_inv_id.id,
                     'part_ship_id':order.partner_ship_id.id,
                     'attn_inv':order.attn_pur.id,
-                    'landed_cost':[(6,0,order.landed_cost_pur.ids)],
+                    'landed_cost':[(6, 0, order.landed_cost_pur.ids)],
                     'landed_cost_price':order.total_cost_price,
                     
                     })
         return res
-
-
-
-
-
 # vim:expandtab:smartindent:tabstop=4:softtabstop=4:shiftwidth=4:
