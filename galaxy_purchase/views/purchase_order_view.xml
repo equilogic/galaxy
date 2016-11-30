@@ -32,6 +32,7 @@
 					<field name="attn_pur"
 						domain="[('type','=','contact'),('parent_id','=',partner_id)]"
 						attrs="{'readonly': [('state','not in',('draft','sent'))]}" />
+					<field name="direct_invoice" invisible="1"/>
 				</xpath>
 
 				<xpath

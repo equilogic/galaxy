@@ -64,7 +64,7 @@ class sale_register_report_new(models.Model):
     def init(self, cr):
         tools.drop_view_if_exists(cr, 'sale_register_report_list_new')
         cr.execute("""create or replace view sale_register_report_list_new as
-            (SELECT inv.id,inv.number as invoice_no,inv.date_invoice as date,
+            (SELECT inv.id,inv.origin as invoice_no,inv.date_invoice as date,
                 inv.customer_po as customer_po_no, rp.name as customer_name,
                 concat(rc.name,rc.symbol) as cur_sym_code,
                 inv.amount_total as amount, 
