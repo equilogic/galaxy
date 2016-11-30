@@ -47,6 +47,8 @@
 					<field name="attn_sal"
 						domain="[('type','=','contact'),('parent_id','=',partner_id)]"
 						attrs="{'readonly': [('state','not in',('draft','sent'))]}" />
+					<field name="customer_po" />
+					<field name="direct_invoice" />
 				</xpath>
 				<xpath
 					expr="//page[@string='Order Lines']/field[@name='order_line']/tree[@string='Sales Order Lines']/field[@name='price_unit']"

@@ -23,7 +23,7 @@
 
         <!-- Action for Sale Register Report Wizard -->
         <record model="ir.actions.act_window" id="sale_register_report_action">
-            <field name="name">Sale Register Report</field>
+            <field name="name">Sale Order Report</field>
             <field name="res_model">wiz.sale.register.report</field>
             <field name="view_type">form</field>
             <field name="view_mode">form</field>
@@ -47,12 +47,8 @@
 					<field name="customer_po_no"/>
 					<field name="customer_name"/>
 					<field name="total_amount" sum="Total"/>
-					<!-- <field name="residual_amount"/> -->
-					
-					<!-- <field name="amt_in_actual_currency"/> -->
-					<!-- <field name="tax_amt"/> -->
-<!-- 					<field name="amt_in_sgd"/>
-					<field name="tax_amt_in_sgd"/> -->
+					<field name="residual_amount"/>
+					<field name="status"/>
 				</tree>
 			</field>
 		</record>

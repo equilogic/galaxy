@@ -23,6 +23,7 @@
 import galaxy_tax_invoice
 import galaxy_sale_local_tax_report
 import galaxy_bank_invoice_report
+import purchase_reg_report_pdf
 
 
 # vim:expandtab:smartindent:tabstop=4:softtabstop=4:shiftwidth=4:

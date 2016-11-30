@@ -81,6 +81,7 @@ class purchase_order(models.Model):
     attn_pur = fields.Many2one('res.partner','ATTN')
     
     sup_inv_num = fields.Char('Supplier Invoice Number')
+    direct_invoice = fields.Boolean('Direct Invoice')
 
     landed_cost_pur = fields.One2many('landed.cost.invoice','acc_pur_id',string='Landed Cost')
     @api.multi

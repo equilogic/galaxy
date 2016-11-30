@@ -21,5 +21,6 @@
 ##############################################################################
 
 import update_currency_rates
+import purchase_register_pdf_wiz
 
 # vim:expandtab:smartindent:tabstop=4:softtabstop=4:shiftwidth=4:

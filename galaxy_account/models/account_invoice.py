@@ -201,7 +201,9 @@ class account_invoice(models.Model):
                           'attn_sal':self.attn_inv.id,
                           'landed_cost_sal':[(6,0,self.landed_cost.ids)],
                           'landed_cost_price':self.landed_cost_price,
-                          'currency_rate': self.currency_rate
+                          'currency_rate': self.currency_rate,
+                          'customer_po': self.customer_po,
+                          'direct_invoice': True
                           }
             res = so_obj.create(order_vals)
             for line in self.invoice_line:
@@ -252,6 +254,7 @@ class account_invoice(models.Model):
                           'invoice_ids':[(4, self.ids)],
                           'currency_rate': self.currency_rate,
                           'partner_ref': self.supplier_invoice_number,
+                          'direct_invoice': True
                           }
             po_res = po_obj.create(order_vals)
             for line in self.invoice_line:

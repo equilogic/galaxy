@@ -78,6 +78,8 @@ class sale_order(models.Model):
                                 store=True, string='Total')
     account_id = fields.Many2one('account.invoice', 'Invoice')
     landed_cost_sal = fields.One2many('landed.cost.invoice','acc_sal_id',string='Landed Cost')
+    customer_po = fields.Char('Customer PO')
+    direct_invoice = fields.Boolean('Direct Invoice')
     
     @api.multi
     @api.depends('order_line', 'landed_cost_sal')

@@ -79,5 +79,13 @@
             <field name="report_ids" eval="[(4, ref('galaxy_account.galaxy_bank_invoice'))]"/>
         </record>
 
+         <report 
+                id = "galaxy_purchase_order_template_pdf_id"
+                string = "Purchase Register"
+                model="account.invoice" 
+                name = "galaxy_account.galaxy_purchase_order_template_pdf"
+                report_type = "qweb-pdf"
+                menu="False"/>
+                
 	</data>
 </openerp>
