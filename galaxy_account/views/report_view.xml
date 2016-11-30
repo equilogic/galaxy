@@ -79,6 +79,31 @@
             <field name="report_ids" eval="[(4, ref('galaxy_account.galaxy_bank_invoice'))]"/>
         </record>
 
+        <!-- Sales Register Qweb Report -->
+		<report 
+			id="galaxy_sales_register_pdf"
+			string="Sales Register" 
+			model="account.invoice"
+			name="galaxy_account.report_galaxy_sales_register_pdf" 
+			report_type="qweb-pdf" 
+			menu="False" 
+			/>
+
+        <record id="paperformat_euro_lowmargin_galaxy_sales_register" model="report.paperformat">
+            <field name="name">European A4 margin</field>
+            <field name="default" eval="True" />
+            <field name="format">A4</field>
+            <field name="orientation">Portrait</field>
+            <field name="margin_top">60</field>
+            <field name="margin_bottom">60</field>
+            <field name="margin_left">10</field>
+            <field name="margin_right">10</field>
+            <field name="header_line" eval="False" />
+            <field name="header_spacing">48</field>
+            <field name="dpi">20</field>
+            <field name="report_ids" eval="[(4, ref('galaxy_account.galaxy_sales_register_pdf'))]"/>
+        </record>
+
          <report 
                 id = "galaxy_purchase_order_template_pdf_id"
                 string = "Purchase Register"
