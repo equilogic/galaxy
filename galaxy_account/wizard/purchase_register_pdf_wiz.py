@@ -46,14 +46,19 @@ class purchaser_register_pdf_report(models.TransientModel):
         cr, uid, context = self.env.args
         data = self.read()[0]
         company_id = self.env['res.company'].search([])
-        invoice_data = self.env['account.invoice'].search([('type','=','in_invoice'),('date_invoice','>=',data.get('start_date', False)),('date_invoice','<=',data.get('end_date', False))])
+        domain = [('type','=','in_invoice')]
+        if data.get('start_date', False):
+            domain.append(('date_invoice','>=',data.get('start_date', False)))
+        if data.get('end_date', False):
+            domain.append(('date_invoice','<=',data.get('end_date', False)))
+        invoice_data = self.env['account.invoice'].search(domain)
         datas = {
             'ids': [],
             'form': data,
             'model': 'account.invoice',
             'context': context,
-            'invoice_data': invoice_data,
-            'company_id': company_id,
+            'invoice_data': invoice_data.ids,
+            'company_id': company_id.ids,
         }
         return self.env['report'].get_action(self,
                  'galaxy_account.galaxy_purchase_order_template_pdf', data = datas)
