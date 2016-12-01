@@ -22,5 +22,6 @@
 
 import wiz_import_products
 import wiz_import_customer_supplier
+import product_qty_onhand_report
 
 # vim:expandtab:smartindent:tabstop=4:softtabstop=4:shiftwidth=4:
