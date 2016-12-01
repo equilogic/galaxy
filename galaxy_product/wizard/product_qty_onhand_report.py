@@ -131,9 +131,9 @@ class product_qty_on_hand(models.TransientModel):
                     product_qty[product.id].update({'name': product.name,'ref': product.default_code, 'qty_avi': product.qty_available})
                 else:
                     product_qty[product.id] = {'name': product.name,'ref': product.default_code,'qty_avi': product.qty_available}
-                if product_qty: 
-                    proudct_list.append(product_qty)                                                 
-        
+            if product_qty: 
+                proudct_list.append(product_qty)                                                 
+    
         if proudct_list:
             row = 4
             for pro_dict in proudct_list:
