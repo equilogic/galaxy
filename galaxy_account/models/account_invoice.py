@@ -273,7 +273,6 @@ class account_invoice(models.Model):
                         'order_id':po_res.id,
                         }
                 po_res1 = po_line_obj.create(vals)
-            po_obj._amount_all()
             po_res.signal_workflow('purchase_confirm')
             
             if po_res.picking_ids:

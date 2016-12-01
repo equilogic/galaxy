@@ -22,6 +22,9 @@
 import time
 from openerp.report import report_sxw
 from openerp import models
+import time
+from datetime import datetime
+from openerp.tools import DEFAULT_SERVER_DATE_FORMAT
 
 GLOBAL_STATE_DICT = {'draft' : 'Draft',
 		               'proforma': 'Pro-forma',
@@ -47,16 +50,18 @@ class report_sales_register_pdf(report_sxw.rml_parse):
 			if data['form'].get('st_dt', False) and data['form'].get('en_dt', False):
 				invoices = self.pool.get('account.invoice').search(self.cr, self.uid, [('date_invoice','>=', data['form']['st_dt']),
 													('date_invoice','<=', data['form']['en_dt']),
-													('type','=', 'out_invoice')])
+													('type','=', 'out_invoice')], order='origin' )
 			if invoices:
 				for inv in self.pool.get('account.invoice').browse(self.cr, self.uid, invoices):
+					new_dt=datetime.strptime(inv.date_invoice, DEFAULT_SERVER_DATE_FORMAT)
+					formated_dt=datetime.strftime(new_dt, "%d-%m-%Y")					
 					inv_data_lst.append({
-						'date': inv.date_invoice or '',
-						'invoice': inv.number or '',
+						'date': formated_dt or '',
+						'invoice': inv.origin or '',
 						'customer_po': inv.customer_po or '', 
 						'customer': inv.partner_id and inv.partner_id.name or '',
-						'amount': inv.amount_total or '',
-						'amount_due': inv.residual or '',
+						'amount': inv.amount_total or 0.00,
+						'amount_due': inv.residual or 0.00,
 						'status': GLOBAL_STATE_DICT.get(inv.state, '') or '',
 					})
 		return inv_data_lst

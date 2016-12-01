@@ -77,52 +77,56 @@
 					<div class="page">
 						<table class="table-condensed" style="font-family:Helvetica;font-size:12px;"
 						width="100%">
-							<tr style="border-bottom:1px solid;font-family:Helvetica;font-size:12px;">
-								<th>
-									Date
-								</th>
-								<th> 
-			         				Invoice #
-								</th>
-								<th>
-									Customer PO #
-								</th>
-								<th>
-									Customer Name
-								</th>
-								<th>
-									Amount
-								</th>
-								<th>
-									Amount Due
-								</th>
-								<th>
-									Status
-								</th>
-							</tr>
-							<tr t-foreach="get_invoice_data(data)" t-as="line">
-								<td>
-									<span t-esc="line.get('date')" />
-								</td>
-								<td> 
-			         				<span t-esc="line.get('invoice')" />
-								</td>
-								<td>
-									<span t-esc="line.get('customer_po')" />
-								</td>
-								<td>
-									<span t-esc="line.get('customer')" />
-								</td>
-								<td>
-									<span t-esc="line.get('amount')" />
-								</td>
-								<td>
-									<span t-esc="line.get('amount_due')" />
-								</td>
-								<td>
-									<span t-esc="line.get('status')" />
-								</td>
-							</tr>
+							<thead>
+								<tr style="border-bottom:1px solid;font-family:Helvetica;font-size:10px;">
+									<th>
+										Date
+									</th>
+									<th> 
+				         				Invoice #
+									</th>
+									<th>
+										Customer PO #
+									</th>
+									<th>
+										Customer Name
+									</th>
+									<th>
+										Amount
+									</th>
+									<th>
+										Amount Due
+									</th>
+									<th>
+										Status
+									</th>
+								</tr>
+							</thead>
+							<tbody>
+								<tr t-foreach="get_invoice_data(data)" t-as="line">
+									<td width="10%">
+										<span t-esc="line.get('date')" />
+									</td>
+									<td width="10%"> 
+				         				<span t-esc="line.get('invoice')" />
+									</td>
+									<td width="10%">
+										<span t-esc="line.get('customer_po')" />
+									</td>
+									<td width="30%">
+										<span t-esc="line.get('customer')" />
+									</td>
+									<td width="8%">
+										<span t-esc="line.get('amount')" />
+									</td>
+									<td width="10%">
+										<span t-esc="line.get('amount_due')" />
+									</td>
+									<td width="10%">
+										<span t-esc="line.get('status')" />
+									</td>
+								</tr>
+							</tbody>
 						</table>
 					</div>
 				</t>
