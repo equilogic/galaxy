@@ -13,7 +13,8 @@ class purchaser_reg_pdf_report(report_sxw.rml_parse):
         super(purchaser_reg_pdf_report,self).__init__(cr,uid,name,context=context)
         self.localcontext.update({
             'time': time,
-            'get_details': self._get_details
+            'get_details': self._get_details,
+            'get_company': self._get_company,
             })
    
     def _get_details(self, data):
@@ -33,9 +34,11 @@ class purchaser_reg_pdf_report(report_sxw.rml_parse):
                                  'delivery_status': data.delivery_status,
                                  })
                 data_list.append(inv_dict)
-        print "inv_dict=========",data_list
-                    
         return data_list
+
+    def _get_company(self, data):
+        user = self.pool.get('res.users').browse(self.cr, self.uid, self.uid)
+        return user and user.company_id or False
     
 class allergan_hourly_profile(osv.AbstractModel):
     _name = 'report.galaxy_account.galaxy_purchase_order_template_pdf'

@@ -63,4 +63,6 @@ class purchaser_register_pdf_report(models.TransientModel):
         return self.env['report'].get_action(self,
                  'galaxy_account.galaxy_purchase_order_template_pdf', data = datas)
 
+
+
 # vim:expandtab:smartindent:tabstop=4:softtabstop=4:shiftwidth=4:
