@@ -48,6 +48,22 @@ class account_invoice_line(models.Model):
                 res['domain'].update({'origin_ids':[('product_id', 'in', [prod_tmpl_id])]})
         return res
 
+    @api.model
+    def move_line_get(self, invoice_id):
+        res = super(account_invoice_line, self).move_line_get(invoice_id)
+        inv = self.env['account.invoice'].browse(invoice_id)
+        if inv.landed_cost_price and inv.landed_cost_price > 0.0:
+            acc_id = False
+            for line in inv.invoice_line:
+                acc_id = line.account_id and line.account_id.id or False
+            res.append({'uos_id': False, 'account_id': acc_id, 'price_unit': inv.landed_cost_price,
+                        'name': 'Landed Cost', 'product_id': False, 'taxes': False,
+                        'invl_id': False, 'account_analytic_id': False,
+                        'type': 'dest', 'price': inv.landed_cost_price,
+                        'quantity': 1.0})
+        return res
+
+
 class account_invoice(models.Model):
     _inherit = "account.invoice"
     
