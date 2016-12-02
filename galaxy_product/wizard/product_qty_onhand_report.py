@@ -69,7 +69,7 @@ class product_qty_on_hand(models.TransientModel):
         
         worksheet = wbk.add_sheet('Sales Register Report')
         rep_name = 'Item Register.xls'
-        product_ids = self.env['product.product'].search([])
+        product_ids = self.env['product.product'].search([('type','!=','service')])
         
         worksheet.row(0).height = 600
         worksheet.write_merge(0, 0, 0, 6, 'Item Register Report ' + ' ( ' + start_dt + ' to ' + end_dt+' ) ', main_header)
@@ -110,7 +110,8 @@ class product_qty_on_hand(models.TransientModel):
                         product_qty[product.id] = {'opening_stock': stock_data.product_uom_qty}
                 sale_line_data = sale_line_obj.search([('product_id','=',product.id),
                                                        ('order_id.date_order', '>=', self.date_from),
-                                                       ('order_id.date_order', '<=', self.date_to)])
+                                                       ('order_id.date_order', '<=', self.date_to),
+                                                       ('order_id.state','not in',('cancel','invoice_except'))])
                 if sale_line_data:
                     for line in sale_line_data:
                         if product_qty.has_key(product.id):
@@ -120,7 +121,8 @@ class product_qty_on_hand(models.TransientModel):
                              product_qty[product.id] ={'sold_qty': line.product_uom_qty}
                 pur_line_data = purchase_line_obj.search([('product_id','=',product.id),
                                                        ('order_id.date_order', '>=', self.date_from),
-                                                       ('order_id.date_order', '<=', self.date_to)])
+                                                       ('order_id.date_order', '<=', self.date_to),
+                                                       ('order_id.state','not in',('cancel','except_invoice'))])
                 if pur_line_data:
                     for line1 in pur_line_data:
                         if product_qty.has_key(product.id):

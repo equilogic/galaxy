@@ -50,14 +50,14 @@ class report_sales_register_pdf(report_sxw.rml_parse):
 			if data['form'].get('st_dt', False) and data['form'].get('en_dt', False):
 				invoices = self.pool.get('account.invoice').search(self.cr, self.uid, [('date_invoice','>=', data['form']['st_dt']),
 													('date_invoice','<=', data['form']['en_dt']),
-													('type','=', 'out_invoice')], order='origin' )
+													('type','=', 'out_invoice'),('state', '!=','cancel')], order='origin' )
 			if invoices:
 				for inv in self.pool.get('account.invoice').browse(self.cr, self.uid, invoices):
 					new_dt=datetime.strptime(inv.date_invoice, DEFAULT_SERVER_DATE_FORMAT)
-					formated_dt=datetime.strftime(new_dt, "%d-%m-%Y")					
+					formated_dt=datetime.strftime(new_dt, "%d-%m-%Y")	
 					inv_data_lst.append({
 						'date': formated_dt or '',
-						'invoice': inv.origin or '',
+						'invoice': inv.number or '',
 						'customer_po': inv.customer_po or '', 
 						'customer': inv.partner_id and inv.partner_id.name or '',
 						'amount': inv.amount_total or 0.00,

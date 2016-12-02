@@ -104,7 +104,7 @@
 							</thead>
 							<tbody>
 								<tr t-foreach="get_invoice_data(data)" t-as="line">
-									<td width="10%">
+									<td width="15%">
 										<span t-esc="line.get('date')" />
 									</td>
 									<td width="10%"> 
@@ -122,7 +122,7 @@
 									<td width="10%">
 										<span t-esc="line.get('amount_due')" />
 									</td>
-									<td width="10%">
+									<td width="8%">
 										<span t-esc="line.get('status')" />
 									</td>
 								</tr>

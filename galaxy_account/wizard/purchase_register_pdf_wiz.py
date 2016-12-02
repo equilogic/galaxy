@@ -46,7 +46,7 @@ class purchaser_register_pdf_report(models.TransientModel):
         cr, uid, context = self.env.args
         data = self.read()[0]
         company_id = self.env['res.company'].search([])
-        domain = [('type','=','in_invoice')]
+        domain = [('type','=','in_invoice'), ('state', '!=','cancel')]
         if data.get('start_date', False):
             domain.append(('date_invoice','>=',data.get('start_date', False)))
         if data.get('end_date', False):
