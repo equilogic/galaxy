@@ -6,6 +6,12 @@ from datetime import datetime
 from openerp.tools import DEFAULT_SERVER_DATE_FORMAT,ustr
 
 
+GLOBAL_STATE_DICT = {'draft' : 'Draft',
+                       'proforma': 'Pro-forma',
+                       'proforma2': 'Pro-forma',
+                       'open': 'Open',
+                       'paid': 'Paid',
+                       'cancel': 'Cancelled'}
 
 class purchaser_reg_pdf_report(report_sxw.rml_parse):
    
@@ -24,17 +30,19 @@ class purchaser_reg_pdf_report(report_sxw.rml_parse):
         inv_data = inv_obj.browse(self.cr, self.uid, data.get('invoice_data', False))
         if inv_data:
             for data in inv_data:
-                inv_dict.update({'date': data.date_invoice,
+                new_dt=datetime.strptime(data.date_invoice, DEFAULT_SERVER_DATE_FORMAT)
+                formated_dt=datetime.strftime(new_dt, "%d-%m-%Y")                    
+                data_list.append({'date': formated_dt,
                                  'po': data.number,
                                  'supplier_inv': data.supplier_invoice_number,
                                  'supplier': data.partner_id.name,
                                  'amount': data.amount_total,
                                  'amt_due': data.residual,
-                                 'state': data.state,
+                                 'state': GLOBAL_STATE_DICT.get(data.state, '') or '',
                                  'delivery_status': data.delivery_status,
                                  })
-                data_list.append(inv_dict)
-        return data_list
+        newlist = sorted(data_list, key=lambda k: k['po']) 
+        return newlist
 
     def _get_company(self, data):
         user = self.pool.get('res.users').browse(self.cr, self.uid, self.uid)

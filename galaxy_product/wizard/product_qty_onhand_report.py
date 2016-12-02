@@ -122,11 +122,12 @@ class product_qty_on_hand(models.TransientModel):
                                                        ('order_id.date_order', '>=', self.date_from),
                                                        ('order_id.date_order', '<=', self.date_to)])
                 if pur_line_data:
-                    if product_qty.has_key(product.id):
-                        product_qty[product.id].update({'pur_qty': product_qty[product.id].get('pur_qty', 0) + \
-                                                        pur_line_data.product_qty}) 
-                    else:
-                         product_qty[product.id] = {'pur_qty': pur_line_data.product_qty} 
+                    for line1 in pur_line_data:
+                        if product_qty.has_key(product.id):
+                            product_qty[product.id].update({'pur_qty': product_qty[product.id].get('pur_qty', 0) + \
+                                                            line1.product_qty}) 
+                        else:
+                            product_qty[product.id] = {'pur_qty': line1.product_qty} 
                 if product_qty.has_key(product.id): 
                     product_qty[product.id].update({'name': product.name,'ref': product.default_code, 'qty_avi': product.qty_available})
                 else:

@@ -103,14 +103,14 @@
 								</th>
 							</tr>
                             <tr t-foreach="get_details(data)" t-as="line">
-                            	<td><span t-esc="line['date']"/></td>
-                            	<td><span t-esc="line['po']"/></td>
-                            	<td><span t-esc="line['supplier_inv']"/></td>
-                            	<td><span t-esc="line['supplier']"/></td>
-                            	<td><span t-esc="line['amount']"/></td>
-                            	<td><span t-esc="line['amt_due']"/></td>
-                            	<td><span t-esc="line['state']"/></td>
-                            	<td><span t-esc="line['delivery_status']"/></td>
+                            	<td width="15%"><span t-esc="line['date']"/></td>
+                            	<td width="10%"><span t-esc="line['po']"/></td>
+                            	<td width="8%"><span t-esc="line['supplier_inv']"/></td>
+                            	<td width="30%"><span t-esc="line['supplier']"/></td>
+                            	<td width="10%"><span t-esc="line['amount']"/></td>
+                            	<td width="8%"><span t-esc="line['amt_due']"/></td>
+                            	<td width="10%"><span t-esc="line['state']"/></td>
+                            	<td width="10%"><span t-esc="line['delivery_status']"/></td>
                             </tr>
 						</table>
 					</div>

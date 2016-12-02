@@ -68,9 +68,9 @@ class account_invoice(models.Model):
     part_inv_id = fields.Many2one('res.partner', 'Invoice Address', readonly=True, required=True,
                                   states={'draft': [('readonly', False)], 'sent': [('readonly', False)]},
                                   help="Invoice address for current sales order.")
-    cust_add = fields.Text('Customer Address')
-    part_inv_add = fields.Text('Invoice Address')
-    part_ship_add = fields.Text('Delivery Address')
+    cust_add = fields.Text('Customer Address', readonly=True, states={'draft': [('readonly', False)]})
+    part_inv_add = fields.Text('Invoice Address', readonly=True, states={'draft': [('readonly', False)]})
+    part_ship_add = fields.Text('Delivery Address', readonly=True, states={'draft': [('readonly', False)]})
     
 
     part_ship_id = fields.Many2one('res.partner', 'Delivery Address', readonly=True, required=True,
@@ -328,18 +328,20 @@ class account_invoice(models.Model):
         picking_rec = self.env['stock.picking'].search([('account_id', '=', self.ids[0])])
         if picking_rec:
             return_line = []
-            for move_rec in picking_rec.move_lines:
-                return_dict = {'product_id': move_rec.product_id.id,
-                               'move_id': move_rec.id,
-                               'quantity': move_rec.product_uom_qty,
-                               }
-                return_line.append((0, 0, return_dict))
-                move_rec.write({'state': 'cancel'})
+            for pick in picking_rec:
+                for move_rec in pick.move_lines:
+                    return_dict = {'product_id': move_rec.product_id.id,
+                                   'move_id': move_rec.id,
+                                   'quantity': move_rec.product_uom_qty,
+                                   }
+                    return_line.append((0, 0, return_dict))
+                    move_rec.write({'state': 'cancel'})
             picking_return_rec = self.env['stock.return.picking'].create({'product_return_moves': return_line, 'invoice_state': 'none'})
-            new_picking, old_picking = picking_return_rec.with_context({'active_id': picking_rec.id})._create_returns()
-            picking_rec.write({'state': 'cancel'})
-            pick_obj = self.env['stock.picking'].browse(new_picking)
-            pick_obj.do_transfer()
+            for pick in picking_rec:
+                new_picking, old_picking = picking_return_rec.with_context({'active_id': pick.id})._create_returns()
+                pick.write({'state': 'cancel'})
+                pick_obj = self.env['stock.picking'].browse(new_picking)
+                pick_obj.do_transfer()
             if self.type=="out_invoice":
                 sale_rec = self.env['sale.order'].search([('account_id', '=', self.ids[0])])
             if self.type=="in_invoice":

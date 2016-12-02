@@ -51,7 +51,7 @@ class purchaser_register_pdf_report(models.TransientModel):
             domain.append(('date_invoice','>=',data.get('start_date', False)))
         if data.get('end_date', False):
             domain.append(('date_invoice','<=',data.get('end_date', False)))
-        invoice_data = self.env['account.invoice'].search(domain)
+        invoice_data = self.env['account.invoice'].search(domain, order='name')
         datas = {
             'ids': [],
             'form': data,
