@@ -21,6 +21,8 @@
 ##############################################################################
 
 from openerp import models, fields, api
+from datetime import datetime
+from openerp.tools import DEFAULT_SERVER_DATETIME_FORMAT, DEFAULT_SERVER_DATE_FORMAT
 from openerp.exceptions import except_orm
 from openerp.tools.translate import _
 
@@ -99,6 +101,29 @@ class account_invoice(models.Model):
     customer_po = fields.Char(string="Customer PO")
     delivery_status =fields.Char(string="Delivery Status")
     export = fields.Boolean('Export')
+    
+    @api.v7
+    def _check_check_currency_rate(self, cr, uid, ids, context=None):
+        curr_day = datetime.now().strftime('%A')
+        curr_dt = datetime.now().strftime(DEFAULT_SERVER_DATE_FORMAT)
+        flag = False
+        if curr_day == 'Tuesday':
+            for invoice in self.browse(cr, uid, ids, context=context):
+                if invoice.currency_id and invoice.currency_id.rate_ids:
+                    for rate_line in invoice.currency_id.rate_ids:
+                        if rate_line.name:
+                            rate_dt = datetime.strptime(rate_line.name, DEFAULT_SERVER_DATETIME_FORMAT)
+                            if curr_dt == rate_dt.date().strftime(DEFAULT_SERVER_DATE_FORMAT):
+                                flag = True
+            if not flag:
+                return False
+            else:
+                return True
+        return True
+
+    _constraints = [
+        (_check_check_currency_rate, 'Please Update Current Currency rate for this invoice.', ['currency_id'])
+    ]
     
     @api.multi
     def onchange_partner_id(self, type, partner_id, date_invoice=False,
