@@ -246,10 +246,12 @@ class account_invoice(models.Model):
         if self.type == "in_invoice" and not self.invoice_from_purchase:
             product_ids = []
             invoice_method='picking'
+            flag = False
             if self.invoice_line:
                 for line in self.invoice_line:
-                    product_ids.append(line.product_id.id)
-            if not product_ids or (len(product_ids) == 1 and product_ids[0] == False):
+                    if line.product_id.id:
+                        flag = True
+            if flag == False:
                 invoice_method='manual'
             order_vals = {
                           'partner_id': self.partner_id.id,
