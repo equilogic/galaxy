@@ -24,6 +24,10 @@ from openerp import models, fields, api
 from openerp.tools.translate import _
 from openerp import SUPERUSER_ID
 import openerp.addons.decimal_precision as dp
+from datetime import datetime
+from openerp.tools import DEFAULT_SERVER_DATETIME_FORMAT, DEFAULT_SERVER_DATE_FORMAT
+from openerp.exceptions import except_orm
+
 
 class purchase_order_line(models.Model):
     _inherit = 'purchase.order.line'
@@ -75,6 +79,29 @@ class purchase_order(models.Model):
 
     landed_cost_pur = fields.One2many('landed.cost.invoice', 'acc_pur_id', string='Landed Cost')
 
+    @api.v7
+    def _check_pur_currency_rate(self, cr, uid, ids, context=None):
+        curr_day = datetime.now().strftime('%A')
+        curr_dt = datetime.now().strftime(DEFAULT_SERVER_DATE_FORMAT)
+        flag = False
+        if curr_day == 'Tuesday':
+            for purchase in self.browse(cr, uid, ids, context=context):
+                if purchase.currency_id and purchase.currency_id.rate_ids:
+                    for rate_line in purchase.currency_id.rate_ids:
+                        if rate_line.name:
+                            rate_dt = datetime.strptime(rate_line.name, DEFAULT_SERVER_DATETIME_FORMAT)
+                            if curr_dt == rate_dt.date().strftime(DEFAULT_SERVER_DATE_FORMAT):
+                                flag = True
+            if not flag:
+                return False
+            else:
+                return True
+        return True
+
+    _constraints = [
+        (_check_pur_currency_rate, 'Please Update Current Currency rate !', ['currency_id'])
+    ]
+    
 
 from openerp.osv import osv,fields
 
@@ -90,7 +117,6 @@ class purchase_order(osv.osv):
         
         return res
 
-#    
     @api.multi
     def onchange_partner_id(self,partner_id):
         res = super(purchase_order, self).onchange_partner_id(partner_id)

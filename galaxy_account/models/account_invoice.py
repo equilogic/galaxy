@@ -122,7 +122,7 @@ class account_invoice(models.Model):
         return True
 
     _constraints = [
-        (_check_check_currency_rate, 'Please Update Current Currency rate for this invoice.', ['currency_id'])
+        (_check_check_currency_rate, 'Please Update Current Currency rate !', ['currency_id'])
     ]
     
     @api.multi
