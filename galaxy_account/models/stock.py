@@ -27,4 +27,4 @@ class stock_picking(models.Model):
 
     _inherit = "stock.picking"
     
-    invoice_id = fields.Many2one('account.invoice', 'Invoice')
+    account_id = fields.Many2one('account.invoice', 'Invoice')

@@ -245,7 +245,7 @@ class account_invoice(models.Model):
                           'date_order': self.date_invoice,
                           'pricelist_id': self.partner_id.property_product_pricelist.id,
                           'active': True,
-                          'invoice_id': self._ids,
+                          'account_id': self._ids,
                           'attn_sal':self.attn_inv.id,
                           'landed_cost_sal':[(6,0,self.landed_cost.ids)],
                           'landed_cost_price':self.landed_cost_price,
@@ -297,7 +297,7 @@ class account_invoice(models.Model):
                           'invoiced':True,
                           'active': True,
                           'currency_id':self.currency_id.id,
-                          'invoice_id': self._ids,
+                          'account_id': self._ids,
                           'location_id' : loc_id.id,#self.partner_id.property_stock_supplier.id,
                           'attn_pur':self.attn_inv.id,
                           'landed_cost_pur':[(6,0,self.landed_cost.ids)],
@@ -376,7 +376,7 @@ class account_invoice(models.Model):
         # First, set the invoices as cancelled and detach the move ids
         self.write({'state': 'cancel', 'move_id': False})
         self._log_event(-1.0, 'Cancel Invoice')
-        picking_rec = self.env['stock.picking'].search([('invoice_id', '=', self.ids[0])])
+        picking_rec = self.env['stock.picking'].search([('account_id', '=', self.ids[0])])
         if picking_rec:
             return_line = []
             for pick in picking_rec:
@@ -394,9 +394,9 @@ class account_invoice(models.Model):
                 pick_obj = self.env['stock.picking'].browse(new_picking)
                 pick_obj.do_transfer()
             if self.type=="out_invoice":
-                sale_rec = self.env['sale.order'].search([('invoice_id', '=', self.ids[0])])
+                sale_rec = self.env['sale.order'].search([('account_id', '=', self.ids[0])])
             if self.type=="in_invoice":
-                purchase_rec = self.env['purchase.order'].search([('invoice_id', '=', self.ids[0])])
+                purchase_rec = self.env['purchase.order'].search([('account_id', '=', self.ids[0])])
             if sale_rec:
                 sale_rec.action_invoice_cancel()
             if purchase_rec:
