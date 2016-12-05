@@ -62,7 +62,7 @@ class purchase_order(models.Model):
     
     _inherit = 'purchase.order'
 
-    account_id = fields.Many2one('account.invoice', 'Invoice')
+    invoice_id = fields.Many2one('account.invoice', 'Invoice')
     currency_rate = fields.Float(string='Currency rate')
 
     partner_inv_id = fields.Many2one('res.partner', 'Invoice Address', readonly=True, required=True,
@@ -75,7 +75,7 @@ class purchase_order(models.Model):
     attn_pur = fields.Many2one('res.partner', 'ATTN')
     
     sup_inv_num = fields.Char('Supplier Invoice Number')
-    direct_invoice = fields.Boolean('Direct Invoice')
+    direct_invoice = fields.Boolean('Direct Invoice', default=False)
 
     landed_cost_pur = fields.One2many('landed.cost.invoice', 'acc_pur_id', string='Landed Cost')
 

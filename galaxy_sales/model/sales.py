@@ -66,10 +66,10 @@ class sale_order(models.Model):
     currency_rate = fields.Float(string='Currency rate')
     active = fields.Boolean('Active', default=True, help="If the active field is set to False, it will allow you to hide the sale order without removing it.")
     attn_sal = fields.Many2one('res.partner', 'ATTN')
-    account_id = fields.Many2one('account.invoice', 'Invoice')
+    invoice_id = fields.Many2one('account.invoice', 'Invoice')
     landed_cost_sal = fields.One2many('landed.cost.invoice','acc_sal_id',string='Landed Cost')
     customer_po = fields.Char('Customer PO')
-    direct_invoice = fields.Boolean('Direct Invoice')
+    direct_invoice = fields.Boolean('Direct Invoice', defualt=False)
 
 
 from openerp.osv import osv,fields
