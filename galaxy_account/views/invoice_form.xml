@@ -70,7 +70,7 @@
 				<field name="account_id" position='after'>
 					<field name="attn_inv"
 						domain="[('type','=','contact'),('parent_id','=',partner_id)]"
-						attrs="{'readonly': [('state','not in',('draft','sent'))]}" />
+						attrs="{'readonly': [('state','not in',('draft','sent','open'))]}" />
 					<field name="customer_po"/>
 					<field name="delivery_status"/>
 					<field name="part_ship_id"
@@ -112,6 +112,13 @@
 					<field name="landed_cost_price" readonly="1" widget="monetary"
 						options="{'currency_field': 'currency_id'}" />
 				</xpath>
+                <xpath expr="//field[@name='journal_id']" position="replace">
+                    <field name="journal_id" groups="account.group_account_user"
+                        on_change="onchange_journal_id(journal_id)" options="{'no_create': True}"/>
+                </xpath>
+                <xpath expr="//field[@name='residual']" position="attributes">
+                    <attribute name="invisible">1</attribute>
+                </xpath>
 			</field>
 		</record>
 
@@ -138,7 +145,7 @@
 				<xpath expr="//field[@name='fiscal_position']" position="after">
 					<field name="attn_inv"
 						domain="[('type','=','contact'),('parent_id','=',partner_id)]"
-						attrs="{'readonly': [('state','not in',('draft','sent'))]}" />
+						attrs="{'readonly': [('state','not in',('draft','sent','open'))]}" />
 					<field name="delivery_status"/>
 				</xpath>
 				<xpath
@@ -180,6 +187,14 @@
 					<field name="landed_cost_price" readonly="1" widget="monetary"
 						options="{'currency_field': 'currency_id'}" />
 				</xpath>
+				<xpath expr="//field[@name='journal_id']" position="replace">
+                    <field name="journal_id" groups="account.group_account_user"
+                        on_change="onchange_journal_id(journal_id)" options="{'no_create': True}"/>
+                </xpath>
+                <xpath expr="//field[@name='residual']" position="attributes">
+                    <attribute name="invisible">1</attribute>
+                </xpath>
+                
 			</field>
 		</record>
 

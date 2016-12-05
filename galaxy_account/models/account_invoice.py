@@ -26,6 +26,13 @@ from openerp.tools import DEFAULT_SERVER_DATETIME_FORMAT, DEFAULT_SERVER_DATE_FO
 from openerp.exceptions import except_orm
 from openerp.tools.translate import _
 
+# mapping invoice type to journal type
+TYPE2JOURNAL = {
+    'out_invoice': 'sale',
+    'in_invoice': 'purchase',
+    'out_refund': 'sale_refund',
+    'in_refund': 'purchase_refund',
+}
 
 class account_invoice_line(models.Model):
     _inherit = 'account.invoice.line'
@@ -68,7 +75,23 @@ class account_invoice_line(models.Model):
 
 class account_invoice(models.Model):
     _inherit = "account.invoice"
-    
+
+    @api.model
+    def _default_journal(self):
+        inv_type = self._context.get('type', 'out_invoice')
+        inv_types = inv_type if isinstance(inv_type, list) else [inv_type]
+        company_id = self._context.get('company_id', self.env.user.company_id.id)
+        domain = [
+            ('type', 'in', filter(None, map(TYPE2JOURNAL.get, inv_types))),
+            ('company_id', '=', company_id),
+        ]
+        return self.env['account.journal'].search(domain, limit=1)
+
+    @api.model
+    def _default_currency(self):
+        journal = self._default_journal()
+        return journal.currency or journal.company_id.currency_id
+
     vehicle_name = fields.Char('Vehicle Name')
     container_name = fields.Char('Container Name')
     container_place_area_code = fields.Char('Container Place Area Code')
@@ -84,15 +107,15 @@ class account_invoice(models.Model):
     currency_rate = fields.Float(string='Currency rate', digits=(16,4))
     
     part_inv_id = fields.Many2one('res.partner', 'Invoice Address', readonly=True, required=True,
-                                  states={'draft': [('readonly', False)], 'sent': [('readonly', False)]},
+                                  states={'draft': [('readonly', False)], 'sent': [('readonly', False)], 'open': [('readonly', False)]},
                                   help="Invoice address for current sales order.")
-    cust_add = fields.Text('Customer Address', readonly=True, states={'draft': [('readonly', False)]})
-    part_inv_add = fields.Text('Invoice Address', readonly=True, states={'draft': [('readonly', False)]})
-    part_ship_add = fields.Text('Delivery Address', readonly=True, states={'draft': [('readonly', False)]})
+    cust_add = fields.Text('Customer Address', readonly=True, states={'draft': [('readonly', False)],'open': [('readonly', False)]})
+    part_inv_add = fields.Text('Invoice Address', readonly=True, states={'draft': [('readonly', False)],'open': [('readonly', False)]})
+    part_ship_add = fields.Text('Delivery Address', readonly=True, states={'draft': [('readonly', False)],'open': [('readonly', False)]})
     
 
     part_ship_id = fields.Many2one('res.partner', 'Delivery Address', readonly=True, required=True,
-                                   states={'draft': [('readonly', False)], 'sent': [('readonly', False)]},
+                                   states={'draft': [('readonly', False)], 'sent': [('readonly', False)],'open': [('readonly', False)]},
                                    help="Delivery address for current sales order.")
     attn_inv = fields.Many2one('res.partner', 'ATTN')
 
@@ -102,6 +125,62 @@ class account_invoice(models.Model):
     delivery_status =fields.Char(string="Delivery Status")
     export = fields.Boolean('Export')
     
+    ####    
+    # This Fields Overrite to Edit its value after validate invoice.(TO Change Attrs and domains)
+    ####
+    partner_id = fields.Many2one('res.partner', string='Partner', change_default=True,
+        required=True, readonly=True, states={'draft': [('readonly', False)],'open': [('readonly', False)]},
+        track_visibility='always')
+    date_invoice = fields.Date(string='Invoice Date',
+        readonly=True, states={'draft': [('readonly', False)],'open': [('readonly', False)]}, index=True,
+        help="Keep empty to use the current date", copy=False)
+    journal_id = fields.Many2one('account.journal', string='Journal',
+        required=True, readonly=True, states={'draft': [('readonly', False)],'open': [('readonly', False)]},
+        default=_default_journal,
+        domain="[('type', 'in', {'out_invoice': ['sale'], 'out_refund': ['sale_refund'], 'in_refund': ['purchase_refund'], 'in_invoice': ['purchase']}.get(type, [])), ('company_id', '=', company_id)]")
+    account_id = fields.Many2one('account.account', string='Account',
+        required=True, readonly=True, states={'draft': [('readonly', False)],'open': [('readonly', False)]},
+        help="The partner account used for this invoice.")
+    fiscal_position = fields.Many2one('account.fiscal.position', string='Fiscal Position',
+        readonly=True, states={'draft': [('readonly', False)],'open': [('readonly', False)]})
+    company_id = fields.Many2one('res.company', string='Company', change_default=True,
+        required=True, readonly=True, states={'draft': [('readonly', False)],'open': [('readonly', False)]},
+        default=lambda self: self.env['res.company']._company_default_get('account.invoice'))
+    payment_term = fields.Many2one('account.payment.term', string='Payment Terms',
+        readonly=True, states={'draft': [('readonly', False)],'open': [('readonly', False)]},
+        help="If you use payment terms, the due date will be computed automatically at the generation "
+             "of accounting entries. If you keep the payment term and the due date empty, it means direct payment. "
+             "The payment term may compute several due dates, for example 50% now, 50% in one month.")
+    user_id = fields.Many2one('res.users', string='Salesperson', track_visibility='onchange',
+        readonly=True, states={'draft': [('readonly', False)],'open': [('readonly', False)]},
+        default=lambda self: self.env.user)
+    partner_bank_id = fields.Many2one('res.partner.bank', string='Bank Account',
+        help='Bank Account Number to which the invoice will be paid. A Company bank account if this is a Customer Invoice or Supplier Refund, otherwise a Partner bank account number.',
+        readonly=True, states={'draft': [('readonly', False)],'open': [('readonly', False)]})
+    period_id = fields.Many2one('account.period', string='Force Period',
+        domain=[('state', '!=', 'done')], copy=False,
+        help="Keep empty to use the period of the validation(invoice) date.",
+        readonly=True, states={'draft': [('readonly', False)],'open': [('readonly', False)]})
+    date_due = fields.Date(string='Due Date',
+        readonly=True, states={'draft': [('readonly', False)], 'open': [('readonly', False)]}, index=True, copy=False,
+        help="If you use payment terms, the due date will be computed automatically at the generation "
+             "of accounting entries. The payment term may compute several due dates, for example 50% "
+             "now and 50% in one month, but if you want to force a due date, make sure that the payment "
+             "term is not set on the invoice. If you keep the payment term and the due date empty, it "
+             "means direct payment.")
+    origin = fields.Char(string='Source Document',
+        help="Reference of the document that produced this invoice.",
+        readonly=True, states={'draft': [('readonly', False)],'open': [('readonly', False)]})
+    name = fields.Char(string='Reference/Description', index=True,
+        readonly=True, states={'draft': [('readonly', False)],'open': [('readonly', False)]})
+    currency_id = fields.Many2one('res.currency', string='Currency',
+        required=True, readonly=True, states={'draft': [('readonly', False)],'open': [('readonly', False)]},
+        default=_default_currency, track_visibility='always')
+    supplier_invoice_number = fields.Char(string='Supplier Invoice Number',
+        help="The reference of this invoice as provided by the supplier.",
+        readonly=True, states={'draft': [('readonly', False)],'open': [('readonly', False)]})
+
+
     @api.onchange('currency_id')
     def onchange_currency_id(self):
         for rec in self:

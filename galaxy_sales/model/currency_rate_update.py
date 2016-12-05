@@ -26,6 +26,8 @@ from datetime import datetime
 from openerp.tools.translate import _
 from openerp import SUPERUSER_ID
 from openerp.exceptions import ValidationError
+from openerp.osv import osv
+from openerp.tools.translate import _
 
 class res_company(models.Model):
     _inherit = 'res.company'
