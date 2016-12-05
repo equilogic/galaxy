@@ -81,7 +81,7 @@ class account_invoice(models.Model):
     insurence_covered_id = fields.Many2one('insurence.covered', 'Insurance Covered')
     vessale_name_id = fields.Many2one('vessale.name', 'Vessale')
     bank = fields.Char('Bank')
-    currency_rate = fields.Float(string='Currency rate')
+    currency_rate = fields.Float(string='Currency rate', digits=(16,4))
     
     part_inv_id = fields.Many2one('res.partner', 'Invoice Address', readonly=True, required=True,
                                   states={'draft': [('readonly', False)], 'sent': [('readonly', False)]},
@@ -101,6 +101,14 @@ class account_invoice(models.Model):
     customer_po = fields.Char(string="Customer PO")
     delivery_status =fields.Char(string="Delivery Status")
     export = fields.Boolean('Export')
+    
+    @api.onchange('currency_id')
+    def onchange_currency_id(self):
+        for rec in self:
+            curr = rec.currency_id
+            if curr:
+                rec.currency_rate = curr and \
+                            curr.rate_silent or 0.0
     
     @api.v7
     def _check_check_currency_rate(self, cr, uid, ids, context=None):
