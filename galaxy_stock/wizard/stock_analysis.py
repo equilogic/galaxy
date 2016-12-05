@@ -204,7 +204,7 @@ class stock_wiz_report(models.TransientModel):
             col+=1
             worksheet.write(row, col, stock_price,header1)
             col+=1
-#            row+=1
+            row+=1
             ex_rate_1 = cur_obj._get_conversion_rate(from_currency,to_currency1)
             ex_rate_2 = cur_obj._get_conversion_rate(from_currency,to_currency2)
             ex_rate_3 = cur_obj._get_conversion_rate(from_currency,to_currency3)
@@ -233,7 +233,7 @@ class stock_wiz_report(models.TransientModel):
                     worksheet.write(f_row, col, ex_rate_1,SKY_BLUE_TABLE)
                     col+=1
                     f_row+=1
-#                    row+=1
+                    row+=1
                     
 
 
@@ -256,6 +256,7 @@ class stock_wiz_report(models.TransientModel):
                     worksheet.write(s_row, col, ex_rate_2,CORAL_TABLE)
                     col+=1
                     s_row+=1
+                    row+=1
 
 
             cr.execute("select id from purchase_order where currency_id = %s and state='approved'",(38,))
