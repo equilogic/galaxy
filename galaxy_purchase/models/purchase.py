@@ -63,7 +63,7 @@ class purchase_order(models.Model):
     _inherit = 'purchase.order'
 
     invoice_id = fields.Many2one('account.invoice', 'Invoice')
-    currency_rate = fields.Float(string='Currency rate')
+    currency_rate = fields.Float(string='Currency rate', digits=(16,4))
 
     partner_inv_id = fields.Many2one('res.partner', 'Invoice Address', readonly=True, required=True,
                                   states={'draft': [('readonly', False)], 'sent': [('readonly', False)]},
@@ -78,6 +78,14 @@ class purchase_order(models.Model):
     direct_invoice = fields.Boolean('Direct Invoice', default=False)
 
     landed_cost_pur = fields.One2many('landed.cost.invoice', 'acc_pur_id', string='Landed Cost')
+
+    @api.onchange('currency_id')
+    def onchange_currency_id(self):
+        for rec in self:
+            curr = rec.currency_id
+            if curr:
+                rec.currency_rate = curr and \
+                            curr.rate_silent or 0.0
 
     @api.v7
     def _check_pur_currency_rate(self, cr, uid, ids, context=None):

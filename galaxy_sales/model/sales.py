@@ -63,7 +63,7 @@ class sale_order(models.Model):
 
 
     pricelist_id = fields.Many2one('product.pricelist', 'Currency', required=True, readonly=True, states={'draft': [('readonly', False)], 'sent': [('readonly', False)]}, help="Pricelist for current sales order.")
-    currency_rate = fields.Float(string='Currency rate')
+    currency_rate = fields.Float(string='Currency rate', digits=(16,4))
     active = fields.Boolean('Active', default=True, help="If the active field is set to False, it will allow you to hide the sale order without removing it.")
     attn_sal = fields.Many2one('res.partner', 'ATTN')
     invoice_id = fields.Many2one('account.invoice', 'Invoice')
@@ -153,7 +153,13 @@ class sale_order(osv.osv):
         res = super(sale_order, self).onchange_pricelist_id(pricelist_id, order_lines)
         cur_lst = []
         
-        price_list_obj = self.env['product.pricelist'].browse(pricelist_id)
+        price_list_rec = self.env['product.pricelist'].browse(pricelist_id)
+        if price_list_rec.currency_id:
+            curr = price_list_rec.currency_id
+            if res and res.get('value', False):
+                res['value'].update({'currency_rate': price_list_rec.currency_id.rate_silent or 0.0})
+            else:
+                res.update({'value': {'currency_rate': price_list_rec.currency_id.rate_silent or 0.0}})
         if self.partner_id and not self.partner_id.currency:
             raise except_orm(_('Error!'), _('PLease select Currency for Customer'))
         if self.pricelist_id and self.partner_id and self.partner_id.currency:
