@@ -18,14 +18,14 @@
 						domain="['|',('parent_id','=',partner_id),('id','=',partner_id)]"
 						options="{'always_reload': True}" />
 					<label string=''/>
-					<field name="part_inv_add" nolabel="1" options="{'always_reload': True}" invisible="1"
+					<field name="part_inv_add" nolabel="1" options="{'always_reload': True}" 
 					/>
 					<field name="part_ship_id"
 						context="{'search_default_customer':1,'default_type':'delivery'}"
 						domain="['|',('parent_id','=',partner_id),('id','=',partner_id)]"
 						options="{'always_reload': True}" />
 					<label string=''/>
-					<field name="part_ship_add" nolabel="1" options="{'always_reload': True}" invisible="1"
+					<field name="part_ship_add" nolabel="1" options="{'always_reload': True}"
 					/>
 
 				</xpath>

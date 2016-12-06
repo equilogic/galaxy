@@ -532,7 +532,7 @@ class account_invoice(models.Model):
 
 class res_partner(models.Model):
     _inherit = 'res.partner'
-    
+
     cust_code = fields.Char('Code')
 
     @api.multi
