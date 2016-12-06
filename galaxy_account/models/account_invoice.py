@@ -179,7 +179,8 @@ class account_invoice(models.Model):
     supplier_invoice_number = fields.Char(string='Supplier Invoice Number',
         help="The reference of this invoice as provided by the supplier.",
         readonly=True, states={'draft': [('readonly', False)],'open': [('readonly', False)]})
-
+    invoice_line = fields.One2many('account.invoice.line', 'invoice_id', string='Invoice Lines',
+        readonly=True, states={'draft': [('readonly', False)],'open': [('readonly', False)]}, copy=True)
 
     @api.onchange('currency_id')
     def onchange_currency_id(self):
