@@ -49,6 +49,8 @@ class wiz_import_products(models.TransientModel):
 #                                        if rec_value:
 #                                            products_ids = prod_obj.search([('name', '=', ustr(rec_value))])
                                         product_vals.update({'name': rec_value or ''})
+                                    if header_l == 'Full Description':
+                                        product_vals.update({'description': rec_value or ''})
                                     if header_l == 'Internal Reference':
                                         if rec_value:
                                             products_ids = prod_obj.search([('default_code', '=', ustr(rec_value))])

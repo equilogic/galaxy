@@ -33,6 +33,7 @@
     'data': [
             'views/invoice_form.xml',
             'views/report_view.xml',    
+            'views/res_partner_view.xml',
             'views/account_invoice_sequence.xml',
             'report/galaxy_product_tax_invoice_report_view.xml',
             'report/galaxy_sale_local_tax_report.xml',
