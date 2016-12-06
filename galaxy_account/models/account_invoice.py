@@ -182,6 +182,31 @@ class account_invoice(models.Model):
     invoice_line = fields.One2many('account.invoice.line', 'invoice_id', string='Invoice Lines',
         readonly=True, states={'draft': [('readonly', False)],'open': [('readonly', False)]}, copy=True)
 
+
+    @api.onchange('part_ship_id')
+    def onchange_part_ship_add(self):
+        ship_add_list = []
+        ship_address=''
+        for rec in self:
+            res_ship = rec.partner_id.address_get(adr_pref=['delivery', 'invoice', 'contact']).get('delivery')
+            ship_inv = self.env['res.partner'].browse(res_ship)
+            if ship_inv.street:
+                ship_add_list.append(ship_inv.street +'\n')
+            if ship_inv.street2:
+                ship_add_list.append(ship_inv.street2 +'\n')
+            if ship_inv.city:
+                ship_add_list.append(ship_inv.city +'\n')
+            if ship_inv.state_id:
+                ship_add_list.append(ship_inv.state_id.code +' ')
+            if ship_inv.zip:
+                ship_add_list.append(ship_inv.zip +'\n')
+            if ship_inv.country_id:
+                ship_add_list.append(ship_inv.country_id.name +' ')
+            
+            for ship_add in ship_add_list:
+                ship_address += ship_add
+            rec.part_ship_add = ship_address
+            
     @api.onchange('currency_id')
     def onchange_currency_id(self):
         for rec in self:
@@ -189,7 +214,7 @@ class account_invoice(models.Model):
             if curr:
                 rec.currency_rate = curr and \
                             curr.rate_silent or 0.0
-    
+                                
     @api.v7
     def _check_check_currency_rate(self, cr, uid, ids, context=None):
         curr_day = datetime.now().strftime('%A')
@@ -315,8 +340,6 @@ class account_invoice(models.Model):
         loc_id = self.env['stock.location'].search([('location_id','!=',False),('location_id.name','ilike','WH'),
                     ('company_id.id','=',self.company_id.id),('usage','=','internal')])
     
-        
-        
         if self.type == "out_invoice" and not self.invoice_from_sale:
             order_vals = {
                           'partner_id': self.partner_id.id,
@@ -332,7 +355,7 @@ class account_invoice(models.Model):
                           'currency_rate': self.currency_rate,
                           'customer_po': self.customer_po,
                           'direct_invoice': True,
-                          'invoice_ids': self.ids,
+                          'invoice_ids':[(4, self.ids)],
                           }
             res = so_obj.create(order_vals)
             for line in self.invoice_line:
@@ -354,7 +377,7 @@ class account_invoice(models.Model):
             if res.picking_ids:
                 for pick_id in res.picking_ids:
                     pick_id.active = True
-                    pick_id.invoice_id = self._ids
+                    pick_id.account_id = self._ids
                     pick_id.do_transfer()
         if self.type == "in_invoice" and not self.invoice_from_purchase:
             product_ids = []
@@ -409,7 +432,7 @@ class account_invoice(models.Model):
             if po_res.picking_ids:
                 for pick_id in po_res.picking_ids:
                     pick_id.active = True
-                    pick_id.invoice_id = self._ids
+                    pick_id.account_id = self._ids
                     pick_id.do_transfer()
     @api.multi
     def invoice_validate(self):
@@ -479,6 +502,7 @@ class account_invoice(models.Model):
                 purchase_rec = self.env['purchase.order'].search([('account_id', '=', self.ids[0])])
             if sale_rec:
                 sale_rec.action_invoice_cancel()
+                sale_rec.write({'state': 'cancel'})
             if purchase_rec:
                 purchase_rec.write({'state':'except_invoice'})
         return True
