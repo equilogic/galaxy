@@ -121,7 +121,7 @@
                 </xpath>
                 <button name="button_reset_taxes" states="draft,proforma2"
                     string="(update)" class="oe_link oe_edit_only"
-                    type="object" help="Recompute taxes and total">
+                    type="object" help="Recompute taxes and total" position="replace">
 	                <button name="button_reset_taxes" states="draft,proforma2,open"
 	                    string="(update)" class="oe_link oe_edit_only"
 	                    type="object" help="Recompute taxes and total"/>                    
@@ -204,7 +204,7 @@
                 </xpath>
                 <button name="button_reset_taxes" states="draft,proforma2"
                     string="(update)" class="oe_link oe_edit_only"
-                    type="object" help="Recompute taxes and total">
+                    type="object" help="Recompute taxes and total" position="replace">
 	                <button name="button_reset_taxes" states="draft,proforma2,open"
 	                    string="(update)" class="oe_link oe_edit_only"
 	                    type="object" help="Recompute taxes and total"/>                    
