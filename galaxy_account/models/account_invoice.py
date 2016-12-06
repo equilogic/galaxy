@@ -206,6 +206,29 @@ class account_invoice(models.Model):
             for ship_add in ship_add_list:
                 ship_address += ship_add
             rec.part_ship_add = ship_address
+    
+    @api.onchange('part_inv_add')
+    def onchange_part_inv_add(self):
+        inv_add_list=[]
+        inv_address=''
+        for rec in self:
+            res_inv = rec.partner_id.address_get(adr_pref=['delivery', 'invoice', 'contact']).get('invoice')
+            part_inv = self.env['res.partner'].browse(res_inv)
+            if part_inv.street:
+                inv_add_list.append(part_inv.street +'\n')
+            if part_inv.street2:
+                inv_add_list.append(part_inv.street2 +'\n')
+            if part_inv.city:
+                inv_add_list.append(part_inv.city +'\n')
+            if part_inv.state_id:
+                inv_add_list.append(part_inv.state_id.code +' ')
+            if part_inv.zip:
+                inv_add_list.append(part_inv.zip +'\n')
+            if part_inv.country_id:
+                inv_add_list.append(part_inv.country_id.name +' ')
+            for inv_add in inv_add_list:
+                inv_address += inv_add
+            rec.part_inv_add = inv_address
             
     @api.onchange('currency_id')
     def onchange_currency_id(self):
@@ -511,7 +534,18 @@ class res_partner(models.Model):
     _inherit = 'res.partner'
     
     cust_code = fields.Char('Code')
-    
+
+    @api.multi
+    def name_get(self):
+        result=[]
+        for rec in self:
+            name=''
+            if rec.name:
+                name+=rec.name
+            
+            result.append((rec.id,name))
+        return result
+
 #     _sql_constraints = [
 #         ('cust_code_unique', 'unique(cust_code)', 'Please Enter Unique Customer Code.'),
 #     ]
@@ -526,6 +560,7 @@ class res_partner(models.Model):
                     return False
         return True
 
+    
 #    @api.v7
 #    def _check_supp_code_unique(self, cr, uid, ids, context=None):
 #        for partner in self.browse(cr, uid, ids, context=context):

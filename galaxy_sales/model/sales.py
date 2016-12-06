@@ -32,6 +32,17 @@ class sale_order_line(models.Model):
     no_origin = fields.Boolean('No Origin')
     
     @api.model
+    def create(self, values):
+        prod_obj=self.env['product.product'].browse(values.get('product_id'))
+        qty=prod_obj.qty_available
+        if qty > 0:
+            return super(sale_order_line, self).create(values)
+        else :
+            raise except_orm(_('Product Stock is not Available!'),
+                _('Please select another Product.'))
+            return False
+    
+    @api.model
     def _prepare_order_line_invoice_line(self,line, account_id=False):
         res = super(sale_order_line, self)._prepare_order_line_invoice_line(line, account_id)
         res.update({'origin_ids': [(6, 0, line.origin_ids.ids)], 'no_origin': line.no_origin})
