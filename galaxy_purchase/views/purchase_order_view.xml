@@ -11,14 +11,14 @@
 						'show_address': 1}</attribute>
 					<attribute name="options">{"always_reload": True}</attribute>
 				</xpath>
-				<xpath expr="//field[@name='partner_id']" position="after">
+<!-- 				<xpath expr="//field[@name='partner_id']" position="after">
 					<field name="partner_inv_id"
 						context="{'search_default_supplier':1, 'show_address': 1,'default_type':'invoice'}"
 						options="{'always_reload': True}" />
 					<field name="partner_ship_id"
 						context="{'search_default_supplier':1, 'show_address': 1,'default_type':'delivery'}"
 						options="{'always_reload': True}" />
-				</xpath>
+				</xpath> -->
 
 				<xpath expr="//field[@name='picking_type_id']" position="after">
 					<field name="sup_inv_num" attrs="{'readonly': [('state','not in',('draft','sent'))]}" />

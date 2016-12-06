@@ -65,12 +65,12 @@ class purchase_order(models.Model):
     account_id = fields.Many2one('account.invoice', 'Invoice')
     currency_rate = fields.Float(string='Currency rate', digits=(16,4))
 
-    partner_inv_id = fields.Many2one('res.partner', 'Invoice Address', readonly=True, required=True,
-                                  states={'draft': [('readonly', False)], 'sent': [('readonly', False)]},
-                                  help="Invoice address for current sales order.")
-    partner_ship_id = fields.Many2one('res.partner', 'Delivery Address', readonly=True, required=True,
-                                   states={'draft': [('readonly', False)], 'sent': [('readonly', False)]},
-                                   help="Delivery address for current sales order.")
+#    partner_inv_id = fields.Many2one('res.partner', 'Invoice Address', readonly=True, required=True,
+#                                  states={'draft': [('readonly', False)], 'sent': [('readonly', False)]},
+#                                  help="Invoice address for current sales order.")
+#    partner_ship_id = fields.Many2one('res.partner', 'Delivery Address', readonly=True, required=True,
+#                                   states={'draft': [('readonly', False)], 'sent': [('readonly', False)]},
+#                                   help="Delivery address for current sales order.")
 
     attn_pur = fields.Many2one('res.partner', 'ATTN')
     
