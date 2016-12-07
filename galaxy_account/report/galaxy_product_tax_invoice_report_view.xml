@@ -13,7 +13,8 @@
 
 			<t t-call="galaxy_account.external_layout_header_galaxy_account_tax_invoice" />
 			<t t-raw="0" />
-			<t t-call="galaxy_account.external_layout_footer_galaxy_account_tax_invoice_ft" />
+			<t
+				t-call="galaxy_account.external_layout_footer_galaxy_account_tax_invoice_ft" />
 		</template>
 
 		<!-- Report Header -->
@@ -40,7 +41,7 @@
 							<span>Fax :</span>
 							<span t-field="o.company_id.fax" />
 						</div>
-						
+
 						<div style="font-family:Helvetica;font-size:12px;">
 							<span>Company Reg No. </span>
 							<span t-field="o.company_id.company_registry" />
@@ -63,7 +64,7 @@
 							</t>
 						</td>
 
-						<td width="15%" class="text-right">
+						<td width="15%" class="text-left">
 							<span style="font-family:Helvetica;font-size:13px;">
 								<b>INVOICE NO :</b>
 							</span>
@@ -77,12 +78,12 @@
 					</tr>
 					<tr>
 						<td width="70%" colspan="2"></td>
-						<td width="15%" class="text-right">
-							<span style="font-family:Helvetica;font-size:12px;">
+						<td width="15%" class="text-left">
+							<span style="font-family:Helvetica;font-size:13px;">
 								<b>DATE : </b>
 							</span>
 						</td>
-						<td width="20%" style="font-family:Helvetica;font-size:12px;">
+						<td width="20%" style="font-family:Helvetica;font-size:13px;">
 							&amp;nbsp;&amp;nbsp;
 							<b>
 								<span t-field="o.date_invoice" t-field-options='{"format": "dd-MM-Y"}' />
@@ -95,15 +96,16 @@
 		<template id="external_layout_footer_galaxy_account_tax_invoice_ft">
 			<div class="footer">
 				<div class="last-page">
-					<table
-						style="border-top:1px solid;font-family:Helvetica;font-size:11px;"
+					<table style="border-top:1px solid;font-family:Helvetica;font-size:11px;"
 						width="100%">
 						<br />
-						<br/>
+						<br />
 						<tr>
 							<td width="30%">Sub-Total
 								: &amp;nbsp;
-								<span class="text-left" t-field="o.currency_id.name" /><span class="text-left" t-field="o.currency_id.symbol" /><span class="text-left" t-field="o.amount_untaxed" />
+								<span class="text-left" t-field="o.currency_id.name" />
+								<span class="text-left" t-field="o.currency_id.symbol" />
+								<span class="text-left" t-field="o.amount_untaxed" />
 							</td>
 							<td width="15%">
 								Rate = &amp;nbsp;
@@ -128,8 +130,10 @@
 							<td width="15%" class="text-left">
 								SUB-TOTAL
 							</td>
-							<td width="20%" class="text-left">
-								<span t-field="o.currency_id.name" /><span t-field="o.currency_id.symbol" /><span t-field="o.amount_untaxed" />
+							<td width="20%" class="text-right">
+								<span t-field="o.currency_id.name" />
+								<span t-field="o.currency_id.symbol" />
+								<span t-field="o.amount_untaxed" />
 							</td>
 						</tr>
 						<tr>
@@ -139,7 +143,7 @@
 							</td>
 							<td width="25%">
 							</td>
-							<td width="15%">
+							<td width="15%" class='text-left'>
 								<t t-if="o.partner_id.country_id.name == 'Singapore'">
 									<span>7% GST </span>
 
@@ -148,11 +152,13 @@
 									<span>GST @0% </span>
 								</t>
 							</td>
-							<td width="20%" class="text-left">
-								<span t-field="o.currency_id.name" /><span t-field="o.currency_id.symbol" /><span t-field="o.amount_tax"></span>
+							<td width="20%" class="text-right">
+								<span t-field="o.currency_id.name" />
+								<span t-field="o.currency_id.symbol" />
+								<span t-field="o.amount_tax"></span>
 							</td>
 						</tr>
-						<br/>
+						<br />
 					</table>
 					<table style="font-family:Helvetica;font-size:11px">
 						<tr>
@@ -160,9 +166,10 @@
 								<b>AMOUNT IN WORDS:</b>
 							</td>
 							<td width="50%">
-								<span t-field="o.currency_id.symbol" /><span t-field="o.amount_total" />
+								<span t-field="o.currency_id.symbol" />
+								<span t-field="o.amount_total" />
 								<span>and</span>
-								<span t-field="o.currency_id.name"/>
+								<span t-field="o.currency_id.name" />
 							</td>
 							<td width="30%"></td>
 						</tr>
@@ -171,30 +178,50 @@
 						style="border-bottom:1px solid ;font-family:Helvetica;font-size:11px;"
 						width="100%">
 						<tr>
-							<td width="70%"></td>
-							<td width="20%" class="text-left">
+							<td width="30%">
+								 &amp;nbsp;
+							</td>
+							<td width="15%">
+								&amp;nbsp;
+							</td>
+							<td width="25%" style="padding:5px">
+								&amp;nbsp;
+							</td>
+							<td width="15%" class="text-left">
 								<b>TOTAL</b>
 							</td>
-							<td width="10%" class="text-left">
-								<b>
-									<span t-field="o.currency_id.name" /><span t-field="o.currency_id.symbol" /><span t-field="o.amount_total" />
-								</b>
+							<td width="20%" class="text-right">
+								<b><span t-field="o.currency_id.name" />
+								<span t-field="o.currency_id.symbol" />
+								<span t-field="o.amount_total" /></b>
 							</td>
- 						</tr>
+						</tr>
 						<tr>
-							<td width="70%" style="color:white">11</td>
-							<td width="20%" style="color:white">11
+							<td width="30%">
+								 &amp;nbsp;
 							</td>
-							<td width="10%" style="color:white">11
+							<td width="15%">
+								&amp;nbsp;
+							</td>
+							<td width="25%" style="padding:5px">
+								&amp;nbsp;
+							</td>
+							<td width="15%" class="text-left">
+								&amp;nbsp;
+							</td>
+							<td width="20%" class="text-right">
+								&amp;nbsp;
 							</td>
 						</tr>
 					</table>
-					<br/>
+					<br />
 					<div class="text-right">
 						<span class="text-right" style="font-size:11px;padding:20px">
 							<b>GALAXY ENTERPRISE PTE LTD</b>
 						</span>
 					</div>
+					<br />
+					<br />
 					<br />
 					<br />
 					<div>
@@ -219,52 +246,57 @@
 						</td>
 					</tr>
 				</table>
-			</div>		
+			</div>
 		</template>
-		
+
 		<template id="report.minimal_layout">
-            <t t-raw="'&lt;base href=%s&gt;' % base_url"/>
-            &lt;!DOCTYPE html&gt;
-                <html style="height: 0;">
-                    <head>
-                        <link href="/report/static/src/css/reset.min.css" rel="stylesheet"/>
-                        <link href="/web/static/lib/bootstrap/css/bootstrap.css" rel="stylesheet"/>
-                        <link href="/website/static/src/css/website.css" rel="stylesheet"/>
-                        <link href="/web/static/lib/fontawesome/css/font-awesome.css" rel="stylesheet"/>
-                        <style type='text/css'><t t-raw="css"/></style>
-                        <t t-if="subst is True">
-                            		        <script>
-                       function subst() {
-                           var vars = {};
-                           var x = document.location.search.substring(1).split('&amp;');
-                           for (var i in x) {
-                               var z = x[i].split('=', 2);
-                               vars[z[0]] = unescape(z[1]);
-                           }
-                           var x=['frompage', 'topage', 'page', 'webpage', 'section', 'subsection', 'subsubsection'];
-                           for (var i in x) {
-                               var y = document.getElementsByClassName(x[i]);
-                               for (var j=0; j&lt;y.length; ++j)
-                                   y[j].textContent = vars[x[i]];
-                           }
-                           var operations = {
-    							'last-page': function (elt) { elt.style.visibility = (vars.page === vars.topage) ? "visible" : "hidden"; },
+			<t t-raw="'&lt;base href=%s&gt;' % base_url" />
+			&lt;!DOCTYPE html&gt;
+			<html style="height: 0;">
+				<head>
+					<link href="/report/static/src/css/reset.min.css" rel="stylesheet" />
+					<link href="/web/static/lib/bootstrap/css/bootstrap.css" rel="stylesheet" />
+					<link href="/website/static/src/css/website.css" rel="stylesheet" />
+					<link href="/web/static/lib/fontawesome/css/font-awesome.css"
+						rel="stylesheet" />
+					<style type='text/css'>
+						<t t-raw="css" />
+					</style>
+					<t t-if="subst is True">
+						<script>
+							function subst() {
+							var vars = {};
+							var x = document.location.search.substring(1).split('&amp;');
+							for (var i in x) {
+							var z = x[i].split('=', 2);
+							vars[z[0]] = unescape(z[1]);
+							}
+							var x=['frompage', 'topage', 'page', 'webpage', 'section',
+							'subsection', 'subsubsection'];
+							for (var i in x) {
+							var y = document.getElementsByClassName(x[i]);
+							for (var j=0; j&lt;y.length; ++j)
+							y[j].textContent = vars[x[i]];
+							}
+							var operations = {
+							'last-page': function (elt) { elt.style.visibility = (vars.page ===
+							vars.topage) ? "visible" : "hidden"; },
 							};
 
-                           for (var klass in operations) {
-                               var y = document.getElementsByClassName(klass);
-                               for (var j=0; j&lt;y.length; ++j)
-                               operations[klass](y[j]);
-                           }
-                      }
-                  </script>
-                        </t>
-                    </head>
-                    <body class="container" onload="subst()">
-                        <t t-raw="body"/>
-                    </body>
-                </html>
-          </template>
+							for (var klass in operations) {
+							var y = document.getElementsByClassName(klass);
+							for (var j=0; j&lt;y.length; ++j)
+							operations[klass](y[j]);
+							}
+							}
+						</script>
+					</t>
+				</head>
+				<body class="container" onload="subst()">
+					<t t-raw="body" />
+				</body>
+			</html>
+		</template>
 
 		<!-- Reports Template -->
 		<template id="galaxy_account_tax_invoice_template">
@@ -273,6 +305,9 @@
 				font-family:Helvetica;
 				font-size:12px;
 				}
+				
+				
+		
 			</style>
 			<t t-call="report.html_container">
 				<t t-call="galaxy_account.external_layout_galaxy_account_tax_invoice">
@@ -399,14 +434,13 @@
 										</t>
 									</td>
 									<td class="text-left line" width="35%">
-										<t
-											t-if="o.partner_id.country_id.name == 'Singapore' and o.currency_id.name == 'SGD'">
+										<t t-if="line.prod_desc">
+											<!-- <t t-if="o.partner_id.country_id.name == 'Singapore' and 
+												o.currency_id.name == 'SGD'"> -->
 											<span style="text-transform:uppercase;" t-field="line.prod_desc" />
 										</t>
-										<t t-if="o.partner_id.country_id.name != 'Singapore'">
-											<div width="25%" style="text-transform:uppercase;"
-												t-field="line.name" />
-										</t>
+										<!-- <t t-if="o.partner_id.country_id.name != 'Singapore'"> <div 
+											width="25%" style="text-transform:uppercase;" t-field="line.name" /> </t> -->
 									</td>
 									<td class="text-left line" width="10%">
 										<t t-if="o.currency_id.name != 'SGD'">
