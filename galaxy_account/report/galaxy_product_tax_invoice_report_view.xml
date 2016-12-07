@@ -108,19 +108,19 @@
 								<span class="text-left" t-field="o.currency_id.symbol" />
 								<span class="text-left" t-field="o.amount_untaxed" />
 							</td>
-							<td width="15%">
+							<td width="15%" class="text-left">
 								Rate = &amp;nbsp;
 								<span t-field="o.currency_rate" />
 							</td>
-							<td width="25%" style="padding:5px">
-								<t t-if="o.partner_id.country_id.name == 'Singapore'">
+							<td width="25%" >
+								<t t-if="o.export == False">
 									<span>7%GST = </span>
 									&amp;nbsp;
 									<span t-field="o.currency_id.name" />
 									<span t-field="o.currency_id.symbol" />
 									<span t-field="o.amount_tax"></span>
 								</t>
-								<t t-if="o.partner_id.country_id.name != 'Singapore'">
+								<t t-if="o.export == True">
 									<span>0%GST = </span>
 									&amp;nbsp;
 									<span t-field="o.currency_id.name" />
@@ -144,19 +144,19 @@
 							</td>
 							<td width="25%">
 							</td>
-							<td width="15%" class='text-left'>
-								<t t-if="o.partner_id.country_id.name == 'Singapore'">
-									<span>7% GST </span>
+							<td width="15%" class="text-left">
+								<t t-if="o.export == False">
+									<span>7%  GST</span>
 
 								</t>
-								<t t-if="o.partner_id.country_id.name != 'Singapore'">
+								<t t-if="o.export == True">
 									<span>GST @0% </span>
 								</t>
 							</td>
 							<td width="20%" class="text-right">
 								<span t-field="o.currency_id.name" />
 								<span t-field="o.currency_id.symbol" />
-								<span t-field="o.amount_tax"></span>
+								<span t-field="o.amount_tax" />
 							</td>
 						</tr>
 						<br />
@@ -167,10 +167,11 @@
 								<b>AMOUNT IN WORDS:</b>
 							</td>
 							<td width="50%">
-								<span t-field="o.currency_id.symbol" />
+								<span t-esc="amount_to_text(o.amount_total, o.currency_id)" />
+								<!-- <span t-field="o.currency_id.symbol" />
 								<span t-field="o.amount_total" />
 								<span>and</span>
-								<span t-field="o.currency_id.name" />
+								<span t-field="o.currency_id.name" /> -->
 							</td>
 							<td width="30%"></td>
 						</tr>

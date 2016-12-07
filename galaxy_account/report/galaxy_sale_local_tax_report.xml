@@ -142,19 +142,24 @@
 						width="100%">
 						<tr>
 							<td width="70%"></td>
-							<td width="20%" class="text-left">
+							<td width="15%" class="text-left">
 								<b>TOTAL</b>
 							</td>
-							<td width="10%" class="text-left">
+							<td width="15%" class="text-left">
+								<b><span t-field="o.currency_id.name" />
+								<span t-field="o.currency_id.symbol" />
+								<span t-field="o.amount_total" /></b>
+							</td>							
+<!-- 							<td width="10%" class="text-right">
 								<b>
 									<span t-field="o.currency_id.name" /><span t-field="o.currency_id.symbol" /><span t-field="o.amount_total" />
 								</b>
-							</td>
+							</td> -->
 						</tr>
 						<tr>
 							<td width="70%" style="color:white">11</td>
-							<td width="20%" style="color:white">11</td>
-							<td width="10%" style="color:white">11</td>
+							<td width="15%" style="color:white">11</td>
+							<td width="15%" style="color:white">11</td>
 						</tr>
 					</table>
 					<br />
