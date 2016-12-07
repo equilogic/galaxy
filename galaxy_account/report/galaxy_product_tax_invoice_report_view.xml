@@ -128,10 +128,10 @@
 									<span>0.0</span>
 								</t>
 							</td>
-							<td width="15%" class="text-left">
+							<td width="10%" class="text-left">
 								SUB-TOTAL
 							</td>
-							<td width="20%" class="text-right">
+							<td width="25%" class="text-left">
 								<span t-field="o.currency_id.name" />
 								<span t-field="o.currency_id.symbol" />
 								<span t-field="o.amount_untaxed" />
@@ -144,7 +144,7 @@
 							</td>
 							<td width="25%">
 							</td>
-							<td width="15%" class="text-left">
+							<td width="10%" class="text-left">
 								<t t-if="o.export == False">
 									<span>7%  GST</span>
 
@@ -153,7 +153,7 @@
 									<span>GST @0% </span>
 								</t>
 							</td>
-							<td width="20%" class="text-right">
+							<td width="25%" class="text-left">
 								<span t-field="o.currency_id.name" />
 								<span t-field="o.currency_id.symbol" />
 								<span t-field="o.amount_tax" />
@@ -189,10 +189,10 @@
 							<td width="25%" style="padding:5px">
 								&amp;nbsp;
 							</td>
-							<td width="15%" class="text-left">
+							<td width="10%" class="text-left">
 								<b>TOTAL</b>
 							</td>
-							<td width="20%" class="text-right">
+							<td width="25%" class="text-left">
 								<b><span t-field="o.currency_id.name" />
 								<span t-field="o.currency_id.symbol" />
 								<span t-field="o.amount_total" /></b>
@@ -208,10 +208,10 @@
 							<td width="25%" style="padding:5px">
 								&amp;nbsp;
 							</td>
-							<td width="15%" class="text-left">
+							<td width="10%" class="text-left">
 								&amp;nbsp;
 							</td>
-							<td width="20%" class="text-right">
+							<td width="25%" class="text-right">
 								&amp;nbsp;
 							</td>
 						</tr>
@@ -427,13 +427,15 @@
 							</thead>
 							<tbody>
 								<tr t-foreach="o.invoice_line" t-as="line">
-									<td class="text-right" width="10%" style="padding:5px;">
-										<span t-esc="get_qty(line.quantity)" />
+									<td class="text-left" width="10%" style="padding:5px;">
+										<span t-esc="get_qty(line.quantity)" /><t t-if="get_qty(line.quantity)">
+										pc
+									</t>
 									</td>
 									<td width="5%" style="padding:5px;">
-										<t t-if="get_qty(line.quantity)">
+										<!-- <t t-if="get_qty(line.quantity)" class="text-left">
 											pc
-										</t>
+										</t> -->
 									</td>
 									<td class="text-left line" width="35%">
 										<t t-if="line.prod_desc">

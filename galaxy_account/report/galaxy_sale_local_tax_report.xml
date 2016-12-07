@@ -312,13 +312,15 @@
 
 							<tr t-foreach="o.invoice_line" t-as="line">
 
-								<td class="text-right" width="10%" style="padding:5px;font-size:11px;">
-									<span t-esc="get_qty(line.quantity)" />
-								</td>
-								<td width="5%" style="padding:5px;font-size:12px;">
-									<t t-if="get_qty(line.quantity)">
+								<td class="text-left" width="10%" style="padding:5px;font-size:11px;">
+									<span t-esc="get_qty(line.quantity)" /> <t t-if="get_qty(line.quantity)">
 										pc
 									</t>
+								</td>
+								<td width="5%" style="padding:5px;font-size:12px;" class="text-left">
+									<!-- <t t-if="get_qty(line.quantity)">
+										pc
+									</t> -->
 								</td>
 								<td class="text-left line" width="35%" style="font-size:11px">
 									<t
