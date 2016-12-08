@@ -6,6 +6,14 @@
 			<field name="model">account.invoice</field>
 			<field name="inherit_id" ref="account.invoice_form" />
 			<field name="arch" type="xml">
+				<field name="state"  position="before">
+					<button name="%(wiz_galaxy_add_prod_in_inv_action)d" string="Add Products"
+						type="action" states="draft" groups="base.group_user" />
+				</field>
+							
+                <xpath expr="//form/sheet" position="attributes">
+                    <attribute name="class">oe_form_sheet_width_wider</attribute>
+                </xpath>			
 				<xpath expr="//field[@name='partner_id']" position="attributes">
 					<attribute name="context">{'search_default_customer':1, 'default_type':'invoice'}</attribute>
 				</xpath>
@@ -163,6 +171,13 @@
 			<field name="model">account.invoice</field>
 			<field name="inherit_id" ref="account.invoice_supplier_form" />
 			<field name="arch" type="xml">
+                <xpath expr="//form/sheet" position="attributes">
+                    <attribute name="class">oe_form_sheet_width_wider</attribute>
+                </xpath>	
+				<field name="state"  position="before">
+					<button name="%(wiz_galaxy_add_prod_in_inv_action)d" string="Add Products"
+						type="action" states="draft" groups="base.group_user" />
+				</field>                		
                 <xpath expr="//field[@name='date_invoice']" position="replace"></xpath>
                 <xpath expr="//field[@name='partner_id']" position="before">
                     <field name="date_invoice" on_change="onchange_payment_term_date_invoice(payment_term, date_invoice)" />
@@ -188,7 +203,9 @@
 					<field name="prod_desc"/>
 					<field name="qty_on_hand" readonly="1"/>
 				</xpath>
-				
+				<field name="number" class="oe_inline"  attrs="{'invisible': [('state', '=', 'draft')]}" position="replace">
+					<field name="number" class="oe_inline" />
+				</field>
 				<xpath expr="//field[@name='partner_id']" position="attributes">
 					<attribute name="context">{'search_default_supplier':1,
 						'show_address': 1,'default_type':'invoice'}</attribute>
@@ -230,6 +247,7 @@
 				</xpath>
 				<field name="currency_id" position="after">
 					<field name="currency_rate"/>
+					<field name="export" />
 				</field>
 				<xpath expr="//page[@string='Payments']" position="after">
 					<page string="Transport Details">

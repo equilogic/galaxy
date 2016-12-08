@@ -1,0 +1,36 @@
+<?xml version="1.0" encoding="utf-8"?>
+  <openerp>
+    <data>
+
+        <!-- Products Add wizard view -->
+        <record id="wiz_galaxy_add_prod_in_inv_form" model="ir.ui.view">
+            <field name="name">wiz.galaxy.add.prod.in.invoice.form</field>
+            <field name="model">wiz.galaxy.add.prod.in.invoice</field>
+            <field name="type">form</field>
+            <field name="arch" type="xml"> 
+                <form string="Add Products">
+                    <separator string="Products"/>
+                    <field name="product_ids" nolable="1"/>
+                    <newline/>
+                    <footer>
+                        <button name="products_add_in_so" string="Add Products" type="object" class="oe_highlight"/>
+                        or
+                        <button special="cancel" string="Cancel" class="oe_link"/>
+                    </footer>
+                </form>
+            </field>
+        </record>
+
+        <!-- Products Add Action view -->
+        <record id="wiz_galaxy_add_prod_in_inv_action" model="ir.actions.act_window">
+            <field name="name">Add Products</field>
+            <field name="type">ir.actions.act_window</field>
+            <field name="res_model">wiz.galaxy.add.prod.in.invoice</field>
+            <field name="view_type">form</field>
+            <field name="view_mode">form</field>
+            <field name="target">new</field>
+            <field name="view_id" ref="wiz_galaxy_add_prod_in_inv_form"/>
+        </record>
+
+    </data>
+</openerp>

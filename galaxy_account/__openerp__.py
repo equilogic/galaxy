@@ -31,9 +31,11 @@
     'depends': ['sg_account_odoo','galaxy_product', 'account_cancel','galaxy_stock', 'account_voucher'],
     'demo': [],
     'data': [
+            'wizard/wiz_galaxy_add_prod_in_inv_view.xml',
             'views/invoice_form.xml',
             'views/report_view.xml',    
             'views/res_partner_view.xml',
+            'views/acount_view.xml',
             'views/account_invoice_sequence.xml',
             'report/galaxy_product_tax_invoice_report_view.xml',
             'report/galaxy_sale_local_tax_report.xml',

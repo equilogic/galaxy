@@ -1,0 +1,11 @@
+<openerp>
+	<data>
+        <template id="assets_backend" name="sinthai account assets" inherit_id="web.assets_backend">
+            <xpath expr="." position="inside">
+                <link rel="stylesheet" href="/galaxy_account/static/src/css/account.css"/>
+                 <script type="text/javascript" src="/sinthai_account/static/src/js/sinthai.js"></script>
+            </xpath>
+        </template>
+                
+	</data>
+</openerp>

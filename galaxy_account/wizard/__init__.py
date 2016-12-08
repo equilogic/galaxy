@@ -23,5 +23,6 @@
 import update_currency_rates
 import sales_register_pdf_wiz
 import purchase_register_pdf_wiz
+import wiz_galaxy_add_prod_in_inv
 
 # vim:expandtab:smartindent:tabstop=4:softtabstop=4:shiftwidth=4:

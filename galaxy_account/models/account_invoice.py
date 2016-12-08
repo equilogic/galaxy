@@ -41,7 +41,7 @@ class account_invoice_line(models.Model):
     origin_ids = fields.Many2many('origin.origin', string='Origin')
     no_origin = fields.Boolean('NO Origin')
     qty_on_hand = fields.Float(related='product_id.qty_available', string='Quantity On Hand', default=0.0)
-    
+
     @api.multi
     def product_id_change(self, product, uom_id, qty=0, name='', type='out_invoice',
             partner_id=False, fposition_id=False, price_unit=False, currency_id=False,
@@ -108,15 +108,15 @@ class account_invoice(models.Model):
     currency_rate = fields.Float(string='Currency rate', digits=(16,4))
     
     part_inv_id = fields.Many2one('res.partner', 'Invoice Address', readonly=True, required=True,
-                                  states={'draft': [('readonly', False)], 'sent': [('readonly', False)], 'open': [('readonly', False)]},
+                                  states={'draft': [('readonly', False)], 'sent': [('readonly', False)]},
                                   help="Invoice address for current sales order.")
-    cust_add = fields.Text('Customer Address', readonly=True, states={'draft': [('readonly', False)],'open': [('readonly', False)]})
-    part_inv_add = fields.Text('Invoice Address', readonly=True, states={'draft': [('readonly', False)],'open': [('readonly', False)]})
-    part_ship_add = fields.Text('Delivery Address', readonly=True, states={'draft': [('readonly', False)],'open': [('readonly', False)]})
+    cust_add = fields.Text('Customer Address', readonly=True, states={'draft': [('readonly', False)]})
+    part_inv_add = fields.Text('Invoice Address', readonly=True, states={'draft': [('readonly', False)]})
+    part_ship_add = fields.Text('Delivery Address', readonly=True, states={'draft': [('readonly', False)]})
     
 
     part_ship_id = fields.Many2one('res.partner', 'Delivery Address', readonly=True, required=True,
-                                   states={'draft': [('readonly', False)], 'sent': [('readonly', False)],'open': [('readonly', False)]},
+                                   states={'draft': [('readonly', False)],},
                                    help="Delivery address for current sales order.")
     attn_inv = fields.Many2one('res.partner', 'ATTN')
 
@@ -124,64 +124,64 @@ class account_invoice(models.Model):
     landed_cost_price = fields.Float(compute='_compute_amount',store=True,string='Landed Amount')
     customer_po = fields.Char(string="Customer PO")
     delivery_status =fields.Char(string="Delivery Status")
-    export = fields.Boolean('Export')
+    export = fields.Boolean('Export', readonly=True, states={'draft': [('readonly', False)]})
     
     ####    
     # This Fields Overrite to Edit its value after validate invoice.(TO Change Attrs and domains)
     ####
-    partner_id = fields.Many2one('res.partner', string='Partner', change_default=True,
-        required=True, readonly=True, states={'draft': [('readonly', False)],'open': [('readonly', False)]},
-        track_visibility='always')
-    date_invoice = fields.Date(string='Invoice Date',
-        readonly=True, states={'draft': [('readonly', False)],'open': [('readonly', False)]}, index=True,
-        help="Keep empty to use the current date", copy=False)
-    journal_id = fields.Many2one('account.journal', string='Journal',
-        required=True, readonly=True, states={'draft': [('readonly', False)],'open': [('readonly', False)]},
-        default=_default_journal,
-        domain="[('type', 'in', {'out_invoice': ['sale'], 'out_refund': ['sale_refund'], 'in_refund': ['purchase_refund'], 'in_invoice': ['purchase']}.get(type, [])), ('company_id', '=', company_id)]")
-    account_id = fields.Many2one('account.account', string='Account',
-        required=True, readonly=True, states={'draft': [('readonly', False)],'open': [('readonly', False)]},
-        help="The partner account used for this invoice.")
-    fiscal_position = fields.Many2one('account.fiscal.position', string='Fiscal Position',
-        readonly=True, states={'draft': [('readonly', False)],'open': [('readonly', False)]})
-    company_id = fields.Many2one('res.company', string='Company', change_default=True,
-        required=True, readonly=True, states={'draft': [('readonly', False)],'open': [('readonly', False)]},
-        default=lambda self: self.env['res.company']._company_default_get('account.invoice'))
-    payment_term = fields.Many2one('account.payment.term', string='Payment Terms',
-        readonly=True, states={'draft': [('readonly', False)],'open': [('readonly', False)]},
-        help="If you use payment terms, the due date will be computed automatically at the generation "
-             "of accounting entries. If you keep the payment term and the due date empty, it means direct payment. "
-             "The payment term may compute several due dates, for example 50% now, 50% in one month.")
-    user_id = fields.Many2one('res.users', string='Salesperson', track_visibility='onchange',
-        readonly=True, states={'draft': [('readonly', False)],'open': [('readonly', False)]},
-        default=lambda self: self.env.user)
-    partner_bank_id = fields.Many2one('res.partner.bank', string='Bank Account',
-        help='Bank Account Number to which the invoice will be paid. A Company bank account if this is a Customer Invoice or Supplier Refund, otherwise a Partner bank account number.',
-        readonly=True, states={'draft': [('readonly', False)],'open': [('readonly', False)]})
-    period_id = fields.Many2one('account.period', string='Force Period',
-        domain=[('state', '!=', 'done')], copy=False,
-        help="Keep empty to use the period of the validation(invoice) date.",
-        readonly=True, states={'draft': [('readonly', False)],'open': [('readonly', False)]})
-    date_due = fields.Date(string='Due Date',
-        readonly=True, states={'draft': [('readonly', False)], 'open': [('readonly', False)]}, index=True, copy=False,
-        help="If you use payment terms, the due date will be computed automatically at the generation "
-             "of accounting entries. The payment term may compute several due dates, for example 50% "
-             "now and 50% in one month, but if you want to force a due date, make sure that the payment "
-             "term is not set on the invoice. If you keep the payment term and the due date empty, it "
-             "means direct payment.")
-    origin = fields.Char(string='Source Document',
-        help="Reference of the document that produced this invoice.",
-        readonly=True, states={'draft': [('readonly', False)],'open': [('readonly', False)]})
-    name = fields.Char(string='Reference/Description', index=True,
-        readonly=True, states={'draft': [('readonly', False)],'open': [('readonly', False)]})
-    currency_id = fields.Many2one('res.currency', string='Currency',
-        required=True, readonly=True, states={'draft': [('readonly', False)],'open': [('readonly', False)]},
-        default=_default_currency, track_visibility='always')
-    supplier_invoice_number = fields.Char(string='Supplier Invoice Number',
-        help="The reference of this invoice as provided by the supplier.",
-        readonly=True, states={'draft': [('readonly', False)],'open': [('readonly', False)]})
-    invoice_line = fields.One2many('account.invoice.line', 'invoice_id', string='Invoice Lines',
-        readonly=True, states={'draft': [('readonly', False)],'open': [('readonly', False)]}, copy=True)
+#    partner_id = fields.Many2one('res.partner', string='Partner', change_default=True,
+#        required=True, readonly=True, states={'draft': [('readonly', False)],'open': [('readonly', False)]},
+#        track_visibility='always')
+#    date_invoice = fields.Date(string='Invoice Date',
+#        readonly=True, states={'draft': [('readonly', False)],'open': [('readonly', False)]}, index=True,
+#        help="Keep empty to use the current date", copy=False)
+#    journal_id = fields.Many2one('account.journal', string='Journal',
+#        required=True, readonly=True, states={'draft': [('readonly', False)],'open': [('readonly', False)]},
+#        default=_default_journal,
+#        domain="[('type', 'in', {'out_invoice': ['sale'], 'out_refund': ['sale_refund'], 'in_refund': ['purchase_refund'], 'in_invoice': ['purchase']}.get(type, [])), ('company_id', '=', company_id)]")
+#    account_id = fields.Many2one('account.account', string='Account',
+#        required=True, readonly=True, states={'draft': [('readonly', False)],'open': [('readonly', False)]},
+#        help="The partner account used for this invoice.")
+#    fiscal_position = fields.Many2one('account.fiscal.position', string='Fiscal Position',
+#        readonly=True, states={'draft': [('readonly', False)],'open': [('readonly', False)]})
+#    company_id = fields.Many2one('res.company', string='Company', change_default=True,
+#        required=True, readonly=True, states={'draft': [('readonly', False)],'open': [('readonly', False)]},
+#        default=lambda self: self.env['res.company']._company_default_get('account.invoice'))
+#    payment_term = fields.Many2one('account.payment.term', string='Payment Terms',
+#        readonly=True, states={'draft': [('readonly', False)],'open': [('readonly', False)]},
+#        help="If you use payment terms, the due date will be computed automatically at the generation "
+#             "of accounting entries. If you keep the payment term and the due date empty, it means direct payment. "
+#             "The payment term may compute several due dates, for example 50% now, 50% in one month.")
+#    user_id = fields.Many2one('res.users', string='Salesperson', track_visibility='onchange',
+#        readonly=True, states={'draft': [('readonly', False)],'open': [('readonly', False)]},
+#        default=lambda self: self.env.user)
+#    partner_bank_id = fields.Many2one('res.partner.bank', string='Bank Account',
+#        help='Bank Account Number to which the invoice will be paid. A Company bank account if this is a Customer Invoice or Supplier Refund, otherwise a Partner bank account number.',
+#        readonly=True, states={'draft': [('readonly', False)],'open': [('readonly', False)]})
+#    period_id = fields.Many2one('account.period', string='Force Period',
+#        domain=[('state', '!=', 'done')], copy=False,
+#        help="Keep empty to use the period of the validation(invoice) date.",
+#        readonly=True, states={'draft': [('readonly', False)],'open': [('readonly', False)]})
+#    date_due = fields.Date(string='Due Date',
+#        readonly=True, states={'draft': [('readonly', False)], 'open': [('readonly', False)]}, index=True, copy=False,
+#        help="If you use payment terms, the due date will be computed automatically at the generation "
+#             "of accounting entries. The payment term may compute several due dates, for example 50% "
+#             "now and 50% in one month, but if you want to force a due date, make sure that the payment "
+#             "term is not set on the invoice. If you keep the payment term and the due date empty, it "
+#             "means direct payment.")
+#    origin = fields.Char(string='Source Document',
+#        help="Reference of the document that produced this invoice.",
+#        readonly=True, states={'draft': [('readonly', False)],'open': [('readonly', False)]})
+#    name = fields.Char(string='Reference/Description', index=True,
+#        readonly=True, states={'draft': [('readonly', False)],'open': [('readonly', False)]})
+#    currency_id = fields.Many2one('res.currency', string='Currency',
+#        required=True, readonly=True, states={'draft': [('readonly', False)],'open': [('readonly', False)]},
+#        default=_default_currency, track_visibility='always')
+#    supplier_invoice_number = fields.Char(string='Supplier Invoice Number',
+#        help="The reference of this invoice as provided by the supplier.",
+#        readonly=True, states={'draft': [('readonly', False)],'open': [('readonly', False)]})
+#    invoice_line = fields.One2many('account.invoice.line', 'invoice_id', string='Invoice Lines',
+#        readonly=True, states={'draft': [('readonly', False)],'open': [('readonly', False)]}, copy=True)
     
     @api.onchange('part_ship_id')
     def onchange_part_ship_add(self):
@@ -237,6 +237,39 @@ class account_invoice(models.Model):
             if curr:
                 rec.currency_rate = curr and \
                             curr.rate_silent or 0.0
+                            
+    @api.onchange('user_id', 'export')
+    def onchange_export(self):
+        account_tax_pool = self.env['account.tax']
+        account_line_pool = self.env['account.invoice.line']
+        for inv_rec in self:
+            if inv_rec.type == 'out_invoice' and inv_rec.export:
+                zero_per_tax = account_tax_pool.search([('description','=','0% ZR')])
+                if inv_rec.invoice_line:
+                    for i_line in inv_rec.invoice_line:
+                        if zero_per_tax:
+                            i_line.write({'invoice_line_tax_id': [(6,0, zero_per_tax.ids)],})
+            if inv_rec.type == 'out_invoice' and not inv_rec.export:
+                sr_per_tax = account_tax_pool.search([('description','=','7% SR')])
+                if inv_rec.invoice_line:
+                    for i_line in inv_rec.invoice_line:
+                        if sr_per_tax:
+                            i_line.write({'invoice_line_tax_id': [(6,0, sr_per_tax.ids)],})
+                            
+            if inv_rec.type == 'in_invoice' and inv_rec.export:
+                zero_zp_tax = account_tax_pool.search([('description','=','0% ZP')])
+                if inv_rec.invoice_line:
+                    for i_line in inv_rec.invoice_line:
+                        if zero_zp_tax:
+                            i_line.write({'invoice_line_tax_id': [(6,0, zero_zp_tax.ids)],})
+            if inv_rec.type == 'in_invoice' and not inv_rec.export:
+                tx_tax = account_tax_pool.search([('description','=','7% TX7')])
+                if inv_rec.invoice_line:
+                    for i_line in inv_rec.invoice_line:
+                        if tx_tax:
+                            i_line.write({'invoice_line_tax_id': [(6,0, tx_tax.ids)],})
+                                                        
+            self.env['account.invoice'].button_reset_taxes()                            
                                 
     @api.v7
     def _check_check_currency_rate(self, cr, uid, ids, context=None):
@@ -353,6 +386,11 @@ class account_invoice(models.Model):
 
     @api.multi
     def prepare_order_line(self):
+        """
+        This method create sale order and purchase order
+        ------------------------------------------------------
+        @param self : object pointer
+        """        
         cr, uid, context = self.env.args
         so_obj = self.env['sale.order']
         so_line_obj = self.env['sale.order.line']
@@ -459,6 +497,10 @@ class account_invoice(models.Model):
                     pick_id.do_transfer()
     @api.multi
     def invoice_validate(self):
+        """
+        This method used for create sales order when invoice
+        validated.
+        """        
 #         prefix = ''
         cr,uid,context = self.env.args
 #         if self.partner_id and self.number:
@@ -483,10 +525,30 @@ class account_invoice(models.Model):
 #                 self.number = self.env['ir.sequence'].get('sup_inv')
         self.prepare_order_line()
         return self.write({'state': 'open'})
-
+ 
     @api.model
     def create(self, vals):
+        """
+        This method create invoice number and update zero rated tax
+        ------------------------------------------------------
+        @param self : object pointer
+        @param vals : A dictionary containing keys and values
+        """        
+        account_tax_pool = self.env['account.tax']
+        zero_per_tax = account_tax_pool.search([('description','=','0% ZR')])
+        if vals.get('export') and vals.get('out_invoice', False) == 'out_invoice':
+            for line in vals.get('invoice_line'):
+                if line and line[2]:
+                    if zero_per_tax:
+                        line[2]['invoice_line_tax_id'][0] = [6, False, zero_per_tax.ids]
+        zero_zp_tax = account_tax_pool.search([('description','=','0% ZP')])
+        if vals.get('export') and vals.get('in_invoice', False) == 'in_invoice':
+            for line in vals.get('invoice_line'):
+                if line and line[2]:
+                    if zero_zp_tax:
+                        line[2]['invoice_line_tax_id'][0] = [6, False, zero_zp_tax.ids]                        
         inv = super(account_invoice, self).create(vals)
+        inv.button_reset_taxes()
         if inv.partner_id:
             if inv.type=='out_invoice':
                 if inv.export == False: 
@@ -499,10 +561,10 @@ class account_invoice(models.Model):
                             raise except_orm(_('Error!'), _('Please Enter Customer code'))
                     cust_code = str(inv.partner_id.cust_code) + '/'
                     prefix = cust_code[:3].upper()
-                    cr.execute("select id from ir_sequence where name = %s",('Customer Invoice Export',))
-                    res=cr.fetchone()
+                    self._cr.execute("select id from ir_sequence where name = %s",('Customer Invoice Export',))
+                    res=self._cr.fetchone()
                     if res:                    
-                        cr.execute("update ir_sequence set prefix = %s where id=%s",(cust_code,res[0]))
+                        self._cr.execute("update ir_sequence set prefix = %s where id=%s",(cust_code,res[0]))
                         seq_id = self.env['ir.sequence'].next_by_id(res[0])
                         inv.number = seq_id
                         inv.internal_number = seq_id
@@ -514,6 +576,12 @@ class account_invoice(models.Model):
 
     @api.multi
     def action_cancel(self):
+        """
+        This method cancel created picking and generate return
+        order and cancel saled order created from invoice
+        ------------------------------------------------------
+        @param self : object pointer
+        """           
         moves = self.env['account.move']
         quant_obj = self.env["stock.quant"]
         uom_obj = self.env['product.uom']

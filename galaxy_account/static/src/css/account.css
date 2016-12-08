@@ -1,0 +1,18 @@
+.oe_form_sheet_width_wider {
+    max-width: 100% !important;
+    margin-left:10px;
+}
+.oe_form_payment_sheet_width_wider{
+    max-width: 1550px !important;
+    margin-left:10px;
+    width:1250px;
+}
+
+.oe_form_payment_header_width_wider{
+    width:1250px;
+}
+
+.openerp .oe_list_content td.oe_number {
+  text-align: left !important;
+  max-width: 100px;
+}
