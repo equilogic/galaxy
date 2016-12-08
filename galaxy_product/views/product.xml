@@ -57,7 +57,10 @@
             	</xpath>
             	<xpath expr="//field[@name='name']" position="before">
             		<field name="default_code" string="Item No"/>
-            	</xpath>            	
+            	</xpath> 
+            	<xpath expr="//field[@name='name']" position="after">
+            		<field name="description"/>
+            	</xpath>                 	           	
             </field>
         </record>
 
