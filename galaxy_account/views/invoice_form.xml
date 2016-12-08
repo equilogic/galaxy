@@ -31,8 +31,13 @@
 					<label string=''/>
 					<field name="part_ship_add" nolabel="1" options="{'always_reload': True}"
 					/>
-
 				</xpath>
+				<button name="invoice_print" string="Print" type="object" attrs="{'invisible':['|',('sent','=',True), ('state', '!=', 'open')]}" class="oe_highlight" groups="base.group_user" position="replace">
+					<button name="invoice_print" string="Print" type="object" attrs="{'invisible':[ '|',('sent','=',True),('state', 'in', ('open','draft','cancel','paid'))]}" class="oe_highlight" groups="base.group_user"/>
+				</button>
+				<button name="invoice_print" string="Print Invoice" type="object" attrs="{'invisible':['|',('sent','=',False), ('state', '!=', 'open')]}" groups="base.group_user" position="replace">
+					<button name="invoice_print" string="Print Invoice" type="object" attrs="{'invisible':['|',('sent','=',True),('state', 'in', ('open','draft','cancel','paid'))]}" groups="base.group_user"/>
+				</button>				
 				<xpath expr="//page[@string='Payments']" position="after">
 					<page string="Transport Details">
 						<group col="4">
@@ -405,5 +410,30 @@
               </p>
             </field>
         </record>
+        
+        <record id="account_voucher.view_invoice_customer" model="ir.ui.view">
+            <field name="name">account.invoice.customer.pay</field>
+            <field name="model">account.invoice</field>
+            <field name="inherit_id" ref="account.invoice_form"/>
+            <field name="arch" type="xml">
+                <xpath expr="//button[@name='invoice_open'][last()]" position="after">
+                    <button name="invoice_pay_customer" type="object" string="Register Payment"
+                        attrs="{'invisible': ['|', ('state', 'in', ('open','draft','cancel','paid')), ('sent','=',True)]}" groups="base.group_user"/>
+                    <button name="invoice_pay_customer" type="object" string="Register Payment"
+                        attrs="{'invisible': ['|', ('state', 'in', ('open','draft','cancel','paid')), ('sent','=',False)]}" class="oe_highlight" groups="base.group_user"/>
+                </xpath>
+            </field>
+        </record>
+        <record id="account_voucher.view_invoice_supplier" model="ir.ui.view">
+            <field name="name">account.invoice.supplier.pay</field>
+            <field name="model">account.invoice</field>
+            <field name="inherit_id" ref="account.invoice_supplier_form"/>
+            <field name="arch" type="xml">
+                <xpath expr="//button[@name='invoice_open'][last()]" position="after">
+                    <button name="invoice_pay_customer" attrs="{'invisible': [('state', '=','open')]}"  type="object" string="Pay" states="open" class="oe_highlight" groups="base.group_user"/>
+                </xpath>
+            </field>
+        </record>
+                
 	</data>
 </openerp>
