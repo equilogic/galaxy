@@ -238,7 +238,7 @@ class account_invoice(models.Model):
                 rec.currency_rate = curr and \
                             curr.rate_silent or 0.0
                             
-    @api.onchange('user_id', 'export')
+    @api.onchange('export')
     def onchange_export(self):
         account_tax_pool = self.env['account.tax']
         account_line_pool = self.env['account.invoice.line']
@@ -525,7 +525,16 @@ class account_invoice(models.Model):
 #                 self.number = self.env['ir.sequence'].get('sup_inv')
         self.prepare_order_line()
         return self.write({'state': 'open'})
- 
+
+    @api.multi
+    def unlink(self):
+        for invoice in self:
+            if invoice.state not in ('draft', 'cancel'):
+                raise Warning(_('You cannot delete an invoice which is not draft or cancelled. You should refund it instead.'))
+            elif invoice.internal_number and invoice.state != 'draft':
+                raise Warning(_('You cannot delete an invoice after it has been validated (and received a number).  You can set it back to "Draft" state and modify its content, then re-confirm it.'))
+        return True
+     
     @api.model
     def create(self, vals):
         """
@@ -536,17 +545,18 @@ class account_invoice(models.Model):
         """        
         account_tax_pool = self.env['account.tax']
         zero_per_tax = account_tax_pool.search([('description','=','0% ZR')])
-        if vals.get('export') and vals.get('out_invoice', False) == 'out_invoice':
+
+        zero_zp_tax = account_tax_pool.search([('description','=','0% ZP')])
+        if vals.get('export') == True and self._context.get('type', False) == 'out_invoice':
             for line in vals.get('invoice_line'):
                 if line and line[2]:
                     if zero_per_tax:
-                        line[2]['invoice_line_tax_id'][0] = [6, False, zero_per_tax.ids]
-        zero_zp_tax = account_tax_pool.search([('description','=','0% ZP')])
-        if vals.get('export') and vals.get('in_invoice', False) == 'in_invoice':
+                        line[2]['invoice_line_tax_id'][0] = [6, False, zero_per_tax.ids]  
+        if vals.get('export') and self._context.get('type', False) == 'in_invoice':
             for line in vals.get('invoice_line'):
                 if line and line[2]:
                     if zero_zp_tax:
-                        line[2]['invoice_line_tax_id'][0] = [6, False, zero_zp_tax.ids]                        
+                        line[2]['invoice_line_tax_id'][0] = [6, False, zero_zp_tax.ids]                          
         inv = super(account_invoice, self).create(vals)
         inv.button_reset_taxes()
         if inv.partner_id:
