@@ -33,10 +33,10 @@
 					/>
 				</xpath>
 				<button name="invoice_print" string="Print" type="object" attrs="{'invisible':['|',('sent','=',True), ('state', '!=', 'open')]}" class="oe_highlight" groups="base.group_user" position="replace">
-					<button name="invoice_print" string="Print" type="object" attrs="{'invisible':[ '|',('sent','=',True),('state', 'in', ('open','draft','cancel','paid'))]}" class="oe_highlight" groups="base.group_user"/>
+					<button name="invoice_print" string="Print" type="object" invisible="1" class="oe_highlight" groups="base.group_user"/>
 				</button>
 				<button name="invoice_print" string="Print Invoice" type="object" attrs="{'invisible':['|',('sent','=',False), ('state', '!=', 'open')]}" groups="base.group_user" position="replace">
-					<button name="invoice_print" string="Print Invoice" type="object" attrs="{'invisible':['|',('sent','=',True),('state', 'in', ('open','draft','cancel','paid'))]}" groups="base.group_user"/>
+					<button name="invoice_print" string="Print Invoice" type="object" invisible="1" groups="base.group_user"/>
 				</button>				
 				<xpath expr="//page[@string='Payments']" position="after">
 					<page string="Transport Details">
@@ -418,9 +418,9 @@
             <field name="arch" type="xml">
                 <xpath expr="//button[@name='invoice_open'][last()]" position="after">
                     <button name="invoice_pay_customer" type="object" string="Register Payment"
-                        attrs="{'invisible': ['|', ('state', 'in', ('open','draft','cancel','paid')), ('sent','=',True)]}" groups="base.group_user"/>
+                        invisible="1" groups="base.group_user"/>
                     <button name="invoice_pay_customer" type="object" string="Register Payment"
-                        attrs="{'invisible': ['|', ('state', 'in', ('open','draft','cancel','paid')), ('sent','=',False)]}" class="oe_highlight" groups="base.group_user"/>
+                        invisible="1" class="oe_highlight" groups="base.group_user"/>
                 </xpath>
             </field>
         </record>
@@ -430,7 +430,7 @@
             <field name="inherit_id" ref="account.invoice_supplier_form"/>
             <field name="arch" type="xml">
                 <xpath expr="//button[@name='invoice_open'][last()]" position="after">
-                    <button name="invoice_pay_customer" attrs="{'invisible': [('state', '=','open')]}"  type="object" string="Pay" states="open" class="oe_highlight" groups="base.group_user"/>
+                    <button name="invoice_pay_customer" invisible="1"  type="object" string="Pay" states="open" class="oe_highlight" groups="base.group_user"/>
                 </xpath>
             </field>
         </record>
