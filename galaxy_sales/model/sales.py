@@ -30,6 +30,7 @@ class sale_order_line(models.Model):
 
     origin_ids = fields.Many2many('origin.origin', string='Origin')
     no_origin = fields.Boolean('No Origin')
+    qty_on_hand = fields.Float(related='product_id.qty_available', string='Quantity On Hand', default=0.0)
     
     @api.model
     def create(self, values):

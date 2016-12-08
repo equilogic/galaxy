@@ -389,8 +389,8 @@
 								</td>
 								<td width="60%">
 									<span>BANK:</span>
-									<t t-if="o.bank">
-										<span t-field="o.bank" />
+									<t t-if="o.partner_id and o.partner_id.bank_detail">
+										<span t-field="o.partner_id.bank_detail" />
 									</t>
 								</td>
 							</tr>

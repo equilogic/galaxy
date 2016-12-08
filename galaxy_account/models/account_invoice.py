@@ -40,6 +40,7 @@ class account_invoice_line(models.Model):
     prod_desc = fields.Text(related='product_id.description', string='Full Description')
     origin_ids = fields.Many2many('origin.origin', string='Origin')
     no_origin = fields.Boolean('NO Origin')
+    qty_on_hand = fields.Float(related='product_id.qty_available', string='Quantity On Hand', default=0.0)
     
     @api.multi
     def product_id_change(self, product, uom_id, qty=0, name='', type='out_invoice',
@@ -534,6 +535,7 @@ class res_partner(models.Model):
     _inherit = 'res.partner'
 
     cust_code = fields.Char('Code')
+    bank_detail = fields.Text(string='Bank Description')
 
     @api.multi
     def name_get(self):

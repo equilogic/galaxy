@@ -34,6 +34,7 @@ class purchase_order_line(models.Model):
 
     origin_ids = fields.Many2many('origin.origin', string='Origin')
     no_origin = fields.Boolean('No Origin')
+    qty_on_hand = fields.Float(related='product_id.qty_available', string='Quantity On Hand', default=0.0)
 
     @api.multi
     def onchange_product_id(self, pricelist_id, product_id, qty, uom_id,
