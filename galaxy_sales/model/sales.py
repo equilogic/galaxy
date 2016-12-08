@@ -36,7 +36,7 @@ class sale_order_line(models.Model):
     def create(self, values):
         prod_obj=self.env['product.product'].browse(values.get('product_id'))
         qty=prod_obj.qty_available
-        if qty > 0:
+        if qty > 0 and values.get('product_uom_qty', 0.0) < qty:
             return super(sale_order_line, self).create(values)
         else :
             raise except_orm(_('Product Stock is not Available!'),

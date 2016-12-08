@@ -182,8 +182,7 @@ class account_invoice(models.Model):
         readonly=True, states={'draft': [('readonly', False)],'open': [('readonly', False)]})
     invoice_line = fields.One2many('account.invoice.line', 'invoice_id', string='Invoice Lines',
         readonly=True, states={'draft': [('readonly', False)],'open': [('readonly', False)]}, copy=True)
-
-
+    
     @api.onchange('part_ship_id')
     def onchange_part_ship_add(self):
         ship_add_list = []
@@ -460,30 +459,58 @@ class account_invoice(models.Model):
                     pick_id.do_transfer()
     @api.multi
     def invoice_validate(self):
-        prefix = ''
+#         prefix = ''
         cr,uid,context = self.env.args
-        if self.partner_id and self.number:
-            country = self.partner_id.country_id.name
-            currency = self.currency_id.name
-            if self.type=='out_invoice':
-                if self.export == False: 
-                    self.number = self.env['ir.sequence'].get('invoice_local')
+#         if self.partner_id and self.number:
+#             country = self.partner_id.country_id.name
+#             currency = self.currency_id.name
+#             if self.type=='out_invoice':
+#                 if self.export == False: 
+#                     self.number = self.env['ir.sequence'].get('invoice_local')
+#                 else:
+#                     if not self.partner_id.cust_code:
+#                         if self.type=="out_invoice":
+#                             raise except_orm(_('Error!'), _('Please Enter Customer code'))
+#                     cust_code = str(self.partner_id.cust_code) + '/'
+#                     prefix = cust_code[:3].upper()
+#                     cr.execute("select id from ir_sequence where name = %s",('Customer Invoice Export',))
+#                     res=cr.fetchone()
+#                     if res:                    
+#                         cr.execute("update ir_sequence set prefix = %s where id=%s",(cust_code,res[0]))
+#                         seq_id = self.env['ir.sequence'].next_by_id(res[0])
+#                         self.number = seq_id
+#             if self.type=='in_invoice':
+#                 self.number = self.env['ir.sequence'].get('sup_inv')
+        self.prepare_order_line()
+        return self.write({'state': 'open'})
+
+    @api.model
+    def create(self, vals):
+        inv = super(account_invoice, self).create(vals)
+        if inv.partner_id:
+            if inv.type=='out_invoice':
+                if inv.export == False: 
+                    seq = self.env['ir.sequence'].get('invoice_local')
+                    inv.number = seq
+                    inv.internal_number = seq
                 else:
-                    if not self.partner_id.cust_code:
-                        if self.type=="out_invoice":
+                    if not inv.partner_id.cust_code:
+                        if inv.type=="out_invoice":
                             raise except_orm(_('Error!'), _('Please Enter Customer code'))
-                    cust_code = str(self.partner_id.cust_code) + '/'
+                    cust_code = str(inv.partner_id.cust_code) + '/'
                     prefix = cust_code[:3].upper()
                     cr.execute("select id from ir_sequence where name = %s",('Customer Invoice Export',))
                     res=cr.fetchone()
                     if res:                    
                         cr.execute("update ir_sequence set prefix = %s where id=%s",(cust_code,res[0]))
                         seq_id = self.env['ir.sequence'].next_by_id(res[0])
-                        self.number = seq_id
-            if self.type=='in_invoice':
-                self.number = self.env['ir.sequence'].get('sup_inv')
-        self.prepare_order_line()
-        return self.write({'state': 'open'})
+                        inv.number = seq_id
+                        inv.internal_number = seq_id
+        if inv.type=='in_invoice':
+            seq_inv = self.env['ir.sequence'].get('sup_inv')
+            inv.number = seq_inv
+            inv.internal_number = seq_inv
+        return inv
 
     @api.multi
     def action_cancel(self):
@@ -530,6 +557,45 @@ class account_invoice(models.Model):
             if purchase_rec:
                 purchase_rec.write({'state':'except_invoice'})
         return True
+
+class account_move(models.Model):
+    _inherit = "account.move"
+    
+    @api.multi
+    def post(self):
+        cr,uid,context = self.env.args
+        if context is None:
+            context = {}
+        invoice = context.get('invoice', False)
+        valid_moves = self.with_context(context=context).validate()
+
+        if not valid_moves:
+            raise osv.except_osv(_('Error!'), _('You cannot validate a non-balanced entry.\nMake sure you have configured payment terms properly.\nThe latest payment term line should be of the "Balance" type.'))
+        obj_sequence = self.pool.get('ir.sequence')
+        for move in self.browse(valid_moves):
+            if move.name =='/':
+                new_name = False
+                journal = move.journal_id
+ 
+                if invoice and invoice.internal_number:
+                    new_name = invoice.internal_number
+                else:
+                    if journal.sequence_id:
+                        c = {'fiscalyear_id': move.period_id.fiscalyear_id.id}
+                        new_name = obj_sequence.next_by_id(cr, uid, journal.sequence_id.id, c)
+                    else:
+                        raise osv.except_osv(_('Error!'), _('Please define a sequence on the journal.'))
+ 
+                if new_name:
+                    move.name = new_name
+
+        cr.execute('UPDATE account_move '\
+                   'SET state=%s '\
+                   'WHERE id IN %s',
+                   ('posted', tuple(valid_moves),))
+        self.with_context(context=context).invalidate_cache(['state', ], valid_moves)
+        return True
+
 
 class res_partner(models.Model):
     _inherit = 'res.partner'
