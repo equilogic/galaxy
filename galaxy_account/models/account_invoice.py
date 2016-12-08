@@ -23,7 +23,7 @@
 from openerp import models, fields, api
 from datetime import datetime
 from openerp.tools import DEFAULT_SERVER_DATETIME_FORMAT, DEFAULT_SERVER_DATE_FORMAT
-from openerp.exceptions import except_orm
+from openerp.exceptions import except_orm, Warning
 from openerp.tools.translate import _
 
 # mapping invoice type to journal type

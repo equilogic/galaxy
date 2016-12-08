@@ -101,7 +101,7 @@ class product_product(models.Model):
             name = d.get('name','')
             code = context.get('display_default_code', True) and d.get('default_code',False) or False
             if code:
-                name = '[%s] %s' % (code,name)
+                name = '%s%s' % (code,name)
             return (d['id'], name)
 
         partner_id = context.get('partner_id', False)
