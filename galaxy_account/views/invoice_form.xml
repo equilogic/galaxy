@@ -51,14 +51,14 @@
 						<group col="4">
 							<field name="ship_via_id" />
 							<field name="vehicle_name" />
-							<field name="container_name" />
+							<field name="from_id" />
+							<field name="port_name_id" />							
+							<field name="container_id" />
 							<field name="container_place_area_code" />
 							<field name="cases_id" />
-							<field name="from_id" />
-							<field name="port_name_id" />
 							<field name="insurence_covered_id" />
 							<field name="vessale_name_id" />
-							<field name="bank" />
+							<field name="bank" invisible="1"/>
 							<field name="invoice_from_sale" invisible="1" />
 						</group>
 					</page>
@@ -114,6 +114,7 @@
 					<field name="delivery_status"/>
 					<field name="currency_rate" />
 					<field name="export" />
+					<field name="direct_shipemt" />
 				</field>
 
 				<xpath
@@ -248,20 +249,21 @@
 				<field name="currency_id" position="after">
 					<field name="currency_rate"/>
 					<field name="export" />
+					<field name="direct_shipemt" />
 				</field>
 				<xpath expr="//page[@string='Payments']" position="after">
 					<page string="Transport Details">
 						<group col="4">
 							<field name="ship_via_id" />
 							<field name="vehicle_name" />
-							<field name="container_name" />
+							<field name="from_id" />
+							<field name="port_name_id" />							
+							<field name="container_id" />
 							<field name="container_place_area_code" />
 							<field name="cases_id" />
-							<field name="from_id" />
-							<field name="port_name_id" />
 							<field name="insurence_covered_id" />
 							<field name="vessale_name_id" />
-							<field name="bank" />
+							<field name="bank" invisible="1"/>
 							<field name="invoice_from_sale" invisible="1" />
 						</group>
 					</page>
