@@ -36,12 +36,24 @@ TYPE2JOURNAL = {
 
 class account_invoice_line(models.Model):
     _inherit = 'account.invoice.line'
-    
+ 
+    @api.multi
+    @api.depends('product_id')
+    def _compute_profoma_qty(self):
+        qty = 0.0
+        for cost in self:
+            if cost.product_id and cost.product_id.non_invenotry_item == False:
+                line_ids = self.search([('product_id', '=', cost.product_id.id), ('invoice_id.state','=', 'draft')])
+                for line_id in line_ids:
+                    qty += line_id.quantity
+            cost.profoma_qty = qty  
+                
     prod_desc = fields.Text(related='product_id.description', string='Full Description')
     origin_ids = fields.Many2many('origin.origin', string='Origin')
     no_origin = fields.Boolean('NO Origin')
     qty_on_hand = fields.Float(related='product_id.qty_available', string='Quantity On Hand', default=0.0)
-
+    profoma_qty = fields.Float(compute='_compute_profoma_qty', string='Profoma QTY')
+    
     @api.multi
     def product_id_change(self, product, uom_id, qty=0, name='', type='out_invoice',
             partner_id=False, fposition_id=False, price_unit=False, currency_id=False,
@@ -126,6 +138,7 @@ class account_invoice(models.Model):
     delivery_status =fields.Char(string="Delivery Status")
     export = fields.Boolean('Export', readonly=True, states={'draft': [('readonly', False)], 'open': [('readonly', False)]})
     direct_shipemt = fields.Boolean('Direct Shipment', readonly=True, states={'draft': [('readonly', False)], 'open': [('readonly', False)]})
+
     
     ####    
     # This Fields Overrite to Edit its value after validate invoice.(TO Change Attrs and domains)
@@ -401,7 +414,7 @@ class account_invoice(models.Model):
 
         loc_id = self.env['stock.location'].search([('location_id','!=',False),('location_id.name','ilike','WH'),
                     ('company_id.id','=',self.company_id.id),('usage','=','internal')])
-    
+        prdouct_dict = {}
         if self.type == "out_invoice" and not self.invoice_from_sale:
             order_vals = {
                           'partner_id': self.partner_id.id,
@@ -434,14 +447,21 @@ class account_invoice(models.Model):
                         'origin_ids': [(6, 0, line.origin_ids.ids)],
                         'order_id':res.id,
                         }
+                if self.direct_shipemt:
+                    rout_ids = self.env['stock.location.route'].search([('name','=', 'Drop Shipping')])
+                    if rout_ids:
+                        vals.update({'route_id' : rout_ids and rout_ids[0].id})                
                 res1 = so_line_obj.create(vals)
+                prdouct_dict[line.product_id.id] = {'line_id': res1.id}
             res.signal_workflow('order_confirm')
-            
             if res.picking_ids:
                 for pick_id in res.picking_ids:
                     pick_id.active = True
                     pick_id.inv_id = self.id or False
                     pick_id.do_transfer()
+                    for m_line in pick_id.move_lines:
+                        s_line_id = prdouct_dict.get(m_line.product_id.id).get('line_id', False)
+                        self._cr.execute('update stock_move set sale_line_id=%s where id=%s',(s_line_id, m_line.id, ))
         if self.type == "in_invoice" and not self.invoice_from_purchase:
             product_ids = []
             invoice_method='picking'
@@ -598,6 +618,8 @@ class account_invoice(models.Model):
         purchase_obj = self.env['purchase.order']
         purchase_l_obj = self.env['purchase.order.line']
         invoice_l_obj = self.env['account.invoice.line']
+        pick_line_obj = self.env['stock.move']
+        stock_quant_obj = self.env['stock.quant']
         res = super(account_invoice, self).write(vals)
         for inv in self:
             sale_ord_id = sale_obj.search([('inv_id', '=', inv.id)])
@@ -638,22 +660,28 @@ class account_invoice(models.Model):
                     if inv_line[1] and inv_line[2]:
                         s_lines_vals = {}
                         p_lines_vals = {}
+                        pick_lines_vals = {}
                         if inv_line[2].get('price_unit', False):
                             s_lines_vals.update({'price_unit': inv_line[2]['price_unit'] or 0.0})
                             p_lines_vals.update({'price_unit': inv_line[2]['price_unit'] or 0.0})
+                            pick_lines_vals.update({'price_unit': inv_line[2]['price_unit'] or 0.0})
                         if inv_line[2].get('product_id', False):
                             s_lines_vals.update({'product_id': inv_line[2]['product_id'] or False})
                             p_lines_vals.update({'product_id': inv_line[2]['product_id'] or False})
+                            pick_lines_vals.update({'price_unit': inv_line[2]['product_id'] or 0.0})
                         if inv_line[2].get('quantity', False):
                             s_lines_vals.update({'product_uom_qty': inv_line[2]['quantity'] or 0.0})
                             p_lines_vals.update({'product_qty': inv_line[2]['quantity'] or 0.0})
+                            pick_lines_vals.update({'product_uom_qty': inv_line[2]['quantity'] or 0.0})
                         if inv_line[2].get('name', False):
                             s_lines_vals.update({'name': inv_line[2]['name'] or ''})
                             p_lines_vals.update({'name': inv_line[2]['name'] or ''})
+                            pick_lines_vals.update({'price_unit': inv_line[2]['name'] or 0.0})
                         if inv_line[2].get('invoice_line_tax_id', False):
                             if inv_line[2]['invoice_line_tax_id'][0] and inv_line[2]['invoice_line_tax_id'][0][2]:
                                 s_lines_vals.update({'tax_id': [(6, 0, inv_line[2]['invoice_line_tax_id'][0][2])]})
                                 p_lines_vals.update({'taxes_id': [(6, 0, inv_line[2]['invoice_line_tax_id'][0][2])]})
+                                p_lines_vals.update({'price_unit': inv_line[2]['price_unit'] or 0.0})
                         if s_lines_vals and sale_ord_id:
                             sale_line_id = sale_l_obj.search([('inv_line_id', '=', inv_line[1])])
                             if sale_line_id:
@@ -663,21 +691,38 @@ class account_invoice(models.Model):
                             purch_line_id = purchase_l_obj.search([('inv_line_id', '=', inv_line[1])])
                             if purch_line_id:
                                 purch_line_id.write(p_lines_vals)
+                        if pick_lines_vals and pick_ord_id:
+                            sale_line_id_new = sale_l_obj.search([('inv_line_id', '=', inv_line[1])])
+                            pick_line_id = pick_line_obj.search([('sale_line_id', '=', sale_line_id_new.id)])
+                            q_id = stock_quant_obj.search([()])
+                            if pick_line_id:
+                                diff = 0.0
+                                pick_line_id.write(pick_lines_vals)
+                                for quant_id in pick_line_id.quant_ids:
+                                    diff = quant_id.qty - pick_line_id.product_uom_qty
+                                    if pick_line_id.product_id.id == quant_id.product_id.id:
+                                        quant_id.write({'qty': pick_line_id.product_uom_qty})
+                                                                
                     if inv_line[2] and not inv_line[1]:
                         s_lines_vals = {}
                         p_lines_vals = {}
+                        pick_lines_vals = {}
                         if inv_line[2].get('price_unit', False):
                             s_lines_vals.update({'price_unit': inv_line[2]['price_unit'] or 0.0})
                             p_lines_vals.update({'price_unit': inv_line[2]['price_unit'] or 0.0})
+                            pick_lines_vals.update({'price_unit': inv_line[2]['price_unit'] or 0.0})
                         if inv_line[2].get('product_id', False):
                             s_lines_vals.update({'product_id': inv_line[2]['product_id'] or False})
                             p_lines_vals.update({'product_id': inv_line[2]['product_id'] or False})
+                            pick_lines_vals.update({'product_id': inv_line[2]['product_id'] or False})
                         if inv_line[2].get('quantity', False):
                             s_lines_vals.update({'product_uom_qty': inv_line[2]['quantity'] or 0.0})
                             p_lines_vals.update({'product_qty': inv_line[2]['quantity'] or 0.0})
+                            pick_lines_vals.update({'product_uom_qty': inv_line[2]['quantity'] or 0.0})
                         if inv_line[2].get('name', False):
                             s_lines_vals.update({'name': inv_line[2]['name'] or ''})
                             p_lines_vals.update({'name': inv_line[2]['name'] or ''})
+                            pick_lines_vals.update({'product_uom_qty': inv_line[2]['quantity'] or 0.0})
                         if inv_line[2].get('invoice_line_tax_id', False):
                             if inv_line[2]['invoice_line_tax_id'][0] and inv_line[2]['invoice_line_tax_id'][0][2]:
                                 s_lines_vals.update({'tax_id': [(6, 0, inv_line[2]['invoice_line_tax_id'][0][2])]})
@@ -701,7 +746,8 @@ class account_invoice(models.Model):
                             if inv_l_id:
                                 p_lines_vals.append({'inv_line_id': inv_l_id.ids[0] or False})
                             purchase_ord_vals.update({'order_line': [(0,0, p_lines_vals)]})
-
+                        if pick_ord_id and pick_lines_vals:
+                            picking_ord_vals.update({'move_lines': pick_lines_vals})
             if sale_ord_id and sale_ord_vals:
                 sale_ord_id.write(sale_ord_vals)
             if purch_ord_id and purchase_ord_vals:
@@ -734,7 +780,7 @@ class account_invoice(models.Model):
         # First, set the invoices as cancelled and detach the move ids
         self.write({'state': 'cancel', 'move_id': False})
         self._log_event(-1.0, 'Cancel Invoice')
-        picking_rec = self.env['stock.picking'].search([('account_id', '=', self.ids[0])])
+        picking_rec = self.env['stock.picking'].search([('inv_id', '=', self.ids[0])])
         if picking_rec:
             return_line = []
             for pick in picking_rec:
@@ -752,9 +798,9 @@ class account_invoice(models.Model):
                 pick_obj = self.env['stock.picking'].browse(new_picking)
                 pick_obj.do_transfer()
             if self.type=="out_invoice":
-                sale_rec = self.env['sale.order'].search([('account_id', '=', self.ids[0])])
+                sale_rec = self.env['sale.order'].search([('inv_id', '=', self.ids[0])])
             if self.type=="in_invoice":
-                purchase_rec = self.env['purchase.order'].search([('account_id', '=', self.ids[0])])
+                purchase_rec = self.env['purchase.order'].search([('inv_id', '=', self.ids[0])])
             if sale_rec:
                 sale_rec.action_invoice_cancel()
                 sale_rec.write({'state': 'cancel'})

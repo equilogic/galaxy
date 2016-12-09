@@ -34,7 +34,14 @@ class ProductTemplate(models.Model):
     origin_ids = fields.One2many('origin.origin', 'product_id', string="Origin")
     non_invenotry_item =  fields.Boolean('Non Inventory Item')
     manufacture_by =  fields.Char('Manufacture By')
-    
+
+    @api.onchange('non_invenotry_item')
+    def onchange_currency_id(self):
+        for rec in self:
+            curr = rec.non_invenotry_item
+            if curr:
+                rec.type = 'service'
+                    
 #    @api.v7
 #    def _check_product_code_unique(self, cr, uid, ids, context=None):
 #        for product in self.browse(cr, uid, ids, context=context):

@@ -63,6 +63,42 @@
 	                            string="Delivery Order" type="action" widget="statinfo" icon="fa-pencil-square-o"/>
 	            	</div>
 				</xpath>
+				
+				 <field domain="[('company_id', '=', company_id),('type','=', 'receivable')]"
+				     name="account_id" groups="account.group_account_user"
+				     context="{'periods_special': False, 'all_fiscalyear': True}" position='replace'>
+					 <field domain="[('company_id', '=', company_id),('type','=', 'receivable')]"
+					     name="account_id" groups="account.group_account_user" invisible="1"
+					     context="{'periods_special': False, 'all_fiscalyear': True}"/>
+				 </field>              
+
+                 <xpath expr="//div[@class='oe_clear']" position="before">
+                     <group>
+                         <group class="oe_left">
+                             <field name="discount_view"/>
+                             <field name="discount_type"/>
+                         </group>
+                         <group>
+                             <button name="button_dummy" states="draft" string="(update)" type="object"
+                                     class="oe_edit_only oe_link oe_right" invisible="1"/>
+                         </group>
+                         <group class="oe_left">
+                             <field name="discount_value"
+                                    attrs="{'invisible':[('discount_type', 'not in', ['Fixed', 'Percentage'])]}"/>
+                         </group>
+                         <group class="oe_right">
+                             <button name="button_dummy" string="(update)" type="object"
+                                     class="oe_edit_only oe_link"
+                                     attrs="{'invisible':['|',('discount_type', 'not in', ['Fixed', 'Percentage']),('state','not in',['draft'])]}"/>
+                         </group>
+                     </group>
+
+                 </xpath>
+                 <xpath expr="//field[@name='amount_tax']" position="after">
+                     <field name="discounted_amount" widget="monetary" options="{'currency_field': 'currency_id'}"
+                            attrs="{'invisible':[('discount_type', 'not in', ['Fixed', 'Percentage'])]}"/>
+                 </xpath>
+                                                    				
                 <xpath expr="//form/sheet" position="attributes">
                     <attribute name="class">oe_form_sheet_width_wider</attribute>
                 </xpath>			
@@ -135,6 +171,7 @@
 					position='after'>
 					<field name="prod_desc" />
 					<field name="qty_on_hand" readonly="1"/>
+					<field name="profoma_qty" />
 				</xpath>
 
 				<xpath
@@ -235,6 +272,14 @@
                 <xpath expr="//field[@name='partner_id']" position="before">
                     <field name="date_invoice" on_change="onchange_payment_term_date_invoice(payment_term, date_invoice)" />
                 </xpath>
+				     
+				 <field domain="[('company_id', '=', company_id),('type','=', 'receivable')]"
+				     name="account_id" groups="account.group_account_user"
+				     context="{'periods_special': False, 'all_fiscalyear': True}" position='replace'>
+					 <field domain="[('company_id', '=', company_id),('type','=', 'receivable')]"
+					     name="account_id" groups="account.group_account_user" invisible="1"
+					     context="{'periods_special': False, 'all_fiscalyear': True}"/>
+				 </field>                  
                 <xpath
                     expr="//page[@string='Invoice']/field[@name='invoice_line']/tree/field[@name='account_id']"
                     position='attributes'>
