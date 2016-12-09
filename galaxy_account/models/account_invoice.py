@@ -410,7 +410,7 @@ class account_invoice(models.Model):
                           'date_order': self.date_invoice,
                           'pricelist_id': self.partner_id.property_product_pricelist.id,
                           'active': True,
-                          'account_id': self._ids,
+                          'inv_id': self.id or False,
                           'attn_sal':self.attn_inv.id,
                           'landed_cost_sal':[(6,0,self.landed_cost.ids)],
                           'landed_cost_price':self.landed_cost_price,
@@ -426,6 +426,7 @@ class account_invoice(models.Model):
                         'name' : line.name,
                         'product_uom_qty' : line.quantity,
                         'product_uom' :line.uos_id.id or 1,
+                        'inv_line_id': line.id or False,
                         'price_unit':line.price_unit,
                         'tax_id': [(6, 0, line.invoice_line_tax_id.ids)],
                         'discount':line.discount,
@@ -439,7 +440,7 @@ class account_invoice(models.Model):
             if res.picking_ids:
                 for pick_id in res.picking_ids:
                     pick_id.active = True
-                    pick_id.account_id = self._ids
+                    pick_id.inv_id = self.id or False
                     pick_id.do_transfer()
         if self.type == "in_invoice" and not self.invoice_from_purchase:
             product_ids = []
@@ -462,7 +463,7 @@ class account_invoice(models.Model):
                           'invoiced':True,
                           'active': True,
                           'currency_id':self.currency_id.id,
-                          'account_id': self._ids,
+                          'inv_id': self.id or False,
                           'location_id' : loc_id.id,#self.partner_id.property_stock_supplier.id,
                           'attn_pur':self.attn_inv.id,
                           'landed_cost_pur':[(6,0,self.landed_cost.ids)],
@@ -477,6 +478,7 @@ class account_invoice(models.Model):
                 vals = {
                         'product_id' : line.product_id.id,
                         'name' : line.name,
+                        'inv_line_id': line.id or False,
                         'date_planned':self.date_invoice,
                         'product_qty' : line.quantity,
                         'product_uom' :line.uos_id.id or 1,
@@ -494,8 +496,10 @@ class account_invoice(models.Model):
             if po_res.picking_ids:
                 for pick_id in po_res.picking_ids:
                     pick_id.active = True
-                    pick_id.account_id = self._ids
+                    pick_id.inv_id = self.id or False
                     pick_id.do_transfer()
+        return True
+
     @api.multi
     def invoice_validate(self):
         """
@@ -524,7 +528,8 @@ class account_invoice(models.Model):
 #                         self.number = seq_id
 #             if self.type=='in_invoice':
 #                 self.number = self.env['ir.sequence'].get('sup_inv')
-        self.prepare_order_line()
+        for inv in self:
+            inv.prepare_order_line()
         return self.write({'state': 'open'})
 
     @api.multi
@@ -586,6 +591,126 @@ class account_invoice(models.Model):
         return inv
 
     @api.multi
+    def write(self, vals):
+        picking_obj = self.env['stock.picking']
+        sale_obj = self.env['sale.order']
+        sale_l_obj = self.env['sale.order.line']
+        purchase_obj = self.env['purchase.order']
+        purchase_l_obj = self.env['purchase.order.line']
+        invoice_l_obj = self.env['account.invoice.line']
+        res = super(account_invoice, self).write(vals)
+        for inv in self:
+            sale_ord_id = sale_obj.search([('inv_id', '=', inv.id)])
+            purch_ord_id = purchase_obj.search([('inv_id', '=', inv.id)])
+            pick_ord_id = picking_obj.search([('inv_id', '=', inv.id)])
+            sale_ord_vals = {}
+            purchase_ord_vals = {}
+            picking_ord_vals = {}
+            if vals.get('date_invoice', False):
+                sale_ord_vals.update({'date_order': vals['date_invoice']})
+                purchase_ord_vals.update({'date_order': vals['date_invoice']})
+                picking_ord_vals.update({'min_date': vals['date_invoice']})
+            if vals.get('partner_id', False):
+                sale_ord_vals.update({'partner_id': vals['partner_id']})
+                purchase_ord_vals.update({'partner_id': vals['partner_id']})
+                picking_ord_vals.update({'partner_id': vals['partner_id']})
+            if vals.get('part_inv_id', False):
+                sale_ord_vals.update({'partner_invoice_id': vals['part_inv_id']})
+                purchase_ord_vals.update({'partner_invoice_id': vals['part_inv_id']})
+            if vals.get('part_ship_id', False):
+                sale_ord_vals.update({'partner_shipping_id': vals['part_ship_id']})
+                purchase_ord_vals.update({'partner_shipping_id': vals['part_ship_id']})
+            if vals.get('attn_inv', False):
+                sale_ord_vals.update({'attn_sal': vals['attn_inv']})
+                purchase_ord_vals.update({'attn_pur': vals['attn_inv']})
+            if vals.get('landed_cost', False):
+                sale_ord_vals.update({'landed_cost_sal': [(6, 0, inv.landed_cost.ids)]})
+                purchase_ord_vals.update({'landed_cost_pur': [(6, 0, inv.landed_cost.ids)]})
+            if vals.get('currency_rate', False):
+                sale_ord_vals.update({'currency_rate': vals['currency_rate']})
+                purchase_ord_vals.update({'currency_rate': vals['currency_rate']})
+            if vals.get('customer_po', False):
+                sale_ord_vals.update({'customer_po': vals['customer_po']})
+
+            if vals.get('invoice_line', False):
+                sale_order_l_lst = []
+                for inv_line in vals['invoice_line']:
+                    if inv_line[1] and inv_line[2]:
+                        s_lines_vals = {}
+                        p_lines_vals = {}
+                        if inv_line[2].get('price_unit', False):
+                            s_lines_vals.update({'price_unit': inv_line[2]['price_unit'] or 0.0})
+                            p_lines_vals.update({'price_unit': inv_line[2]['price_unit'] or 0.0})
+                        if inv_line[2].get('product_id', False):
+                            s_lines_vals.update({'product_id': inv_line[2]['product_id'] or False})
+                            p_lines_vals.update({'product_id': inv_line[2]['product_id'] or False})
+                        if inv_line[2].get('quantity', False):
+                            s_lines_vals.update({'product_uom_qty': inv_line[2]['quantity'] or 0.0})
+                            p_lines_vals.update({'product_qty': inv_line[2]['quantity'] or 0.0})
+                        if inv_line[2].get('name', False):
+                            s_lines_vals.update({'name': inv_line[2]['name'] or ''})
+                            p_lines_vals.update({'name': inv_line[2]['name'] or ''})
+                        if inv_line[2].get('invoice_line_tax_id', False):
+                            if inv_line[2]['invoice_line_tax_id'][0] and inv_line[2]['invoice_line_tax_id'][0][2]:
+                                s_lines_vals.update({'tax_id': [(6, 0, inv_line[2]['invoice_line_tax_id'][0][2])]})
+                                p_lines_vals.update({'taxes_id': [(6, 0, inv_line[2]['invoice_line_tax_id'][0][2])]})
+                        if s_lines_vals and sale_ord_id:
+                            sale_line_id = sale_l_obj.search([('inv_line_id', '=', inv_line[1])])
+                            if sale_line_id:
+                                sale_line_id.write(s_lines_vals)
+                        if p_lines_vals and purch_ord_id:
+                            p_lines_vals.update({'date_planned': inv.date_invoice or False})
+                            purch_line_id = purchase_l_obj.search([('inv_line_id', '=', inv_line[1])])
+                            if purch_line_id:
+                                purch_line_id.write(p_lines_vals)
+                    if inv_line[2] and not inv_line[1]:
+                        s_lines_vals = {}
+                        p_lines_vals = {}
+                        if inv_line[2].get('price_unit', False):
+                            s_lines_vals.update({'price_unit': inv_line[2]['price_unit'] or 0.0})
+                            p_lines_vals.update({'price_unit': inv_line[2]['price_unit'] or 0.0})
+                        if inv_line[2].get('product_id', False):
+                            s_lines_vals.update({'product_id': inv_line[2]['product_id'] or False})
+                            p_lines_vals.update({'product_id': inv_line[2]['product_id'] or False})
+                        if inv_line[2].get('quantity', False):
+                            s_lines_vals.update({'product_uom_qty': inv_line[2]['quantity'] or 0.0})
+                            p_lines_vals.update({'product_qty': inv_line[2]['quantity'] or 0.0})
+                        if inv_line[2].get('name', False):
+                            s_lines_vals.update({'name': inv_line[2]['name'] or ''})
+                            p_lines_vals.update({'name': inv_line[2]['name'] or ''})
+                        if inv_line[2].get('invoice_line_tax_id', False):
+                            if inv_line[2]['invoice_line_tax_id'][0] and inv_line[2]['invoice_line_tax_id'][0][2]:
+                                s_lines_vals.update({'tax_id': [(6, 0, inv_line[2]['invoice_line_tax_id'][0][2])]})
+                                p_lines_vals.update({'taxes_id': [(6, 0, inv_line[2]['invoice_line_tax_id'][0][2])]})
+                        if s_lines_vals and sale_ord_id:
+                            inv_l_id = invoice_l_obj.search([('name', '=', s_lines_vals.get('name', '')),
+                                                  ('product_id', '=', s_lines_vals.get('product_id', False)),
+                                                  ('price_unit', '=', s_lines_vals.get('price_unit', 0.0)),
+                                                  ('quantity', '=', s_lines_vals.get('quantity', 0.0)),
+                                                  ('invoice_id', '=', inv.id or False)])
+                            if inv_l_id:
+                                s_lines_vals.append({'inv_line_id': inv_l_id.ids[0] or False})
+                            sale_ord_vals.update({'order_line': [(0,0, s_lines_vals)]})
+                        if p_lines_vals and purch_ord_id:
+                            p_lines_vals.update({'date_planned': inv.date_invoice or False})
+                            inv_l_id = invoice_l_obj.search([('name', '=', s_lines_vals.get('name', '')),
+                                                  ('product_id', '=', s_lines_vals.get('product_id', False)),
+                                                  ('price_unit', '=', s_lines_vals.get('price_unit', 0.0)),
+                                                  ('quantity', '=', s_lines_vals.get('quantity', 0.0)),
+                                                  ('invoice_id', '=', inv.id or False)])
+                            if inv_l_id:
+                                p_lines_vals.append({'inv_line_id': inv_l_id.ids[0] or False})
+                            purchase_ord_vals.update({'order_line': [(0,0, p_lines_vals)]})
+
+            if sale_ord_id and sale_ord_vals:
+                sale_ord_id.write(sale_ord_vals)
+            if purch_ord_id and purchase_ord_vals:
+                purch_ord_id.write(purchase_ord_vals)
+            if pick_ord_id and picking_ord_vals:
+                pick_ord_id.write(picking_ord_vals)
+        return res
+
+    @api.multi
     def action_cancel(self):
         """
         This method cancel created picking and generate return
@@ -637,43 +762,43 @@ class account_invoice(models.Model):
                 purchase_rec.write({'state':'except_invoice'})
         return True
 
-class account_move(models.Model):
-    _inherit = "account.move"
-    
-    @api.multi
-    def post(self):
-        cr,uid,context = self.env.args
-        if context is None:
-            context = {}
-        invoice = context.get('invoice', False)
-        valid_moves = self.with_context(context=context).validate()
-
-        if not valid_moves:
-            raise osv.except_osv(_('Error!'), _('You cannot validate a non-balanced entry.\nMake sure you have configured payment terms properly.\nThe latest payment term line should be of the "Balance" type.'))
-        obj_sequence = self.pool.get('ir.sequence')
-        for move in self.browse(valid_moves):
-            if move.name =='/':
-                new_name = False
-                journal = move.journal_id
- 
-                if invoice and invoice.internal_number:
-                    new_name = invoice.internal_number
-                else:
-                    if journal.sequence_id:
-                        c = {'fiscalyear_id': move.period_id.fiscalyear_id.id}
-                        new_name = obj_sequence.next_by_id(cr, uid, journal.sequence_id.id, c)
-                    else:
-                        raise osv.except_osv(_('Error!'), _('Please define a sequence on the journal.'))
- 
-                if new_name:
-                    move.name = new_name
-
-        cr.execute('UPDATE account_move '\
-                   'SET state=%s '\
-                   'WHERE id IN %s',
-                   ('posted', tuple(valid_moves),))
-        self.with_context(context=context).invalidate_cache(['state', ], valid_moves)
-        return True
+# class account_move(models.Model):
+#     _inherit = "account.move"
+#     
+#     @api.multi
+#     def post(self):
+#         cr,uid,context = self.env.args
+#         if context is None:
+#             context = {}
+#         invoice = context.get('invoice', False)
+#         valid_moves = self.with_context(context=context).validate()
+# 
+#         if not valid_moves:
+#             raise osv.except_osv(_('Error!'), _('You cannot validate a non-balanced entry.\nMake sure you have configured payment terms properly.\nThe latest payment term line should be of the "Balance" type.'))
+#         obj_sequence = self.pool.get('ir.sequence')
+#         for move in self.browse(valid_moves):
+#             if move.name =='/':
+#                 new_name = False
+#                 journal = move.journal_id
+#  
+#                 if invoice and invoice.internal_number:
+#                     new_name = invoice.internal_number
+#                 else:
+#                     if journal.sequence_id:
+#                         c = {'fiscalyear_id': move.period_id.fiscalyear_id.id}
+#                         new_name = obj_sequence.next_by_id(cr, uid, journal.sequence_id.id, c)
+#                     else:
+#                         raise osv.except_osv(_('Error!'), _('Please define a sequence on the journal.'))
+#  
+#                 if new_name:
+#                     move.name = new_name
+# 
+#         cr.execute('UPDATE account_move '\
+#                    'SET state=%s '\
+#                    'WHERE id IN %s',
+#                    ('posted', tuple(valid_moves),))
+#         self.with_context(context=context).invalidate_cache(['state', ], valid_moves)
+#         return True
 
 
 class res_partner(models.Model):

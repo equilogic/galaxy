@@ -27,4 +27,17 @@ class sale_order(models.Model):
 
     _inherit = "sale.order"
     
-    account_id = fields.Many2one('account.invoice', 'Invoice')
+    inv_id = fields.Many2one('account.invoice', 'Invoice')
+
+
+class sale_order_line(models.Model):
+    _inherit = 'sale.order.line'
+
+    inv_line_id = fields.Many2one('account.invoice.line', 'Invoice Line')
+
+
+class purchase_order_line(models.Model):
+    _inherit = 'purchase.order.line'
+
+    inv_line_id = fields.Many2one('account.invoice.line', 'Invoice Line')
+

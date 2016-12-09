@@ -63,7 +63,7 @@ class purchase_order(models.Model):
     
     _inherit = 'purchase.order'
 
-    account_id = fields.Many2one('account.invoice', 'Invoice')
+    inv_id = fields.Many2one('account.invoice', 'Invoice')
     currency_rate = fields.Float(string='Currency rate', digits=(16,4))
 
     partner_inv_id = fields.Many2one('res.partner', 'Invoice Address', readonly=True, required=False,

@@ -31,11 +31,11 @@
     'depends': ['product'],
     'demo': [],
     'data': [
-             'views/product.xml',
              'security/ir.model.access.csv',
              'wizard/wiz_import_products.xml',
              'wizard/wiz_import_customer_supplier.xml',
              'wizard/product_qty_onhand_report.xml',
+             'views/product.xml',
     ],
     'installable': True,
     'application': False,
