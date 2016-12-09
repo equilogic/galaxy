@@ -21,7 +21,7 @@
 ##############################################################################
 
 from openerp import models, fields, api
-from datetime import datetime
+from datetime import datetime, date, timedelta
 from openerp.tools import DEFAULT_SERVER_DATETIME_FORMAT, DEFAULT_SERVER_DATE_FORMAT
 from openerp.exceptions import except_orm, Warning
 from openerp.tools.translate import _
@@ -132,9 +132,9 @@ class account_invoice(models.Model):
 #    partner_id = fields.Many2one('res.partner', string='Partner', change_default=True,
 #        required=True, readonly=True, states={'draft': [('readonly', False)],'open': [('readonly', False)]},
 #        track_visibility='always')
-#    date_invoice = fields.Date(string='Invoice Date',
-#        readonly=True, states={'draft': [('readonly', False)],'open': [('readonly', False)]}, index=True,
-#        help="Keep empty to use the current date", copy=False)
+    date_invoice = fields.Date(string='Invoice Date',
+        readonly=True, states={'draft': [('readonly', False)],'open': [('readonly', False)]}, index=True,
+        help="Keep empty to use the current date", copy=False, default=date.today().strftime('%Y-%m-%d'))
 #    journal_id = fields.Many2one('account.journal', string='Journal',
 #        required=True, readonly=True, states={'draft': [('readonly', False)],'open': [('readonly', False)]},
 #        default=_default_journal,
