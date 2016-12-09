@@ -436,10 +436,8 @@
         </record>
         
         <!-- Menu for Landed cost -->
-<!--
         <menuitem id="landed_cost_menu" parent="base.menu_product"
                   action="landed_cost_list_action"/>
--->
                   
 		 <!-- Ship Via View -->
         <record id="landed_cost_tree_view" model="ir.ui.view" >
@@ -462,10 +460,8 @@
         </record>
         
         <!-- Menu for Landed cost -->
-      <!--
 						  <menuitem id="ship_vai_menu" parent="base.menu_product"
                   action="ship_via_action"/>       
-						-->   
 		<!-- Inherit Action of res.partner -->
 		<record id="action_partner_form" model="ir.actions.act_window">
             <field name="name">Customers</field>
