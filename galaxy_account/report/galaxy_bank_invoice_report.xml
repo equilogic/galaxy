@@ -194,13 +194,6 @@
 								</b>
 							</td>
  						</tr>
-						<tr>
-							<td width="70%" style="color:white">11</td>
-							<td width="15%" style="color:white">11
-							</td>
-							<td width="15%" style="color:white">11
-							</td>
-						</tr>
 					</table>
 					<br/>
 					<div class="text-right">
@@ -402,25 +395,23 @@
 									<td class="text-right" width="10%">
 										<span />
 									</td>
-									<td class="text-left" width="10%" style="padding:5px;">
-										<span t-esc="get_qty(line.quantity)" /><t t-if="get_qty(line.quantity)">
-										pc
-									</t>
+										<td class="text-left" width="10%" style="padding:5px;">
+											<t t-if="line.product_id.non_invenotry_item == False">
+											<t t-if="get_qty(line.quantity)">
+												<span t-esc="get_qty(line.quantity)" />
+											</t>
+											</t>
 									</td>
 									<td width="5%" style="padding:5px;">
-										<!-- <t t-if="get_qty(line.quantity)" class="text-left">
+										<t t-if="line.product_id.non_invenotry_item == False">
+										<t t-if="get_qty(line.quantity)" class="text-left">
 											pc
-										</t> -->
+										</t> 
+										</t>
 									</td>
 									<td class="text-left line" width="35%">
-										<t
-											t-if="o.partner_id.country_id.name == 'Singapore' and o.currency_id.name == 'SGD'">
-											<span style="text-transform:uppercase;" t-field="line.prod_desc" />
-										</t>
-										<t t-if="o.partner_id.country_id.name != 'Singapore'">
-											<div width="25%" style="text-transform:uppercase;"
+										<div width="25%" style="text-transform:uppercase;"
 												t-field="line.name" />
-										</t>
 									</td>
 									<td class="text-right line" width="20%">
 										<span t-field="o.currency_id.name" />
@@ -440,40 +431,12 @@
 								<td width="10%"></td>
 								<td width="10%"></td>
 								<td width="5%"></td>
-								<td width="35%">========================================</td>
-								<td width="20%"></td>
-								<td width="20%"></td>
-							</tr>
-							<tr>
-								<td width="10%"></td>
-								<td width="10%"></td>
-								<td width="5%"></td>
 								<td width="35%">
 									<div>
-										ADD INVOICE NO :
-										<span style="text-transform:uppercase;" t-field="o.number" />
-									</div>
-								</td>
-								<td width="20%"></td>
-								<td width="20%"></td>
-							</tr>
-							<tr>
-								<td width="10%"></td>
-								<td width="10%"></td>
-								<td width="5%"></td>
-								<td width="35%">========================================</td>
-								<td width="20%"></td>
-								<td width="20%"></td>
-							</tr>
-
-							<tr>
-								<td width="10%"></td>
-								<td width="10%"></td>
-								<td width="5%"></td>
-								<td width="35%">
-									<div>
+										<t if="o.payment_term">
 										TERMS :
 										<span style="text-transform:uppercase;" t-field="o.payment_term" />
+										</t>
 									</div>
 
 								</td>

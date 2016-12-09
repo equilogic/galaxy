@@ -10,6 +10,8 @@
                     <field name="brand"/>
                     <field name="flavor"/>
                     <field name="gender"/>
+                	<field name='non_invenotry_item' />
+                	<field name='manufacture_by' />                    
                 </xpath>
                 <xpath expr="//notebook/page[@string='Sales']" position="after">
                     <page string="Origin">

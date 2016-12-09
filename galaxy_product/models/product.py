@@ -32,7 +32,9 @@ class ProductTemplate(models.Model):
     flavor = fields.Many2one('flavor.flavor', string="Flavor")
     gender = fields.Selection([('male', "Male"), ('female', "Female")], default='male')
     origin_ids = fields.One2many('origin.origin', 'product_id', string="Origin")
-
+    non_invenotry_item =  fields.Boolean('Non Inventory Item')
+    manufacture_by =  fields.Char('Manufacture By')
+    
 #    @api.v7
 #    def _check_product_code_unique(self, cr, uid, ids, context=None):
 #        for product in self.browse(cr, uid, ids, context=context):
@@ -112,7 +114,7 @@ class product_product(models.Model):
             name = d.get('name','')
             code = context.get('display_default_code', True) and d.get('default_code',False) or False
             if code:
-                name = '%s%s' % (code,name)
+                name = '%s' % (code)
             return (d['id'], name)
 
         partner_id = context.get('partner_id', False)
@@ -147,7 +149,7 @@ class product_product(models.Model):
             else:
                 mydict = {
                           'id': product.id,
-#                          'name': name,
+#                          'name': product.qty_available,
                           'default_code': product.default_code,
                           }
                 result.append(_name_get(mydict))

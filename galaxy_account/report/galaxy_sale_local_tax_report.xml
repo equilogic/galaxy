@@ -150,16 +150,6 @@
 								<span t-field="o.currency_id.symbol" />
 								<span t-field="o.amount_total" /></b>
 							</td>							
-<!-- 							<td width="10%" class="text-right">
-								<b>
-									<span t-field="o.currency_id.name" /><span t-field="o.currency_id.symbol" /><span t-field="o.amount_total" />
-								</b>
-							</td> -->
-						</tr>
-						<tr>
-							<td width="70%" style="color:white">11</td>
-							<td width="15%" style="color:white">11</td>
-							<td width="15%" style="color:white">11</td>
 						</tr>
 					</table>
 					<br />
@@ -313,14 +303,17 @@
 							<tr t-foreach="o.invoice_line" t-as="line">
 
 								<td class="text-left" width="10%" style="padding:5px;font-size:11px;">
-									<span t-esc="get_qty(line.quantity)" /> <t t-if="get_qty(line.quantity)">
-										pc
+									<t t-if="line.product_id.non_invenotry_item == False">
+										<span t-esc="get_qty(line.quantity)" /> <t t-if="get_qty(line.quantity)">
+										</t>
 									</t>
 								</td>
 								<td width="5%" style="padding:5px;font-size:12px;" class="text-left">
-									<!-- <t t-if="get_qty(line.quantity)">
-										pc
-									</t> -->
+									<t t-if="line.product_id.non_invenotry_item == False">
+										<t t-if="get_qty(line.quantity)">
+											pc
+										</t>
+									</t>
 								</td>
 								<td class="text-left line" width="35%" style="font-size:11px">
 									<t

@@ -6,6 +6,19 @@
 			<field name="model">purchase.order</field>
 			<field name="inherit_id" ref="purchase.purchase_order_form" />
 			<field name="arch" type="xml">
+                 <button name="wkf_send_rfq" states="draft" string="Send RFQ by Email" 
+                 		type="object" context="{'send_rfq':True}" class="oe_highlight" position='replace'>
+               		<button name="wkf_send_rfq" string="Send RFQ by Email" 
+                 		type="object" context="{'send_rfq':True}" invisible="1" class="oe_highlight"/>
+                 </button>
+                 <button name="wkf_send_rfq" states="sent"  string="Re-Send RFQ by Email" 
+                 		type="object" context="{'send_rfq':True}" position='replace'>
+                 	<button name="wkf_send_rfq" string="Re-Send RFQ by Email" 
+                 		type="object" context="{'send_rfq':True}" invisible="1" />
+                 </button>	
+                 <button name="wkf_send_rfq" states="approved" string="Send PO by Email" type="object" context="{'send_rfq':False}" position='replace'>
+                 	<button name="wkf_send_rfq" invisible="1" string="Send PO by Email" type="object" context="{'send_rfq':False}"/>
+                 </button>		
 			     <xpath expr="//form[@string='Purchase Order']/header/button[@name='print_quotation']" position='attributes'>
 			         <attribute name="invisible">1</attribute>
 			     </xpath>
