@@ -42,6 +42,15 @@ class ProductTemplate(models.Model):
 #                return False
 #        return True
 
+
+class container_container(models.Model):
+    _name = 'container.container'
+    _description = "Containers"
+
+    name = fields.Char(string='Name')
+    code = fields.Char(string='Code')
+
+
 class brand(models.Model):
     _name = 'brand.brand'
     _description = "Product Brand"
@@ -49,12 +58,14 @@ class brand(models.Model):
     name = fields.Char('Name')
     code = fields.Char('Code')
 
+
 class flavor(models.Model):
     _name = 'flavor.flavor'
     _description = "Product Flavor"
 
     name = fields.Char('Name')
     code = fields.Char('Code')
+
 
 class origin(models.Model):
     _name = 'origin.origin'

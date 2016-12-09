@@ -203,6 +203,63 @@
             <field name="context">{"search_default_filter_to_sell":1}</field>
         </record>
      
-     <delete model="ir.ui.menu" search="[('name','=','Product Variants')]"/>
+        <delete model="ir.ui.menu" search="[('name','=','Product Variants')]"/>
+     
+        <!--  Container Tree View-->
+        <record model="ir.ui.view" id="container_tree_view">
+            <field name="name">container.container.tree</field>
+            <field name="model">container.container</field>
+            <field name="arch" type="xml">
+                <tree string="Container">
+                    <field name="name"/>
+                    <field name="code"/>
+                </tree>
+            </field>
+        </record>
+
+        <!-- Container Form View -->
+        <record model="ir.ui.view" id="container_form_view">
+            <field name="name">container.container.form</field>
+            <field name="model">container.container</field>
+            <field name="arch" type="xml">
+                <form string="Container">
+                    <sheet>
+                        <group>
+                            <field name="name" required="1"/>
+                            <field name="code"/>
+                        </group>
+                    </sheet>
+                </form>
+            </field>
+        </record>
+
+        <!-- search View-->
+        <record id="container_container_search_view" model="ir.ui.view">
+            <field name="name">container.container.search.view</field>
+            <field name="model">container.container</field>
+            <field name="arch" type="xml">
+                <search string="Containers">
+                    <field name="name"/>
+                    <field name="code"/>
+                    <group expand="1" string="Group By">
+                        <filter string="Name" name="name" context="{'group_by':'name'}"/>
+                        <filter string="Code" name="code" context="{'group_by':'code'}"/>
+                    </group>
+                </search>
+            </field>
+        </record>
+
+        <!-- Container Action -->
+        <record model="ir.actions.act_window" id="container_action">
+            <field name="name">Containers</field>
+            <field name="res_model">container.container</field>
+            <field name="view_type">form</field>
+            <field name="view_mode">tree,form</field>
+        </record>
+        
+        <!-- Menu for Container -->
+        <menuitem id="container_menu" name="Containers" parent="base.menu_product"
+                  action="container_action" sequence="10"/>
+     
 	</data>
 </openerp>
