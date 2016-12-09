@@ -25,6 +25,7 @@ from datetime import datetime, date, timedelta
 from openerp.tools import DEFAULT_SERVER_DATETIME_FORMAT, DEFAULT_SERVER_DATE_FORMAT
 from openerp.exceptions import except_orm, Warning
 from openerp.tools.translate import _
+import openerp.addons.decimal_precision as dp
 
 # mapping invoice type to journal type
 TYPE2JOURNAL = {
@@ -139,7 +140,48 @@ class account_invoice(models.Model):
     export = fields.Boolean('Export', readonly=True, states={'draft': [('readonly', False)], 'open': [('readonly', False)]})
     direct_shipemt = fields.Boolean('Direct Shipment', readonly=True, states={'draft': [('readonly', False)], 'open': [('readonly', False)]})
 
+    discount_type = fields.Selection([('percent', 'Percentage'), ('amount', 'Amount')], 'Discount Type', readonly=True,
+                                     states={'draft': [('readonly', False)]})
+    discount_rate = fields.Float('Discount Rate',
+                                 digits_compute=dp.get_precision('Account'),
+                                 readonly=True,
+                                 states={'draft': [('readonly', False)]})
+    amount_discount = fields.Float(string='Discount',
+                                   digits=dp.get_precision('Account'),
+                                   readonly=True, compute='_compute_amount')
     
+#    @api.multi
+#    def compute_discount(self, discount):
+#        for inv in self:
+#            val1 = val2 = 0.0
+#            disc_amnt = 0.0
+#            val2 = sum(line.amount for line in self.tax_line)
+#            for line in inv.invoice_line:
+#                val1 += (line.quantity * line.price_unit)
+#                line.discount = discount
+#                disc_amnt += (line.quantity * line.price_unit) * discount / 100
+#            total = val1 + val2 - disc_amnt
+#            self.amount_discount = disc_amnt
+#            self.amount_tax = val2
+#            self.amount_total = total
+#
+#    @api.onchange('discount_type', 'discount_rate')
+#    def supply_rate(self):
+#        for inv in self:
+#            if inv.discount_rate != 0:
+#                amount = sum(line.price_subtotal for line in self.invoice_line)
+#                tax = sum(line.amount for line in self.tax_line)
+#                if inv.discount_type == 'percent':
+#                    self.compute_discount(inv.discount_rate)
+#                else:
+#                    total = 0.0
+#                    discount = 0.0
+#                    for line in inv.invoice_line:
+#                        total += (line.quantity * line.price_unit)
+#                    if inv.discount_rate != 0:
+#                        discount = (inv.discount_rate / total) * 100
+#                    self.compute_discount(discount)
+                        
     ####    
     # This Fields Overrite to Edit its value after validate invoice.(TO Change Attrs and domains)
     ####
@@ -196,6 +238,21 @@ class account_invoice(models.Model):
         readonly=True, states={'draft': [('readonly', False)],'open': [('readonly', False)]})
     invoice_line = fields.One2many('account.invoice.line', 'invoice_id', string='Invoice Lines',
         readonly=True, states={'draft': [('readonly', False)],'open': [('readonly', False)]}, copy=True)
+    
+    state = fields.Selection([
+            ('draft','Proforma'),
+            ('proforma','Pro-forma'),
+            ('proforma2','Pro-forma'),
+            ('open','Open'),
+            ('paid','Paid'),
+            ('cancel','Cancelled'),
+        ], string='Status', index=True, readonly=True, default='draft',
+        track_visibility='onchange', copy=False,
+        help=" * The 'Draft' status is used when a user is encoding a new and unconfirmed Invoice.\n"
+             " * The 'Pro-forma' when invoice is in Pro-forma status,invoice does not have an invoice number.\n"
+             " * The 'Open' status is used when user create invoice,a invoice number is generated.Its in open status till user does not pay invoice.\n"
+             " * The 'Paid' status is set automatically when the invoice is paid. Its related journal entries may or may not be reconciled.\n"
+             " * The 'Cancelled' status is used when user cancel invoice.")
     
     @api.onchange('part_ship_id')
     def onchange_part_ship_add(self):
@@ -256,7 +313,13 @@ class account_invoice(models.Model):
     def onchange_export(self):
         account_tax_pool = self.env['account.tax']
         account_line_pool = self.env['account.invoice.line']
+        curr = self.env['res.currency'].search([('name','=','USD')])
+        curr_sgd = self.env['res.currency'].search([('name','=','SGD')])
         for inv_rec in self:
+            if inv_rec.export:
+                inv_rec.currency_id = curr and curr.id
+            else:
+                inv_rec.currency_id = curr_sgd and curr_sgd.id
             if inv_rec.type == 'out_invoice' and inv_rec.export:
                 zero_per_tax = account_tax_pool.search([('description','=','0% ZR')])
                 if inv_rec.invoice_line:
@@ -390,12 +453,25 @@ class account_invoice(models.Model):
     @api.depends('invoice_line.price_subtotal', 'tax_line.amount','landed_cost')
     def _compute_amount(self):
         val=0.0
+        discount= 0.0
+        total=0.0
         for cost in self.landed_cost:
             val += cost.amount
         self.landed_cost_price = self.currency_id.round(val)
+        if self.discount_type == 'percent':
+            if self.discount_rate != 0:
+                for line in self.invoice_line:
+                    total += (line.quantity * line.price_unit) 
+                discount = self.discount_rate  / 100.0
+        else:
+            discount = self.discount_rate
+        if total == 0:
+            total = 1
+        print 
+        self.amount_discount = discount * total
         self.amount_untaxed = self.currency_id.round(sum(line.price_subtotal for line in self.invoice_line))
         self.amount_tax = self.currency_id.round(sum(line.amount for line in self.tax_line))
-        self.amount_total = self.amount_untaxed + self.amount_tax+self.landed_cost_price
+        self.amount_total = self.amount_untaxed + self.amount_tax+self.landed_cost_price - self.amount_discount
         
 
     @api.multi
@@ -691,18 +767,39 @@ class account_invoice(models.Model):
                             purch_line_id = purchase_l_obj.search([('inv_line_id', '=', inv_line[1])])
                             if purch_line_id:
                                 purch_line_id.write(p_lines_vals)
-                        if pick_lines_vals and pick_ord_id:
-                            sale_line_id_new = sale_l_obj.search([('inv_line_id', '=', inv_line[1])])
-                            pick_line_id = pick_line_obj.search([('sale_line_id', '=', sale_line_id_new.id)])
-                            q_id = stock_quant_obj.search([()])
-                            if pick_line_id:
-                                diff = 0.0
-                                pick_line_id.write(pick_lines_vals)
-                                for quant_id in pick_line_id.quant_ids:
-                                    diff = quant_id.qty - pick_line_id.product_uom_qty
-                                    if pick_line_id.product_id.id == quant_id.product_id.id:
-                                        quant_id.write({'qty': pick_line_id.product_uom_qty})
-                                                                
+                        if inv.type =='out_invoice':
+                            if pick_lines_vals and pick_ord_id:
+                                sale_line_id_new = sale_l_obj.search([('inv_line_id', '=', inv_line[1])])
+                                pick_line_id = pick_line_obj.search([('sale_line_id', '=', sale_line_id_new.id)])
+                                if pick_line_id:
+                                    pick_line_id.write(pick_lines_vals)
+                                    self._cr.execute('select quant_id from stock_quant_move_rel  where move_id=%s',(pick_line_id.id, ))
+                                    quant_id = self._cr.fetchone()
+                                    quat_data = stock_quant_obj.browse(quant_id)
+                                    stock_quant_obj.create({'product_id': sale_line_id_new.product_id.id,
+                                                            'qty': quat_data.qty - pick_lines_vals.get('product_uom_qty'),
+                                                            'in_date': sale_line_id_new.order_id.date_order,
+                                                            'location_id': pick_line_id.location_id.id})  
+                                    quat_data.write({'qty': pick_lines_vals.get('product_uom_qty')})
+                        else:
+                            pur_line_id_new = purchase_l_obj.search([('inv_line_id', '=', inv_line[1])])
+                            pick_det_line_id = pick_line_obj.search([('purchase_line_id', '=', pur_line_id_new.id)])
+                            diff = 0
+                            if pick_det_line_id:
+                                pick_det_line_id.write(pick_lines_vals)
+                                self._cr.execute('select quant_id from stock_quant_move_rel  where move_id=%s',(pick_det_line_id.id, ))
+                                quant_id = self._cr.fetchone()
+                                quat_data = stock_quant_obj.browse(quant_id)
+                                if quat_data.qty - pick_lines_vals.get('product_uom_qty') > 0:
+                                    diff = - quat_data.qty - pick_lines_vals.get('product_uom_qty')
+                                else:
+                                    diff = quat_data.qty - pick_lines_vals.get('product_uom_qty')
+                                stock_quant_obj.create({'product_id': pur_line_id_new.product_id.id,
+                                                        'qty': -(quat_data.qty - pick_lines_vals.get('product_uom_qty')),
+                                                        'in_date': pur_line_id_new.order_id.date_order,
+                                                        'location_id': pick_det_line_id.location_id.id})  
+                                quat_data.write({'qty': pick_lines_vals.get('product_uom_qty')})                           
+                                
                     if inv_line[2] and not inv_line[1]:
                         s_lines_vals = {}
                         p_lines_vals = {}
@@ -746,6 +843,10 @@ class account_invoice(models.Model):
                             if inv_l_id:
                                 p_lines_vals.append({'inv_line_id': inv_l_id.ids[0] or False})
                             purchase_ord_vals.update({'order_line': [(0,0, p_lines_vals)]})
+                            
+                        if pick_lines_vals and pick_ord_id:
+                            pick_lines_vals.update({'state': 'done'})
+                            picking_ord_vals.update({'order_line': [(0,0, pick_lines_vals)]})
                         if pick_ord_id and pick_lines_vals:
                             picking_ord_vals.update({'move_lines': pick_lines_vals})
             if sale_ord_id and sale_ord_vals:

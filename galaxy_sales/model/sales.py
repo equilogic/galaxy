@@ -34,13 +34,15 @@ class sale_order_line(models.Model):
     
     @api.model
     def create(self, values):
+        product_lst = []
         prod_obj=self.env['product.product'].browse(values.get('product_id'))
         qty=prod_obj.qty_available
+        product_lst.append(prod_obj.description)
         if qty > 0 and values.get('product_uom_qty', 0.0) <= qty:
             return super(sale_order_line, self).create(values)
         else :
             raise except_orm(_('Product Stock is not Available!'),
-                _('Please check Product.'))
+                _('Please check Product %s') % product_lst)
             return False
     
     @api.model

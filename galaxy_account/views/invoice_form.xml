@@ -72,33 +72,6 @@
 					     context="{'periods_special': False, 'all_fiscalyear': True}"/>
 				 </field>              
 
-                 <xpath expr="//div[@class='oe_clear']" position="before">
-                     <group>
-                         <group class="oe_left">
-                             <field name="discount_view"/>
-                             <field name="discount_type"/>
-                         </group>
-                         <group>
-                             <button name="button_dummy" states="draft" string="(update)" type="object"
-                                     class="oe_edit_only oe_link oe_right" invisible="1"/>
-                         </group>
-                         <group class="oe_left">
-                             <field name="discount_value"
-                                    attrs="{'invisible':[('discount_type', 'not in', ['Fixed', 'Percentage'])]}"/>
-                         </group>
-                         <group class="oe_right">
-                             <button name="button_dummy" string="(update)" type="object"
-                                     class="oe_edit_only oe_link"
-                                     attrs="{'invisible':['|',('discount_type', 'not in', ['Fixed', 'Percentage']),('state','not in',['draft'])]}"/>
-                         </group>
-                     </group>
-
-                 </xpath>
-                 <xpath expr="//field[@name='amount_tax']" position="after">
-                     <field name="discounted_amount" widget="monetary" options="{'currency_field': 'currency_id'}"
-                            attrs="{'invisible':[('discount_type', 'not in', ['Fixed', 'Percentage'])]}"/>
-                 </xpath>
-                                                    				
                 <xpath expr="//form/sheet" position="attributes">
                     <attribute name="class">oe_form_sheet_width_wider</attribute>
                 </xpath>			
@@ -224,6 +197,29 @@
 						domain="[('parent_id','=',False),('company_id', '=', parent.company_id)]" />
 				</xpath>
 
+                <xpath expr="//group[@class='oe_subtotal_footer oe_right']" position="replace">
+                    <group col="4">
+                        <group name="discount">
+                            <field name="discount_type"/>
+                            <field name="discount_rate"/>
+                        </group>
+                        <group class="oe_subtotal_footer oe_right">
+                            <field name="amount_untaxed" widget="monetary" options="{'currency_field': 'currency_id'}"/>
+                            <field name="amount_discount" widget='monetary' options="{'currency_field': 'currency_id'}"/>
+                            <div>
+                                <label for="amount_tax"/>
+                                <button name="button_reset_taxes" states="draft,proforma2"
+                                        string="(update)" class="oe_link oe_edit_only"
+                                        type="object" help="Recompute taxes and total"/>
+                            </div>
+                            <field name="amount_tax" nolabel="1" widget="monetary" options="{'currency_field': 'currency_id'}"/>
+                            <field name="amount_total" class="oe_subtotal_footer_separator" widget="monetary" options="{'currency_field': 'currency_id'}"/>
+                            <field name="residual" groups="account.group_account_user" widget="monetary" options="{'currency_field': 'currency_id'}"/>
+                            <field name="reconciled" invisible="1"/>
+                        </group>
+                    </group>
+                </xpath>
+                
 				<xpath
 					expr="//page[@string='Invoice Lines']/field[@name='invoice_line']/tree[@string='Invoice Lines']/field[@name='invoice_line_tax_id']"
 					position='replace'>
