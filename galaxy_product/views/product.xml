@@ -11,7 +11,8 @@
                     <field name="flavor"/>
                     <field name="gender"/>
                 	<field name='non_invenotry_item' />
-                	<field name='manufacture_by' />                    
+                	<field name='manufacture_by' />         
+                	<field name="origin_data"/>           
                 </xpath>
                 <xpath expr="//notebook/page[@string='Sales']" position="after">
                     <page string="Origin">

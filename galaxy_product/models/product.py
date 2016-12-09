@@ -34,6 +34,7 @@ class ProductTemplate(models.Model):
     origin_ids = fields.One2many('origin.origin', 'product_id', string="Origin")
     non_invenotry_item =  fields.Boolean('Non Inventory Item')
     manufacture_by =  fields.Char('Manufacture By')
+    origin_data = fields.Char('Origin')
 
     @api.onchange('non_invenotry_item')
     def onchange_currency_id(self):

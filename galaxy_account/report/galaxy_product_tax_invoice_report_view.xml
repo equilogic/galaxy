@@ -428,7 +428,7 @@
 										</t>
 									</td>
 									<td class="text-left line" width="10%">
-										<span style="text-transform:uppercase;" t-esc="origin(line)" />
+										<span style="text-transform:uppercase;" t-field="line.product_id.origin_data" />
 									</td>
 									<td class="text-right line" width="20%">
 										<span t-field="o.currency_id.name" />
