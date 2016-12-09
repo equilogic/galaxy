@@ -1,5 +1,50 @@
 <openerp>
 	<data>
+		
+
+		<!-- Inherited Form View of Invoice Tree (Customer Invoices) -->
+		<record id="invoice_tree_inherited_new" model="ir.ui.view">
+			<field name="name">invoice.tree.inherited.new</field>
+			<field name="model">account.invoice</field>
+			<field name="inherit_id" ref="account.invoice_tree" />
+			<field name="arch" type="xml">
+				 <xpath expr="//tree/field[@name='number']" position="attributes">
+                    <attribute name="string">Invoice No.</attribute>
+                </xpath>
+                <xpath expr="//tree/field[@name='user_id']" position="attributes">
+                    <attribute name="invisible">1</attribute>
+                </xpath>
+                 <xpath expr="//tree/field[@name='date_due']" position="attributes">
+                    <attribute name="invisible">1</attribute>
+                </xpath>
+                 <xpath expr="//tree/field[@name='origin']" position="attributes">
+                    <attribute name="invisible">1</attribute>
+                </xpath>
+                 <xpath expr="//tree/field[@name='residual']" position="attributes">
+                    <attribute name="invisible">1</attribute>
+                </xpath>
+           </field>
+       </record>
+
+
+		<record id="action_view_del_order_from_invoice" model="ir.actions.act_window">
+            <field name="name">Delievery Order</field>
+            <field name="res_model">stock.picking</field>
+            <field name="view_type">form</field>
+            <field name="view_mode">tree,form</field>
+            <field name="view_id" ref="stock.vpicktree"/>
+             <field name="domain">[('inv_id','=',active_id)]</field>
+        </record>
+
+		<record id="action_view_sale_order_from_invoice" model="ir.actions.act_window">
+            <field name="name">Sale Order</field>
+            <field name="res_model">sale.order</field>
+            <field name="view_type">form</field>
+            <field name="view_mode">tree,form</field>
+            <field name="view_id" ref="sale.view_order_tree"/>
+             <field name="domain">[('inv_id','=',active_id)]</field>
+        </record>
+
 		<!-- Inherited Form View of Invoice Form (Customer Invoices) -->
 		<record id="invoice_form_inherited_new" model="ir.ui.view">
 			<field name="name">invoice.form.inherited.new</field>
@@ -10,7 +55,14 @@
 					<button name="%(wiz_galaxy_add_prod_in_inv_action)d" string="Add Products"
 						type="action" states="draft" groups="base.group_user" />
 				</field>
-							
+				<xpath expr="//form/sheet[@string='Invoice']/h1" position="after">
+					<div class="oe_right oe_button_box" name="btn_sale_order">
+	                        <button class="oe_inline oe_stat_button" name="%(action_view_sale_order_from_invoice)d"
+	                            string="Sale Order" type="action" widget="statinfo" icon="fa-pencil-square-o"/>
+	                        <button class="oe_inline oe_stat_button" name="%(action_view_del_order_from_invoice)d"
+	                            string="Delivery Order" type="action" widget="statinfo" icon="fa-pencil-square-o"/>
+	            	</div>
+				</xpath>
                 <xpath expr="//form/sheet" position="attributes">
                     <attribute name="class">oe_form_sheet_width_wider</attribute>
                 </xpath>			
@@ -384,8 +436,10 @@
         </record>
         
         <!-- Menu for Landed cost -->
+<!--
         <menuitem id="landed_cost_menu" parent="base.menu_product"
                   action="landed_cost_list_action"/>
+-->
                   
 		 <!-- Ship Via View -->
         <record id="landed_cost_tree_view" model="ir.ui.view" >
@@ -408,8 +462,10 @@
         </record>
         
         <!-- Menu for Landed cost -->
-        <menuitem id="ship_vai_menu" parent="base.menu_product"
-                  action="ship_via_action"/>          
+      <!--
+						  <menuitem id="ship_vai_menu" parent="base.menu_product"
+                  action="ship_via_action"/>       
+						-->   
 		<!-- Inherit Action of res.partner -->
 		<record id="action_partner_form" model="ir.actions.act_window">
             <field name="name">Customers</field>
