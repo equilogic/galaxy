@@ -27,6 +27,7 @@
        </record>
 
 
+		<!--Action open from Smart Button named Delievery Order in invoice	-->
 		<record id="action_view_del_order_from_invoice" model="ir.actions.act_window">
             <field name="name">Delievery Order</field>
             <field name="res_model">stock.picking</field>
@@ -36,6 +37,7 @@
              <field name="domain">[('inv_id','=',active_id)]</field>
         </record>
 
+		<!-- Action for open Sale order for customer invoice from smart button -->
 		<record id="action_view_sale_order_from_invoice" model="ir.actions.act_window">
             <field name="name">Sale Order</field>
             <field name="res_model">sale.order</field>
@@ -251,6 +253,16 @@
 			</field>
 		</record>
 
+		<!-- Action for Purchase order for Supplier invoice Smart button named Purchase order -->
+		<record id="action_view_po_frm_inv" model="ir.actions.act_window">
+            <field name="name">Purchase Order</field>
+            <field name="res_model">purchase.order</field>
+            <field name="view_type">form</field>
+            <field name="view_mode">tree,form</field>
+            <field name="view_id" ref="purchase.purchase_order_tree"/>
+             <field name="domain">[('inv_id','=',active_id)]</field>
+        </record>
+
 		<!-- Inherited Form View of Supplier Invoice Form -->
 		<record id="invoice_form_inherited" model="ir.ui.view">
 			<field name="name">invoice.form.inherited</field>
@@ -259,7 +271,15 @@
 			<field name="arch" type="xml">
                 <xpath expr="//form/sheet" position="attributes">
                     <attribute name="class">oe_form_sheet_width_wider</attribute>
-                </xpath>	
+                </xpath>
+                <xpath expr="//form/sheet[@string='Supplier Invoice']/div" position="after">
+					<div class="oe_right oe_button_box" name="btn_sale_order">
+	                        <button class="oe_inline oe_stat_button" name="%(action_view_po_frm_inv)d"
+	                            string="Purchase Order" type="action" widget="statinfo" icon="fa-pencil-square-o"/>
+	                        <button class="oe_inline oe_stat_button" name="%(action_view_del_order_from_invoice)d"
+	                            string="Delivery Order" type="action" widget="statinfo" icon="fa-pencil-square-o"/>
+	            	</div>
+				</xpath>
 				<field name="state"  position="before">
 					<button name="%(wiz_galaxy_add_prod_in_inv_action)d" string="Add Products"
 						type="action" states="draft" groups="base.group_user" />
