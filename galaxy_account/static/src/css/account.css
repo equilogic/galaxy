@@ -16,3 +16,28 @@
   text-align: left !important;
   max-width: 100px;
 }
+
+/* .openerp .oe_list_content > tbody > tr {
+    border-top: 1px solid #671212 !important;
+    border-top: 1px solid #671212 !important;
+    border-left: 1px solid #671212 !important;
+    border-rigth: 1px solid #671212 !important;    
+}
+.openerp .oe_list_content > thead {
+    border-bottom: 1px solid #671212  !important;
+    border-top: 1px solid #671212 !important;
+    border-left: 1px solid #671212 !important;
+    border-rigth: 1px solid #671212 !important;
+}
+.openerp thead th {
+    border-left: 1px solid #671212;
+    border-top: 1px solid #671212;
+    border-left: 1px solid #671212;
+    border-rigth: 1px solid #671212;    
+}
+.openerp .oe_list_content > tfoot {
+    border-top: 1px solid #671212;
+    border-bottom: 1px solid #671212;
+    border-left: 1px solid #671212;
+    border-rigth: 1px solid #671212;    
+}  */

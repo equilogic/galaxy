@@ -108,12 +108,12 @@
 					<field name="currency_rate" />
 				</field>
 
-				<xpath expr="//field[@name='amount_untaxed']" position="after">
+<!-- 				<xpath expr="//field[@name='amount_untaxed']" position="after">
 					<field name="landed_cost_price" readonly="1"
 					widget="monetary" options="{'currency_field': 'currency_id'}" />
-				</xpath>
+				</xpath> -->
 				
-				<xpath expr="//page[@string='Other Information']" position='after'>
+<!-- 				<xpath expr="//page[@string='Other Information']" position='after'>
 					<page string="Landed Cost Details">
 						<field name="landed_cost_sal">
 							<tree editable="bottom">
@@ -122,7 +122,7 @@
 							</tree>
 						</field>
 					</page>
-				</xpath>
+				</xpath> -->
 
 			</field>
 		</record>

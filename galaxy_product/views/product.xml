@@ -6,15 +6,19 @@
             <field name="model">product.template</field>
             <field name="inherit_id" ref="product.product_template_form_view"/>
             <field name="arch" type="xml">
+            	<field name="id" position="after">
+            		<field name="default_code" attrs="{'invisible': [('product_variant_count', '>', 1)]}"/>
+            	</field>
                 <xpath expr="//group/field[@name='type']" position="after">
                     <field name="brand"/>
                     <field name="flavor"/>
                     <field name="gender"/>
                 	<field name='non_invenotry_item' />
                 	<field name='manufacture_by' />         
-                	<field name="origin_data"/>           
+                	<field name="origin_data"/>      
+                	<field name="qty_on_hand" invisible="1"/>     
                 </xpath>
-                <xpath expr="//notebook/page[@string='Sales']" position="after">
+                <!-- <xpath expr="//notebook/page[@string='Sales']" position="after">
                     <page string="Origin">
                         <field name="origin_ids">
                             <form>
@@ -31,7 +35,7 @@
                             </tree>
                         </field>
                     </page>
-                </xpath>
+                </xpath> -->
                  <xpath expr="//field[@name='description']" position="before">
                     <separator string="Full Description"/>
                 </xpath>
@@ -112,6 +116,9 @@
                 <xpath expr="//field[@name='default_code']" position="attributes">
                     <attribute name="string">Item No</attribute>
                 </xpath>
+               <field name="ean13" attrs="{'invisible': [('product_variant_count', '>', 1)]}" position="replace">
+               		<field name="ean13" invisible="1"/>
+               </field>
             </field>
         </record>
              

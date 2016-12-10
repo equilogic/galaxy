@@ -35,6 +35,17 @@ class ProductTemplate(models.Model):
     non_invenotry_item =  fields.Boolean('Non Inventory Item')
     manufacture_by =  fields.Char('Manufacture By')
     origin_data = fields.Char('Origin')
+    qty_on_hand = fields.Integer(compute = '_get_on_hand_qty', string='Qty Available')
+    
+    @api.multi
+    @api.depends('qty_on_hand')
+    def _get_on_hand_qty(self):
+        """
+            This method calculate aqy available
+        """
+        for cost in self:
+            print "cost.qty_available ==",cost.qty_available 
+            cost.qty_on_hand = cost.qty_available    
 
     @api.onchange('non_invenotry_item')
     def onchange_currency_id(self):
@@ -122,7 +133,7 @@ class product_product(models.Model):
             name = d.get('name','')
             code = context.get('display_default_code', True) and d.get('default_code',False) or False
             if code:
-                name = '%s' % (code)
+                name = '%s %s' % (code, name)
             return (d['id'], name)
 
         partner_id = context.get('partner_id', False)
@@ -150,8 +161,9 @@ class product_product(models.Model):
                         ) or False
                     mydict = {
                               'id': product.id,
-                              'name': seller_variant or name,
+#                              'name': seller_variant or name,
                               'default_code': s.product_code or product.default_code,
+#                              'qty': product.qty_on_hand
                               }
                     result.append(_name_get(mydict))
             else:
