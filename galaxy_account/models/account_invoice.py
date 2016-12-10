@@ -770,17 +770,20 @@ class account_invoice(models.Model):
                             if inv.type == 'out_invoice':
                                 if pick_lines_vals and pick_ord_id:
                                     sale_line_id_new = sale_l_obj.search([('inv_line_id', '=', inv_line[1])])
-                                    pick_line_id = pick_line_obj.search([('sale_line_id', '=', sale_line_id_new.id)])
-                                    if pick_line_id:
-                                        pick_line_id.write(pick_lines_vals)
-                                        self._cr.execute('select quant_id from stock_quant_move_rel  where move_id=%s', (pick_line_id.id,))
-                                        quant_id = self._cr.fetchone()
-                                        quat_data = stock_quant_obj.browse(quant_id)
-                                        new_qnt = stock_quant_obj.create({'product_id': sale_line_id_new.product_id.id,
-                                                                'qty': quat_data.qty - pick_lines_vals.get('product_uom_qty'),
-                                                                'in_date': sale_line_id_new.order_id.date_order,
-                                                                'location_id': pick_line_id.location_id.id})
-                                        quat_data.write({'qty': pick_lines_vals.get('product_uom_qty')})
+                                    pick_line_ids = False
+                                    if sale_line_id_new:
+                                        pick_line_ids = pick_line_obj.search([('sale_line_id', '=', sale_line_id_new.id)])
+                                    if pick_line_ids:
+                                        for pick_line_id in pick_line_ids:
+                                                pick_line_id.write(pick_lines_vals)
+                                                self._cr.execute('select quant_id from stock_quant_move_rel  where move_id=%s', (pick_line_id.id,))
+                                                quant_id = self._cr.fetchone()
+                                                quat_data = stock_quant_obj.browse(quant_id)
+                                                new_qnt = stock_quant_obj.create({'product_id': sale_line_id_new.product_id.id,
+                                                                        'qty': quat_data.qty - pick_lines_vals.get('product_uom_qty'),
+                                                                        'in_date': sale_line_id_new.order_id.date_order,
+                                                                        'location_id': pick_line_id.location_id.id})
+                                                quat_data.write({'qty': pick_lines_vals.get('product_uom_qty')})
                             else:
                                 pur_line_id_new = purchase_l_obj.search([('inv_line_id', '=', inv_line[1])])
                                 pick_det_line_id = pick_line_obj.search([('purchase_line_id', '=', pur_line_id_new.id)])
