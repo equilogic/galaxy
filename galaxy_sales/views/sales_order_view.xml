@@ -1,6 +1,19 @@
 <openerp>
 	<data>
 
+		<!-- Inherited Tree view of sale order -->
+		<record id="inherited_sale_tree_view" model="ir.ui.view">
+			<field name="name">inherited.sale.order.tree.view.ex</field>
+			<field name="model">sale.order</field>
+			<field name="inherit_id" ref="sale.view_order_tree" />
+			<field name="arch" type="xml">
+                <xpath expr="/tree/field[@name='user_id']" position='attributes'>
+                    <attribute name="invisible">1</attribute>
+                </xpath>
+			</field>
+		</record>
+
+
 		<!-- Inherited form view of sale order -->
 		<record id="inherited_sale_form_view" model="ir.ui.view">
 			<field name="name">inherited.sale.form.view.ex</field>

@@ -203,7 +203,7 @@
             <field name="view_mode">tree,kanban,form</field>
             <field name="view_type">form</field>
             <field name="view_id" ref="product.product_template_tree_view"/>
-            <field name="context">{"search_default_filter_to_sell":1}</field>
+            <field name="context">{"search_default_filter_to_sell":1,"search_default_real_stock_available":1}</field>
         </record>
      
         <delete model="ir.ui.menu" search="[('name','=','Product Variants')]"/>
