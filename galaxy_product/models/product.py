@@ -33,9 +33,10 @@ class ProductTemplate(models.Model):
     gender = fields.Selection([('male', "Male"), ('female', "Female")], default='male')
     origin_ids = fields.One2many('origin.origin', 'product_id', string="Origin")
     non_invenotry_item =  fields.Boolean('Non Inventory Item')
-    manufacture_by =  fields.Char('Manufacture By')
+    manufacture_by =  fields.Text('Manufacture By')
     origin_data = fields.Char('Origin')
     qty_on_hand = fields.Integer(compute = '_get_on_hand_qty', string='Qty Available')
+    print_manufacture =  fields.Boolean('Print on Report')
     
     @api.multi
     @api.depends('qty_on_hand')

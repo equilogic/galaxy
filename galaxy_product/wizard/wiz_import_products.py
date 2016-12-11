@@ -45,12 +45,13 @@ class wiz_import_products(models.TransientModel):
                                 products_ids = []
                                 for header_l in header_list:
                                     rec_value = final_product_dict.get(header_l, False) or False
+                                    print "rec_value==========",rec_value
                                     if header_l == 'Item Name':
 #                                        if rec_value:
 #                                            products_ids = prod_obj.search([('name', '=', ustr(rec_value))])
-                                        product_vals.update({'name': rec_value or ''})
+                                        product_vals.update({'name': ustr(rec_value) or ''})
                                     if header_l == 'Full Description':
-                                        product_vals.update({'description': rec_value or ''})
+                                        product_vals.update({'description': ustr(rec_value) or ''})
                                     if header_l == 'Internal Reference':
                                         if rec_value:
                                             products_ids = prod_obj.search([('default_code', '=', ustr(rec_value))])
@@ -59,6 +60,32 @@ class wiz_import_products(models.TransientModel):
                                         product_vals.update({'list_price': rec_value or 0.0})
                                     elif header_l == 'Cost Price':
                                         product_vals.update({'standard_price': rec_value or 0.0})
+                                    elif header_l == 'Origin':
+                                        product_vals.update({'origin_data': rec_value or ''})
+                                    elif header_l == 'Brand':
+                                        brand_id = self.env['brand.brand'].search([('name','=', ustr(rec_value))])
+                                        if not brand_id:
+                                            self._cr.execute("insert into brand_brand \
+                                            (name) \
+                                            values (%s)  RETURNING id \
+                                            ", ( ustr(rec_value), ))
+                                            brand_rec = self._cr.fetchone()
+                                            brd_id = brand_rec and brand_rec[0]
+                                            product_vals.update({'brand': brd_id or False})
+                                        else:
+                                            product_vals.update({'brand': brand_id.id or False})
+                                    elif header_l == 'Category':
+                                        catg_id = self.env['product.category'].search([('name','=', ustr(rec_value))])
+                                        if not catg_id:
+                                            self._cr.execute("insert into product_category \
+                                                (name,parent_id) \
+                                                values (%s, 1)  RETURNING id \
+                                                ", ( ustr(rec_value), ))
+                                            cat_id = self._cr.fetchone()   
+                                            product_vals.update({'categ_id': cat_id and cat_id[0] or False})   
+                                        else:                                                     
+                                            product_vals.update({'categ_id': catg_id.id or False})                                        
+                                product_vals.update({'type': 'product'})                                                                                                                
                                 if product_vals and products_ids:
                                     if products_ids:
                                         products_ids.write(product_vals)

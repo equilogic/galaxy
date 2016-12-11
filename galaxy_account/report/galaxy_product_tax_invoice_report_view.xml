@@ -422,7 +422,8 @@
 									<td class="text-left line" width="35%">
 										<t t-if="line.prod_desc">
 											<span style="text-transform:uppercase;" t-field="line.prod_desc" />
-											<t t-if="line.product_id.manufacture_by">
+											<br/>
+											<t t-if="line.product_id.print_manufacture">
 												<span style="text-transform:uppercase;" t-field="line.product_id.manufacture_by" />
 											</t>
 										</t>

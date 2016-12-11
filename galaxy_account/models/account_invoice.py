@@ -137,15 +137,15 @@ class account_invoice(models.Model):
     landed_cost_price = fields.Float(compute = '_compute_amount', store = True, string = 'Landed Amount')
     customer_po = fields.Char(string = "Customer PO")
     delivery_status = fields.Char(string = "Delivery Status")
-    export = fields.Boolean('Export', readonly = True, states = {'draft': [('readonly', False)], 'open': [('readonly', False)]})
-    direct_shipemt = fields.Boolean('Direct Shipment', readonly = True, states = {'draft': [('readonly', False)], 'open': [('readonly', False)]})
+    export = fields.Boolean('Export', readonly = True, states = {'draft': [('readonly', False)]})
+    direct_shipemt = fields.Boolean('Direct Shipment', readonly = True, states = {'draft': [('readonly', False)]})
 
     discount_type = fields.Selection([('percent', 'Percentage'), ('amount', 'Amount')], 'Discount Type', readonly = True,
-                                     states = {'draft': [('readonly', False)]})
+                                     states = {'draft': [('readonly', False)], 'open': [('readonly', False)]})
     discount_rate = fields.Float('Discount Rate',
                                  digits_compute = dp.get_precision('Account'),
                                  readonly = True,
-                                 states = {'draft': [('readonly', False)]})
+                                 states = {'draft': [('readonly', False)], 'open': [('readonly', False)]})
     amount_discount = fields.Float(string = 'Discount',
                                    digits = dp.get_precision('Account'),
                                    readonly = True, compute = '_compute_amount')
@@ -888,13 +888,14 @@ class account_invoice(models.Model):
         if picking_rec:
             return_line = []
             for pick in picking_rec:
-                for move_rec in pick.move_lines:
-                    return_dict = {'product_id': move_rec.product_id.id,
-                                   'move_id': move_rec.id,
-                                   'quantity': move_rec.product_uom_qty,
-                                   }
-                    return_line.append((0, 0, return_dict))
-                    move_rec.write({'state': 'cancel'})
+                if not self.direct_shipemt:
+                    for move_rec in pick.move_lines:
+                        return_dict = {'product_id': move_rec.product_id.id,
+                                       'move_id': move_rec.id,
+                                       'quantity': move_rec.product_uom_qty,
+                                       }
+                        return_line.append((0, 0, return_dict))
+                        move_rec.write({'state': 'cancel'})
             picking_return_rec = self.env['stock.return.picking'].create({'product_return_moves': return_line, 'invoice_state': 'none'})
             for pick in picking_rec:
                 new_picking, old_picking = picking_return_rec.with_context({'active_id': pick.id})._create_returns()
