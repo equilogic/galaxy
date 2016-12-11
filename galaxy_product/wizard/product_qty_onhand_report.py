@@ -36,6 +36,7 @@ class product_qty_on_hand(models.TransientModel):
 
     date_from = fields.Date(string='From', default=datetime.now().date().strftime("%Y-%m-01"))
     date_to = fields.Date(string='To', default=datetime.now().date())
+    
 
     @api.multi
     def print_report(self):
@@ -69,7 +70,7 @@ class product_qty_on_hand(models.TransientModel):
         
         worksheet = wbk.add_sheet('Sales Register Report')
         rep_name = 'Item Register.xls'
-        product_ids = self.env['product.product'].search([('type','!=','service')])
+        product_ids = self.env['product.product'].search([('type','!=','service'), ('qty_available', '>=',0)])
         
         worksheet.row(0).height = 600
         worksheet.write_merge(0, 0, 0, 6, 'Item Register Report ' + ' ( ' + start_dt + ' to ' + end_dt+' ) ', main_header)

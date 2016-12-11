@@ -61,7 +61,7 @@ class report_sales_register_pdf(report_sxw.rml_parse):
 						'customer_po': inv.customer_po or '', 
 						'customer': inv.partner_id and inv.partner_id.name or '',
 						'amount': inv.amount_total or 0.00,
-						'amount_due': inv.residual or 0.00,
+						'amount_due': inv.amount_total or 0.00,
 						'status': GLOBAL_STATE_DICT.get(inv.state, '') or '',
 					})
 		return inv_data_lst

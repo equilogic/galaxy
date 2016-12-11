@@ -37,7 +37,7 @@ class purchaser_reg_pdf_report(report_sxw.rml_parse):
                                  'supplier_inv': data.supplier_invoice_number,
                                  'supplier': data.partner_id.name,
                                  'amount': data.amount_total,
-                                 'amt_due': data.residual,
+                                 'amt_due': data.amount_total,
                                  'state': GLOBAL_STATE_DICT.get(data.state, '') or '',
                                  'delivery_status': data.delivery_status,
                                  })

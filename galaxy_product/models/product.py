@@ -53,8 +53,6 @@ class ProductTemplate(models.Model):
             curr = rec.non_invenotry_item
             if curr:
                 rec.type = 'service'
-            else:
-                rec.type = 'product'
                     
 #    @api.v7
 #    def _check_product_code_unique(self, cr, uid, ids, context=None):

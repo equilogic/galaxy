@@ -68,7 +68,7 @@ class sale_register_report_new(models.Model):
                 inv.customer_po as customer_po_no, rp.name as customer_name,
                 concat(rc.name,rc.symbol) as cur_sym_code,
                 inv.amount_total as amount, 
-                inv.residual as amount_due,
+                inv.amount_total as amount_due,
                 (SELECT string_agg(CAST(s_ord_rel.order_id as varchar), ',') FROM sale_order_invoice_rel s_ord_rel, sale_order s_ord where
                 inv.id = s_ord_rel.invoice_id and s_ord.id = s_ord_rel.order_id) as sales_no
                 FROM account_invoice inv

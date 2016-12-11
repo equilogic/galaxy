@@ -187,7 +187,7 @@ class stock_wiz_report(models.TransientModel):
         worksheet.write(row,col,"Exchange Rate",GREEN_TABLE_HEADER)
         col+=1
         row=3
-        product_ids = self.env['product.product'].search([])
+        product_ids = self.env['product.product'].search([('type','!=','service'), ('qty_available', '>=',0)])
         for product in product_ids:
             name=product.name
             qty=product.qty_available

@@ -54,6 +54,10 @@ class account_invoice_line(models.Model):
     no_origin = fields.Boolean('NO Origin')
     qty_on_hand = fields.Float(related = 'product_id.qty_available', string = 'Quantity On Hand', default = 0.0)
     profoma_qty = fields.Float(compute = '_compute_profoma_qty', string = 'Profoma QTY')
+    discount = fields.Float(string='Discount (%)',
+                            digits=(16, 2),
+                            # digits= dp.get_precision('Discount'),
+                            default=0.0)
 
     @api.multi
     def product_id_change(self, product, uom_id, qty = 0, name = '', type = 'out_invoice',
@@ -149,38 +153,39 @@ class account_invoice(models.Model):
     amount_discount = fields.Float(string = 'Discount',
                                    digits = dp.get_precision('Account'),
                                    readonly = True, compute = '_compute_amount')
+    sequence_update =  fields.Boolean('Sequence updated')
 
-#    @api.multi
-#    def compute_discount(self, discount):
-#        for inv in self:
-#            val1 = val2 = 0.0
-#            disc_amnt = 0.0
-#            val2 = sum(line.amount for line in self.tax_line)
-#            for line in inv.invoice_line:
-#                val1 += (line.quantity * line.price_unit)
-#                line.discount = discount
-#                disc_amnt += (line.quantity * line.price_unit) * discount / 100
-#            total = val1 + val2 - disc_amnt
-#            self.amount_discount = disc_amnt
-#            self.amount_tax = val2
-#            self.amount_total = total
-#
-#    @api.onchange('discount_type', 'discount_rate')
-#    def supply_rate(self):
-#        for inv in self:
-#            if inv.discount_rate != 0:
-#                amount = sum(line.price_subtotal for line in self.invoice_line)
-#                tax = sum(line.amount for line in self.tax_line)
-#                if inv.discount_type == 'percent':
-#                    self.compute_discount(inv.discount_rate)
-#                else:
-#                    total = 0.0
-#                    discount = 0.0
-#                    for line in inv.invoice_line:
-#                        total += (line.quantity * line.price_unit)
-#                    if inv.discount_rate != 0:
-#                        discount = (inv.discount_rate / total) * 100
-#                    self.compute_discount(discount)
+    @api.multi
+    def compute_discount(self, discount):
+        for inv in self:
+            val1 = val2 = 0.0
+            disc_amnt = 0.0
+            val2 = sum(line.amount for line in self.tax_line)
+            for line in inv.invoice_line:
+                val1 += (line.quantity * line.price_unit)
+                line.discount = discount
+                disc_amnt += (line.quantity * line.price_unit) * discount / 100
+            total = val1 + val2 - disc_amnt
+            self.amount_discount = disc_amnt
+            self.amount_tax = val2
+            self.amount_total = total
+
+    @api.onchange('discount_type', 'discount_rate')
+    def supply_rate(self):
+        for inv in self:
+            if inv.discount_rate != 0:
+                amount = sum(line.price_subtotal for line in self.invoice_line)
+                tax = sum(line.amount for line in self.tax_line)
+                if inv.discount_type == 'percent':
+                    self.compute_discount(inv.discount_rate)
+                else:
+                    total = 0.0
+                    discount = 0.0
+                    for line in inv.invoice_line:
+                        total += (line.quantity * line.price_unit)
+                    if inv.discount_rate != 0:
+                        discount = (inv.discount_rate / total) * 100
+                    self.compute_discount(discount)
 
     ####
     # This Fields Overrite to Edit its value after validate invoice.(TO Change Attrs and domains)
@@ -345,9 +350,8 @@ class account_invoice(models.Model):
                     for i_line in inv_rec.invoice_line:
                         if tx_tax:
                             i_line.write({'invoice_line_tax_id': [(6, 0, tx_tax.ids)], })
-
             self.env['account.invoice'].button_reset_taxes()
-
+            
     @api.v7
     def _check_check_currency_rate(self, cr, uid, ids, context = None):
         curr_day = datetime.now().strftime('%A')
@@ -522,7 +526,7 @@ class account_invoice(models.Model):
                         'origin_ids': [(6, 0, line.origin_ids.ids)],
                         'order_id':res.id,
                         }
-                if self.direct_shipemt:
+                if self.direct_shipemt or line.product_id.non_invenotry_item:
                     rout_ids = self.env['stock.location.route'].search([('name', '=', 'Drop Shipping')])
                     if rout_ids:
                         vals.update({'route_id' : rout_ids and rout_ids[0].id})
@@ -685,6 +689,29 @@ class account_invoice(models.Model):
             inv.internal_number = seq_inv
         return inv
 
+    def update_sequnce(self):
+        latest_number=''
+        for inv in self:
+            if inv.type=='out_invoice' and inv.sequence_update == False:
+                invoice_id = self.search([('number', '=', inv.number)])
+                if inv.id == invoice_id.id:
+                    self._cr.execute("select id from ir_sequence where name = %s", ('Account Invoice Local',))
+                    loc_res = self._cr.fetchone()      
+                    if loc_res:          
+                        self._cr.execute("update ir_sequence set number_next = %s where id=%s", (inv.number, loc_res[0]))            
+                if not inv.partner_id.cust_code:
+                    if inv.type == "out_invoice":
+                        raise except_orm(_('Error!'), _('Please Enter Customer code'))
+                cust_code = str(inv.partner_id.cust_code) + '/'
+                prefix = cust_code[:3].upper()
+                self._cr.execute("select id from ir_sequence where name = %s", ('Customer Invoice Export',))
+                res = self._cr.fetchone()
+                if res:
+                    self._cr.execute("update ir_sequence set prefix = %s where id=%s", (cust_code, res[0]))
+                    seq_id = self.env['ir.sequence'].next_by_id(res[0])
+                    latest_number = seq_id   
+        return latest_number
+    
     @api.multi
     def write(self, vals):
         picking_obj = self.env['stock.picking']
@@ -695,6 +722,11 @@ class account_invoice(models.Model):
         invoice_l_obj = self.env['account.invoice.line']
         pick_line_obj = self.env['stock.move']
         stock_quant_obj = self.env['stock.quant']
+        if vals.get('export', False) == True:
+            for inv in self:
+                if inv.sequence_update == False and inv.type == 'out_invoice':
+                    num = self.update_sequnce()
+                    vals.update({'number': num, 'internal_number': num, 'sequence_update': True})
         res = super(account_invoice, self).write(vals)
         for inv in self:
             if inv.state not in ('draft', 'cancel'):
@@ -780,7 +812,7 @@ class account_invoice(models.Model):
                                                 quant_id = self._cr.fetchone()
                                                 quat_data = stock_quant_obj.browse(quant_id)
                                                 new_qnt = stock_quant_obj.create({'product_id': sale_line_id_new.product_id.id,
-                                                                        'qty': quat_data.qty - pick_lines_vals.get('product_uom_qty'),
+                                                                        'qty': quat_data.qty - pick_lines_vals.get('product_uom_qty', 0.0),
                                                                         'in_date': sale_line_id_new.order_id.date_order,
                                                                         'location_id': pick_line_id.location_id.id})
                                                 quat_data.write({'qty': pick_lines_vals.get('product_uom_qty')})
@@ -793,12 +825,12 @@ class account_invoice(models.Model):
                                     self._cr.execute('select quant_id from stock_quant_move_rel  where move_id=%s', (pick_det_line_id.id,))
                                     quant_id = self._cr.fetchone()
                                     quat_data = stock_quant_obj.browse(quant_id)
-                                    if quat_data.qty - pick_lines_vals.get('product_uom_qty') > 0:
-                                        diff = -quat_data.qty - pick_lines_vals.get('product_uom_qty')
+                                    if quat_data.qty - pick_lines_vals.get('product_uom_qty', 0) > 0:
+                                        diff = -quat_data.qty - pick_lines_vals.get('product_uom_qty', 0)
                                     else:
-                                        diff = quat_data.qty - pick_lines_vals.get('product_uom_qty')
+                                        diff = quat_data.qty - pick_lines_vals.get('product_uom_qty', 0)
                                     stock_quant_obj.create({'product_id': pur_line_id_new.product_id.id,
-                                                            'qty':-(quat_data.qty - pick_lines_vals.get('product_uom_qty')),
+                                                            'qty':-(quat_data.qty - pick_lines_vals.get('product_uom_qty', 0)),
                                                             'in_date': pur_line_id_new.order_id.date_order,
                                                             'location_id': pick_det_line_id.location_id.id})
                                     quat_data.write({'qty': pick_lines_vals.get('product_uom_qty')})
@@ -913,7 +945,7 @@ class account_invoice(models.Model):
                 purchase_rec.write({'state':'except_invoice'})
         return True
 
-# class account_move(models.Model):
+#class account_move(models.Model):
 #     _inherit = "account.move"
 #
 #     @api.multi
