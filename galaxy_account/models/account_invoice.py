@@ -587,12 +587,12 @@ class account_invoice(models.Model):
                         }
                 po_res1 = po_line_obj.create(vals)
             po_res.signal_workflow('purchase_confirm')
-
-            if po_res.picking_ids:
-                for pick_id in po_res.picking_ids:
-                    pick_id.active = True
-                    pick_id.inv_id = self.id or False
-                    pick_id.do_transfer()
+            if not self.direct_shipemt:
+                if po_res.picking_ids:
+                    for pick_id in po_res.picking_ids:
+                        pick_id.active = True
+                        pick_id.inv_id = self.id or False
+                        pick_id.do_transfer()
         return True
 
     @api.multi

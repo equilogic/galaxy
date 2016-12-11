@@ -45,7 +45,6 @@ class ProductTemplate(models.Model):
             This method calculate aqy available
         """
         for cost in self:
-            print "cost.qty_available ==",cost.qty_available 
             cost.qty_on_hand = cost.qty_available    
 
     @api.onchange('non_invenotry_item')
@@ -54,6 +53,8 @@ class ProductTemplate(models.Model):
             curr = rec.non_invenotry_item
             if curr:
                 rec.type = 'service'
+            else:
+                rec.type = 'product'
                     
 #    @api.v7
 #    def _check_product_code_unique(self, cr, uid, ids, context=None):

@@ -22,8 +22,8 @@
 -       <record id="seq_supplier_invoice" model="ir.sequence">
             <field name="name">Supplier Invoice</field>
             <field name="code">sup_inv</field>
-            <field name="number_next">1</field>
-			<field name="number_increment">2418</field>
+            <field name="number_next">2418</field>
+			<field name="number_increment">1</field>
 			<field name="padding">3</field>
         </record>
 
