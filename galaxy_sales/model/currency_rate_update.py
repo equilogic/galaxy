@@ -32,9 +32,29 @@ from openerp.tools.translate import _
 class res_company(models.Model):
     _inherit = 'res.company'
 
-    currency_id = fields.Many2one('res.currency', string="Currency")
+    currency_id = fields.Many2one('res.currency', string = "Currency")
     api_key = fields.Char(string = 'Api Key', help = 'API Key require for updating current currency rate.')
 
+    @api.multi
+    def set_inv_prod_desc(self):
+        """
+        This will set product description in invoice line as available in product form
+        """
+        cr, uid, context = self.env.args
+        inv_line_obj = self.env['account.invoice.line']
+        inv_line_dict = {}
+        cr.execute("select id,product_id from account_invoice_line where product_id IS NOT NULL")
+        inv_line_dict.update(cr.fetchall())
+        prod_desc_dict = {}
+        cr.execute("select pp.id,pt.description from product_template pt,\
+                        product_product pp where pp.product_tmpl_id = pt.id and pt.description is not null")
+        prod_desc_dict.update(cr.fetchall())
+
+        if inv_line_dict and prod_desc_dict:
+            for line_id, prod_id in inv_line_dict.items():
+                if prod_id in prod_desc_dict:
+                    inv_line_obj.browse(line_id).prod_desc = prod_desc_dict[prod_id]
+        return True
     @api.multi
     def refresh_currency(self):
         """Refresh the currencies rates per day"""

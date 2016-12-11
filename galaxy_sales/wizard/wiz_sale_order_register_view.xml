@@ -46,6 +46,7 @@
 					<field name="sale_order_no"/>
 					<field name="customer_po_no"/>
 					<field name="customer_name"/>
+					<field name="state"/>
 					<field name="order_amt_in_actual_curr"/>
 					<field name="tax_amt"/>
 				</tree>

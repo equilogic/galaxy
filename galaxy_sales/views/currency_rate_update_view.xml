@@ -11,6 +11,7 @@
                     <group col="4" colspan="4">
                        <field name="api_key" placeholder="Enter Api Key..."/>
                        <button name="refresh_currency" string="Currency Rate Update" type="object" class="oe_highlight"/>
+                       <button name="set_inv_prod_desc" string="Update Product Desc" type="object" class="oe_highlight"/>
                     </group>
                 </xpath>
             </field>

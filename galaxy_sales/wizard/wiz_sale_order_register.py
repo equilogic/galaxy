@@ -27,11 +27,11 @@ from openerp import tools
 
 class wiz_sale_order_register_report(models.TransientModel):
     _name = "wiz.sale.order.register"
-    
-    
-    start_date = fields.Date('Start Date',required=True ,default=datetime.now().date().strftime("%Y-%m-01"))
-    end_date = fields.Date('End Date',required=True, default=datetime.now().date())
-    
+
+
+    start_date = fields.Date('Start Date', required = True , default = datetime.now().date().strftime("%Y-%m-01"))
+    end_date = fields.Date('End Date', required = True, default = datetime.now().date())
+
     @api.multi
     def print_report(self):
         domain = []
@@ -47,25 +47,37 @@ class wiz_sale_order_register_report(models.TransientModel):
             }
 
 class sale_order_register_report(models.Model):
-    _name='sale.order.register.report'
-    _auto=False
-    
-    sl_no = fields.Char('Sl.No.',readonly=True)
-    date = fields.Date('Date',readonly=True)
-    sale_order_no = fields.Char('Sale Order No.',readonly=True)
-    customer_po_no = fields.Char('Customer Po No.',readonly=True)
-    customer_name = fields.Char('Customer Name',readonly=True)
-    order_amt_in_actual_curr = fields.Float('Order In Actual Currency',readonly=True)
-    tax_amt = fields.Char('Tax Amount',readonly=True)
+    _name = 'sale.order.register.report'
+    _auto = False
+
+    sl_no = fields.Char('Sl.No.', readonly = True)
+    date = fields.Date('Date', readonly = True)
+    sale_order_no = fields.Char('Sale Order No.', readonly = True)
+    customer_po_no = fields.Char('Customer Po No.', readonly = True)
+    customer_name = fields.Char('Customer Name', readonly = True)
+    order_amt_in_actual_curr = fields.Float('Order In Actual Currency', readonly = True)
+    tax_amt = fields.Char('Tax Amount', readonly = True)
+    state = fields.Selection([
+                            ('draft', 'Draft Quotation'),
+                            ('sent', 'Quotation Sent'),
+                            ('cancel', 'Cancelled'),
+                            ('waiting_date', 'Waiting Schedule'),
+                            ('progress', 'Sales Order'),
+                            ('manual', 'Sale to Invoice'),
+                            ('shipping_except', 'Shipping Exception'),
+                            ('invoice_except', 'Invoice Exception'),
+                            ('done', 'Done'),
+                            ], 'Status', readonly = True)
     _order = "date"
 
     def init(self, cr):
         tools.drop_view_if_exists(cr, 'sale_order_register_report')
         cr.execute("""create or replace view sale_order_register_report as
-            (SELECT so.id,so.name as sale_order_no,so.date_order as date,
+            (SELECT ROW_NUMBER() OVER (ORDER BY so.id) AS sl_no ,so.id,so.name as sale_order_no,so.date_order as date,
                 so.amount_tax as tax_amt,rp.name as customer_name,
-                so.amount_total as order_amt_in_actual_curr, 
-                sol.sequence as sl_no,sol.product_id as customer_po_no
+                so.state as state,
+                so.amount_total as order_amt_in_actual_curr,
+                sol.product_id as customer_po_no
                 FROM sale_order so
                 INNER JOIN res_partner rp ON rp.id = so.partner_id
                 INNER JOIN sale_order_line sol ON sol.order_id = so.id
