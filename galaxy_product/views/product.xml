@@ -66,10 +66,10 @@
             	<xpath expr="//field[@name='state']" position="attributes">
             		<attribute name="invisible">1</attribute>
             	</xpath>
-            	<xpath expr="//field[@name='name']" position="before">
+            	<xpath expr="//field[@name='name']" position="after">
             		<field name="default_code" string="Item No"/>
             	</xpath> 
-            	<xpath expr="//field[@name='name']" position="after">
+            	<xpath expr="//field[@name='default_code']" position="after">
             		<field name="description"/>
             	</xpath>                 	           	
             </field>
@@ -98,6 +98,21 @@
                     <field name="flavor"/>
                     <filter name="grp_flavor" string="Flavor" domain="[]" context="{'group_by':'flavor'}"/>
                 </xpath>
+            </field>
+        </record>
+
+		<!--	Inherited Product Treeview to interchange the position of treeview fields	-->
+		 <record model="ir.ui.view" id="product_tree_view_add_prod_button">
+            <field name="name">product.product.tree.view</field>
+            <field name="model">product.product</field>
+            <field name="inherit_id" ref="product.product_product_tree_view"/>
+            <field name="arch" type="xml">
+            	<xpath expr="//tree/field[@name='default_code']" position="attributes">
+            		<attribute name="invisible">1</attribute>
+            	</xpath>
+            	<xpath expr="//tree/field[@name='name']" position="after">
+            		<field name="default_code"/>
+            	</xpath>
             </field>
         </record>
 

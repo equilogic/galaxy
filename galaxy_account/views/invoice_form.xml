@@ -345,13 +345,13 @@
 				<xpath expr="//field[@name='partner_id']" position="after">
 					<field name="part_inv_id"
 						context="{'search_default_supplier':1, 'show_address': 1,'default_type':'invoice'}"
-                        domain="['|',('parent_id','=',partner_id),('id','=',partner_id),('type','in',['invoice',])]"
-						options="{'always_reload': True}" invisible="1"/>
+                        domain="['|',('parent_id','=',partner_id),('id','=',partner_id),('type','in',['invoice'])]"
+						options="{'always_reload': True}" />
 					
 					<field name="part_ship_id"
 						context="{'search_default_supplier':1, 'show_address': 1,'default_type':'delivery'}"
                         domain="['|',('parent_id','=',partner_id),('id','=',partner_id),('type','in',['delivery'])]"
-						options="{'always_reload': True}" invisible="1" />
+						options="{'always_reload': True}"  />
 				</xpath>
 				<xpath expr="//field[@name='fiscal_position']" position="after">
 					<field name="attn_inv"
