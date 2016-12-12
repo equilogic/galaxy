@@ -32,16 +32,33 @@ class wiz_galaxy_add_prod_in_invoice(models.TransientModel):
     def products_add_in_so(self):
         cr, uid, context = self.env.args
         order_line_list = []
+        so_line ={}
+        tax_ids =[]
+        account_tax_pool = self.env['account.tax']
         invoice_rec = self.env['account.invoice'].browse(context.get('active_ids'))
         if invoice_rec:
+            tx_per_tax = account_tax_pool.search([('description', '=', '7% TX7')])
+            sr_per_tax = account_tax_pool.search([('description', '=', '7% SR')])
+            zero_per_tax = account_tax_pool.search([('description', '=', '0% ZR')])
+            zero_zp_tax = account_tax_pool.search([('description', '=', '0% ZP')])
+            if invoice_rec.export == True and invoice_rec.type  == 'out_invoice':
+                tax_ids = zero_per_tax.ids
+            elif invoice_rec.type  == 'out_invoice':
+                tax_ids = sr_per_tax.ids
+            if invoice_rec.export == True and invoice_rec.type == 'in_invoice':
+                tax_ids = zero_zp_tax.ids   
+            elif invoice_rec.type == 'in_invoice':
+                tax_ids= tx_per_tax.ids 
             for product_rec in self.product_ids:
                 name = product_rec.with_context({'partner_id': invoice_rec.partner_id.id}).name_get()[0][1]
                 if product_rec.description_sale:
                     name += '\n' + product_rec.description_sale
                 so_line = {'product_id': product_rec.id,
                            'name': name, 'price_unit': product_rec.list_price,
-                           'product_qty': 1.0,
+                           'quantity': 1.0,
+                           'invoice_line_tax_id': [(6, 0, tax_ids)]
                            }
                 order_line_list.append((0, 0, so_line))
+                print "order_line_list===========",order_line_list
             invoice_rec.write({'invoice_line': order_line_list})
         return True

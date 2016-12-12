@@ -557,14 +557,14 @@ class account_invoice(models.Model):
                         self._cr.execute('update stock_move set inv_line_id=%s where id=%s', (inv_line_id, m_line.id,))
         if self.type == "in_invoice" and not self.invoice_from_purchase:
             product_ids = []
-            invoice_method = 'picking'
+            invoice_method = 'manual'
             flag = False
-            if self.invoice_line:
-                for line in self.invoice_line:
-                    if line.product_id.id:
-                        flag = True
-            if flag == False:
-                invoice_method = 'manual'
+#            if self.invoice_line:
+#                for line in self.invoice_line:
+#                    if line.product_id.id:
+#                        flag = True
+#            if flag == False:
+#                invoice_method = 'manual'
             order_vals = {
                           'partner_id': self.partner_id.id,
                           'partner_inv_id':self.part_inv_id.id,
@@ -574,7 +574,6 @@ class account_invoice(models.Model):
                           'date_order': self.date_invoice,
                           'pricelist_id': self.partner_id.property_product_pricelist.id,
                           'invoiced':True,
-                          'active': True,
                           'currency_id':self.currency_id.id,
                           'inv_id': self.id or False,
                           'location_id' : loc_id.id,  # self.partner_id.property_stock_supplier.id,
@@ -594,10 +593,9 @@ class account_invoice(models.Model):
                         'inv_line_id': line.id or False,
                         'date_planned':self.date_invoice,
                         'product_qty' : line.quantity,
-                        'product_uom' :line.uos_id.id or 1,
+                        'product_uom' :line.uos_id.id or False,
                         'price_unit':line.price_unit,
                         'taxes_id': [(6, 0, [x.id for x in line.invoice_line_tax_id])],
-                        'discount':line.discount,
                         'price_subtotal':line.price_subtotal,
                         'origin_ids': [(6, 0, line.origin_ids.ids)],
                         'no_origin':line.no_origin,
@@ -711,23 +709,31 @@ class account_invoice(models.Model):
         latest_number=''
         for inv in self:
             if inv.type=='out_invoice' and inv.sequence_update == False:
-                invoice_id = self.search([('number', '=', inv.number)])
-                if inv.id == invoice_id.id:
-                    self._cr.execute("select id from ir_sequence where name = %s", ('Account Invoice Local',))
-                    loc_res = self._cr.fetchone()      
-                    if loc_res:          
-                        self._cr.execute("update ir_sequence set number_next = %s where id=%s", (inv.number, loc_res[0]))            
-                if not inv.partner_id.cust_code:
-                    if inv.type == "out_invoice":
-                        raise except_orm(_('Error!'), _('Please Enter Customer code'))
-                cust_code = str(inv.partner_id.cust_code) + '/'
-                prefix = cust_code[:3].upper()
-                self._cr.execute("select id from ir_sequence where name = %s", ('Customer Invoice Export',))
-                res = self._cr.fetchone()
-                if res:
-                    self._cr.execute("update ir_sequence set prefix = %s where id=%s", (cust_code, res[0]))
-                    seq_id = self.env['ir.sequence'].next_by_id(res[0])
-                    latest_number = seq_id   
+                if inv.number:
+                    invoice_id = self.search([('internal_number', '=', inv.number)])
+                    if inv.id == invoice_id.id:
+                        self._cr.execute("select id from ir_sequence where name = %s", ('Account Invoice Local',))
+                        loc_res = self._cr.fetchone()      
+                        if loc_res:          
+                            self._cr.execute("update ir_sequence set number_next = %s where id=%s", (inv.number, loc_res[0])) 
+                    if inv.export == False:
+                        self._cr.execute("select id from ir_sequence where name = %s", ('Customer Invoice Export',))
+                        res1 = self._cr.fetchone()    
+                        seq_id1 = self.env['ir.sequence'].next_by_id(res1[0])                    
+                        inv.number = seq_id1
+                        inv.internal_number = seq_id1        
+                    else:                               
+                        if not inv.partner_id.cust_code:
+                            if inv.type == "out_invoice":
+                                raise except_orm(_('Error!'), _('Please Enter Customer code'))
+                        cust_code = str(inv.partner_id.cust_code) + '/'
+                        prefix = cust_code[:3].upper()
+                        self._cr.execute("select id from ir_sequence where name = %s", ('Customer Invoice Export',))
+                        res = self._cr.fetchone()
+                        if res:
+                            self._cr.execute("update ir_sequence set prefix = %s where id=%s", (cust_code, res[0]))
+                            seq_id = self.env['ir.sequence'].next_by_id(res[0])
+                            latest_number = seq_id   
         return latest_number
     
     @api.multi
@@ -840,18 +846,19 @@ class account_invoice(models.Model):
                                 diff = 0
                                 if pick_det_line_id:
                                     pick_det_line_id.write(pick_lines_vals)
-                                    self._cr.execute('select quant_id from stock_quant_move_rel  where move_id=%s', (pick_det_line_id.id,))
-                                    quant_id = self._cr.fetchone()
-                                    quat_data = stock_quant_obj.browse(quant_id)
-                                    if quat_data.qty - pick_lines_vals.get('product_uom_qty', 0) > 0:
-                                        diff = -quat_data.qty - pick_lines_vals.get('product_uom_qty', 0)
-                                    else:
-                                        diff = quat_data.qty - pick_lines_vals.get('product_uom_qty', 0)
-                                    stock_quant_obj.create({'product_id': inv_line_rec.product_id.id,
-                                                            'qty':-(quat_data.qty - pick_lines_vals.get('product_uom_qty', 0)),
-                                                            'in_date': inv_line_rec.invoice_id and inv_line_rec.invoice_id.date_invoice,
-                                                            'location_id': pick_det_line_id.location_id.id})
-                                    quat_data.write({'qty': pick_lines_vals.get('product_uom_qty')})
+                                    for pick_det_line_data in pick_det_line_id:
+                                        self._cr.execute('select quant_id from stock_quant_move_rel  where move_id=%s', (pick_det_line_data.id,))
+                                        quant_id = self._cr.fetchone()
+                                        quat_data = stock_quant_obj.browse(quant_id)
+                                        if quat_data.qty - pick_lines_vals.get('product_uom_qty', 0) > 0:
+                                            diff = -quat_data.qty - pick_lines_vals.get('product_uom_qty', 0)
+                                        else:
+                                            diff = quat_data.qty - pick_lines_vals.get('product_uom_qty', 0)
+                                        stock_quant_obj.create({'product_id': inv_line_rec.product_id.id,
+                                                                'qty':-(quat_data.qty - pick_lines_vals.get('product_uom_qty', 0)),
+                                                                'in_date': inv_line_rec.invoice_id and inv_line_rec.invoice_id.date_invoice,
+                                                                'location_id': pick_det_line_data.location_id.id})
+                                        quat_data.write({'qty': pick_lines_vals.get('product_uom_qty')})
 
                         if inv_line[2] and not inv_line[1]:
                             s_lines_vals = {}
