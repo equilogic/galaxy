@@ -1,297 +1,332 @@
 <openerp>
 	<data>
-        <!-- Product Form-->
-        <record id="product_template_inherited" model="ir.ui.view">
-            <field name="name">product template</field>
-            <field name="model">product.template</field>
-            <field name="inherit_id" ref="product.product_template_form_view"/>
-            <field name="arch" type="xml">
-                <field name='description' position="before">
-                	<group>
-                		<group>
-	                    <field name="brand"/>
-	                    <field name="flavor"/>
-	                    <field name="gender"/>
-	                	<field name='non_invenotry_item' />
-	                	<field name="origin_data"/> 
-	                	</group>
-	                	<group>
-	                	<field name='manufacture_by' /> 
-	                	<field name="print_manufacture"/>        
-	                	<field name="qty_on_hand" invisible="1"/>    
-	                	</group> 
-                	</group>
-                </field>
-                <!-- <xpath expr="//notebook/page[@string='Sales']" position="after">
-                    <page string="Origin">
-                        <field name="origin_ids">
-                            <form>
-                                <group col="4" colspan="4">
-                                    <field name="name"/>
-                                    <field name="code"/>
-                                    <field name="qty"/>
-                                </group>
-                            </form>
-                            <tree>
-                                <field name="name"/>
-                                <field name="code"/>
-                                <field name="qty"/>
-                            </tree>
-                        </field>
-                    </page>
-                </xpath> -->
-                 <xpath expr="//field[@name='description']" position="before">
-                    <separator string="Full Description"/>
-                </xpath>
-                <xpath expr="//label[@string='Product Name']" position="attributes">
-                    <attribute name="string">Item Name</attribute>
-                </xpath>
-            </field>
-        </record>
-        
-       
+		<!-- Product Form -->
+		<record id="product_template_inherited" model="ir.ui.view">
+			<field name="name">product template</field>
+			<field name="model">product.template</field>
+			<field name="inherit_id" ref="product.product_template_form_view" />
+			<field name="arch" type="xml">
+				<field name='description' position="before">
+					<group>
+						<group>
+							<field name="brand" />
+							<field name="flavor" />
+							<field name="gender" />
+							<field name='non_invenotry_item' />
+							<field name="origin_data" />
+						</group>
+						<group>
+							<field name='manufacture_by' />
+							<field name="print_manufacture" />
+							<field name="qty_on_hand" invisible="1" />
+						</group>
+					</group>
+				</field>
+				<!-- <xpath expr="//notebook/page[@string='Sales']" position="after"> 
+					<page string="Origin"> <field name="origin_ids"> <form> <group col="4" colspan="4"> 
+					<field name="name"/> <field name="code"/> <field name="qty"/> </group> </form> 
+					<tree> <field name="name"/> <field name="code"/> <field name="qty"/> </tree> 
+					</field> </page> </xpath> -->
+				<xpath expr="//field[@name='description']" position="before">
+					<separator string="Full Description" />
+				</xpath>
+				<xpath expr="//label[@string='Product Name']" position="attributes">
+					<attribute name="string">Item Name</attribute>
+				</xpath>
+			</field>
+		</record>
 
-        <!-- Inherited Product Tree View -->
-         <record id="product_template_inherited_tree_view" model="ir.ui.view">
-            <field name="name">product.template.inherited.tree.view</field>
-            <field name="model">product.template</field>
-            <field name="inherit_id" ref="product.product_template_tree_view"/>
-            <field name="arch" type="xml">
-            	<xpath expr="//field[@name='categ_id']" position="attributes">
-            		<attribute name="invisible">1</attribute>
-            	</xpath>
-            	<xpath expr="//field[@name='type']" position="attributes">
-            		<attribute name="invisible">1</attribute>
-            	</xpath>
-            	<xpath expr="//field[@name='state']" position="attributes">
-            		<attribute name="invisible">1</attribute>
-            	</xpath>
-            	<xpath expr="//field[@name='name']" position="attributes">
-            		<attribute name="string">Item Name</attribute>
-            	</xpath>            	
-            	<xpath expr="//field[@name='name']" position="after">
-            		<field name="default_code" string="Item No"/>
-            	</xpath>
-            	<xpath expr="//field[@name='default_code']" position="after">
-            		<field name="description" string="Full Description"/>
-            	</xpath>                 	           	
-            </field>
-        </record>
+
+
+		<!-- Inherited Product Tree View -->
+		<record id="product_template_inherited_tree_view" model="ir.ui.view">
+			<field name="name">product.template.inherited.tree.view</field>
+			<field name="model">product.template</field>
+			<field name="inherit_id" ref="product.product_template_tree_view" />
+			<field name="arch" type="xml">
+				<xpath expr="//field[@name='categ_id']" position="attributes">
+					<attribute name="invisible">1</attribute>
+				</xpath>
+				<xpath expr="//field[@name='type']" position="attributes">
+					<attribute name="invisible">1</attribute>
+				</xpath>
+				<xpath expr="//field[@name='state']" position="attributes">
+					<attribute name="invisible">1</attribute>
+				</xpath>
+				<xpath expr="//field[@name='name']" position="attributes">
+					<attribute name="string">Item Name</attribute>
+				</xpath>
+				<xpath expr="//field[@name='name']" position="after">
+					<field name="default_code" string="Item No" />
+				</xpath>
+				<xpath expr="//field[@name='default_code']" position="after">
+					<field name="description" string="Full Description" />
+				</xpath>
+			</field>
+		</record>
 
 		<!-- Inherited Search view of Product Template -->
-        <record id="product_template_inherited_1" model="ir.ui.view">
-            <field name="name">product.template.search</field>
-            <field name="model">product.template</field>
-            <field name="inherit_id" ref="product.product_template_search_view"/>
-            <field name="arch" type="xml">
-            	<xpath expr="//search/field[@name='name']" position="after">
-                    <field name="default_code"/>
-                </xpath>
-                <xpath expr="//search/field[@name='name']" position="after">
-                    <field string="Brand" name="brand" domain="[('brand','ilike',self)]"/>
-                </xpath>
-                <xpath expr="//search/field[@name='name']" position="after">
-                    <field string="Flavor" name="flavor" domain="[('flavor','ilike',self)]"/>
-                </xpath>
-                <xpath expr="//search/group/filter[@string='Type']" position="after">
-                    <field name="brand"/>
-                    <filter name="grp_braproductnd" string="Brand" domain="[]" context="{'group_by':'brand'}"/>
-                </xpath>
-                <xpath expr="//search/group/filter[@string='Type']" position="after">
-                    <field name="flavor"/>
-                    <filter name="grp_flavor" string="Flavor" domain="[]" context="{'group_by':'flavor'}"/>
-                </xpath>
-            </field>
-        </record>
+		<record id="product_template_inherited_1" model="ir.ui.view">
+			<field name="name">product.template.search</field>
+			<field name="model">product.template</field>
+			<field name="inherit_id" ref="product.product_template_search_view" />
+			<field name="arch" type="xml">
+				<xpath expr="//search/field[@name='name']" position="after">
+					<field name="default_code" string="Item No" />
+					<field name="description" />
+				</xpath>
+				<xpath expr="//search/group[@string='Group by...']" position="attributes">
+					<attribute name="invisible">1</attribute>
+				</xpath>
+				<xpath expr="//search/field[@name='categ_id']" position="attributes">
+					<attribute name="invisible">1</attribute>
+				</xpath>
+				<xpath expr="//search/field[@name='product_variant_ids']"
+					position="attributes">
+					<attribute name="invisible">1</attribute>
+				</xpath>
+				<xpath expr="//search/field[@name='company_id']" position="attributes">
+					<attribute name="invisible">1</attribute>
+				</xpath>
+				<xpath expr="//search/field[@name='pricelist_id']" position="attributes">
+					<attribute name="invisible">1</attribute>
+				</xpath>
+				<xpath expr="//search/filter[@string='Services']" position="attributes">
+					<attribute name="invisible">1</attribute>
+				</xpath>
+				<xpath expr="//search/filter[@string='Consumable']" position="attributes">
+					<attribute name="invisible">1</attribute>
+				</xpath>
+				<xpath expr="//search/filter[@string='Can be Sold']" position="attributes">
+					<attribute name="invisible">1</attribute>
+				</xpath>
+				<!-- <xpath expr="//search/filter[@string='Services']" position="replace"> 
+					</xpath> -->
+				<!-- <xpath expr="//search/field[@name='name']" position="after"> <field 
+					string="Brand" name="brand" domain="[('brand','ilike',self)]"/> </xpath> 
+					<xpath expr="//search/field[@name='name']" position="after"> <field string="Flavor" 
+					name="flavor" domain="[('flavor','ilike',self)]"/> </xpath> <xpath expr="//search/group/filter[@string='Type']" 
+					position="after"> <field name="brand"/> <filter name="grp_braproductnd" string="Brand" 
+					domain="[]" context="{'group_by':'brand'}"/> </xpath> <xpath expr="//search/group/filter[@string='Type']" 
+					position="after"> <field name="flavor"/> <filter name="grp_flavor" string="Flavor" 
+					domain="[]" context="{'group_by':'flavor'}"/> </xpath> -->
+			</field>
+		</record>
 
-		<!--	Inherited Product Treeview to interchange the position of treeview fields	-->
-		 <record model="ir.ui.view" id="product_tree_view_add_prod_button">
-            <field name="name">product.product.tree.view</field>
-            <field name="model">product.product</field>
-            <field name="inherit_id" ref="product.product_product_tree_view"/>
-            <field name="arch" type="xml">
-            	<xpath expr="//tree/field[@name='default_code']" position="attributes">
-            		<attribute name="invisible">1</attribute>
-            	</xpath>
-            	<xpath expr="//tree/field[@name='name']" position="after">
-            		<field name="default_code" string="Item No."/>
-            	</xpath>
-            </field>
-        </record>
+		<!-- Inherited Product Treeview to interchange the position of treeview 
+			fields -->
+		<record model="ir.ui.view" id="product_tree_view_add_prod_button">
+			<field name="name">product.product.tree.view</field>
+			<field name="model">product.product</field>
+			<field name="inherit_id" ref="product.product_product_tree_view" />
+			<field name="arch" type="xml">
+				<xpath expr="//tree/field[@name='default_code']" position="attributes">
+					<attribute name="invisible">1</attribute>
+				</xpath>
+				<xpath expr="//tree/field[@name='name']" position="after">
+					<field name="default_code" string="Item No." />
+				</xpath>
+			</field>
+		</record>
 
-        <record model="ir.ui.view" id="product_form_view_sale_order_button">
-            <field name="name">product.product.sale.order</field>
-            <field name="model">product.product</field>
-            <field name="inherit_id" ref="product.product_normal_form_view"/>
-            <field name="arch" type="xml">
-                <field name="ean13" position="after">
-                	<field name='newly_imp_prod' />
-                </field>
-            </field>
-        </record>
+		<record model="ir.ui.view" id="product_form_view_sale_order_button">
+			<field name="name">product.product.sale.order</field>
+			<field name="model">product.product</field>
+			<field name="inherit_id" ref="product.product_normal_form_view" />
+			<field name="arch" type="xml">
+				<field name="ean13" position="after">
+					<field name='newly_imp_prod' />
+				</field>
+			</field>
+		</record>
 
-        <record model="ir.ui.view" id="product_template_view_default_galaxy">
-            <field name="name">product.template.galaxy</field>
-            <field name="model">product.template</field>
-            <field name="inherit_id" ref="product.product_template_only_form_view"/>
-            <field name="arch" type="xml">
-                <xpath expr="//field[@name='default_code']" position="attributes">
-                    <attribute name="string">Item No</attribute>
-                </xpath>
-               <field name="ean13" attrs="{'invisible': [('product_variant_count', '>', 1)]}" position="replace">
-               		<field name="ean13" invisible="1"/>
-               </field>
-            </field>
-        </record>
-             
-        <!--  Brand  Tree View-->
-        <record model="ir.ui.view" id="brand_tree_view">
-            <field name="name">Brand.tree</field>
-            <field name="model">brand.brand</field>
-            <field name="arch" type="xml">
-                <tree string="Brand">                
-                       <field name="name"/>
-                       <field name="code"/>
-                </tree>
-            </field>
-        </record>
+		<record model="ir.ui.view" id="product_template_view_default_galaxy">
+			<field name="name">product.template.galaxy</field>
+			<field name="model">product.template</field>
+			<field name="inherit_id" ref="product.product_template_only_form_view" />
+			<field name="arch" type="xml">
+				<xpath expr="//field[@name='default_code']" position="attributes">
+					<attribute name="string">Item No</attribute>
+				</xpath>
+				<field name="ean13"
+					attrs="{'invisible': [('product_variant_count', '>', 1)]}"
+					position="replace">
+					<field name="ean13" invisible="1" />
+				</field>
+			</field>
+		</record>
 
-        <!-- Brand Form View -->
-        <record model="ir.ui.view" id="brand_form_view">
-            <field name="name">Brand.form</field>
-            <field name="model">brand.brand</field>
-            <field name="arch" type="xml">
-                <form string="Brand">                
-                	<sheet>
-	                    <group>
-	                        <field name="name" required="1"/>
-	                        <field name="code"/>
-	                    </group>
-                    </sheet>
-                </form>
-            </field>
-        </record>
+		<!-- Brand Tree View -->
+		<record model="ir.ui.view" id="brand_tree_view">
+			<field name="name">Brand.tree</field>
+			<field name="model">brand.brand</field>
+			<field name="arch" type="xml">
+				<tree string="Brand">
+					<field name="name" />
+					<field name="code" />
+				</tree>
+			</field>
+		</record>
+
+		<!-- Brand Form View -->
+		<record model="ir.ui.view" id="brand_form_view">
+			<field name="name">Brand.form</field>
+			<field name="model">brand.brand</field>
+			<field name="arch" type="xml">
+				<form string="Brand">
+					<sheet>
+						<group>
+							<field name="name" required="1" />
+							<field name="code" />
+						</group>
+					</sheet>
+				</form>
+			</field>
+		</record>
 
 		<!-- Brand Action -->
-        <record model="ir.actions.act_window" id="brand_list_action">
-            <field name="name">Brands</field>
-            <field name="res_model">brand.brand</field>
-            <field name="view_type">form</field>
-            <field name="view_mode">tree,form</field>
-        </record>
-        
-        <!-- Menu for Brand -->
-        <menuitem id="brand_menu" name="Brands" parent="base.menu_product"
-                  action="brand_list_action"/>
-                  
-        <!--  Flavor Tree View-->
-        <record model="ir.ui.view" id="falvor_tree_view">
-            <field name="name">Falvor.tree</field>
-            <field name="model">flavor.flavor</field>
-            <field name="arch" type="xml">
-                <tree string="Flavor">
-                        <field name="name" />
-                        <field name="code"/>
-                </tree>
-            </field>
-        </record>
+		<record model="ir.actions.act_window" id="brand_list_action">
+			<field name="name">Brands</field>
+			<field name="res_model">brand.brand</field>
+			<field name="view_type">form</field>
+			<field name="view_mode">tree,form</field>
+		</record>
 
-        <!-- Flavor Form View -->
-        <record model="ir.ui.view" id="falvor_form_view">
-            <field name="name">Falvor.form</field>
-            <field name="model">flavor.flavor</field>
-            <field name="arch" type="xml">
-                <form string="Flavor">
-                	<sheet>
-	                    <group>
-	                        <field name="name" required="1"/>
-	                        <field name="code"/>
-	                    </group>
-                    </sheet>
-                </form>
-            </field>
-        </record>
+		<!-- Menu for Brand -->
+		<menuitem id="brand_menu" name="Brands" parent="base.menu_product"
+			action="brand_list_action" />
+
+		<!-- Flavor Tree View -->
+		<record model="ir.ui.view" id="falvor_tree_view">
+			<field name="name">Falvor.tree</field>
+			<field name="model">flavor.flavor</field>
+			<field name="arch" type="xml">
+				<tree string="Flavor">
+					<field name="name" />
+					<field name="code" />
+				</tree>
+			</field>
+		</record>
+
+		<!-- Flavor Form View -->
+		<record model="ir.ui.view" id="falvor_form_view">
+			<field name="name">Falvor.form</field>
+			<field name="model">flavor.flavor</field>
+			<field name="arch" type="xml">
+				<form string="Flavor">
+					<sheet>
+						<group>
+							<field name="name" required="1" />
+							<field name="code" />
+						</group>
+					</sheet>
+				</form>
+			</field>
+		</record>
 
 		<!-- Action for Flavor -->
-        <record model="ir.actions.act_window" id="flavor_list_action">
-            <field name="name">Flavors</field>
-            <field name="res_model">flavor.flavor</field>
-            <field name="view_type">form</field>
-            <field name="view_mode">tree,form</field>
-        </record>
+		<record model="ir.actions.act_window" id="flavor_list_action">
+			<field name="name">Flavors</field>
+			<field name="res_model">flavor.flavor</field>
+			<field name="view_type">form</field>
+			<field name="view_mode">tree,form</field>
+		</record>
 
 		<!-- Menu for Flavor -->
-        <menuitem id="flavor_menu" name="Flavors" parent="base.menu_product"
-                  action="flavor_list_action"/>
+		<menuitem id="flavor_menu" name="Flavors" parent="base.menu_product"
+			action="flavor_list_action" />
 
 
-        <record id="product.product_template_action" model="ir.actions.act_window">
-            <field name="name">Products</field>
-            <field name="type">ir.actions.act_window</field>
-            <field name="res_model">product.template</field>
-            <field name="view_mode">tree,kanban,form</field>
-            <field name="view_type">form</field>
-            <field name="view_id" ref="product.product_template_tree_view"/>
-            <field name="context">{"search_default_filter_to_sell":1,"search_default_real_stock_available":1}</field>
-        </record>
-     
-        <delete model="ir.ui.menu" search="[('name','=','Product Variants')]"/>
-     
-        <!--  Container Tree View-->
-        <record model="ir.ui.view" id="container_tree_view">
-            <field name="name">container.container.tree</field>
-            <field name="model">container.container</field>
-            <field name="arch" type="xml">
-                <tree string="Container">
-                    <field name="name"/>
-                    <field name="code"/>
-                </tree>
-            </field>
-        </record>
+		<record id="product.product_template_action" model="ir.actions.act_window">
+			<field name="name">Products</field>
+			<field name="type">ir.actions.act_window</field>
+			<field name="res_model">product.template</field>
+			<field name="view_mode">tree,kanban,form</field>
+			<field name="view_type">form</field>
+			<field name="view_id" ref="product.product_template_tree_view" />
+			<field name="context">{"search_default_filter_to_sell":1,"search_default_real_stock_available":1}
+			</field>
+		</record>
 
-        <!-- Container Form View -->
-        <record model="ir.ui.view" id="container_form_view">
-            <field name="name">container.container.form</field>
-            <field name="model">container.container</field>
-            <field name="arch" type="xml">
-                <form string="Container">
-                    <sheet>
-                        <group>
-                            <field name="name" required="1"/>
-                            <field name="code"/>
-                        </group>
-                    </sheet>
-                </form>
-            </field>
-        </record>
+		<delete model="ir.ui.menu" search="[('name','=','Product Variants')]" />
 
-        <!-- search View-->
-        <record id="container_container_search_view" model="ir.ui.view">
-            <field name="name">container.container.search.view</field>
-            <field name="model">container.container</field>
-            <field name="arch" type="xml">
-                <search string="Containers">
-                    <field name="name"/>
-                    <field name="code"/>
-                    <group expand="1" string="Group By">
-                        <filter string="Name" name="name" context="{'group_by':'name'}"/>
-                        <filter string="Code" name="code" context="{'group_by':'code'}"/>
-                    </group>
-                </search>
-            </field>
-        </record>
+		<!-- Container Tree View -->
+		<record model="ir.ui.view" id="container_tree_view">
+			<field name="name">container.container.tree</field>
+			<field name="model">container.container</field>
+			<field name="arch" type="xml">
+				<tree string="Container">
+					<field name="name" />
+					<field name="code" />
+				</tree>
+			</field>
+		</record>
 
-        <!-- Container Action -->
-        <record model="ir.actions.act_window" id="container_action">
-            <field name="name">Containers</field>
-            <field name="res_model">container.container</field>
-            <field name="view_type">form</field>
-            <field name="view_mode">tree,form</field>
-        </record>
-        
-        <!-- Menu for Container -->
-        <menuitem id="container_menu" name="Containers" parent="base.menu_product"
-                  action="container_action" sequence="10"/>
-     
+		<!-- Container Form View -->
+		<record model="ir.ui.view" id="container_form_view">
+			<field name="name">container.container.form</field>
+			<field name="model">container.container</field>
+			<field name="arch" type="xml">
+				<form string="Container">
+					<sheet>
+						<group>
+							<field name="name" required="1" />
+							<field name="code" />
+						</group>
+					</sheet>
+				</form>
+			</field>
+		</record>
+
+		<!-- search View -->
+		<record id="container_container_search_view" model="ir.ui.view">
+			<field name="name">container.container.search.view</field>
+			<field name="model">container.container</field>
+			<field name="arch" type="xml">
+				<search string="Containers">
+					<field name="name" />
+					<field name="code" />
+					<group expand="1" string="Group By">
+						<filter string="Name" name="name" context="{'group_by':'name'}" />
+						<filter string="Code" name="code" context="{'group_by':'code'}" />
+					</group>
+				</search>
+			</field>
+		</record>
+
+		<!-- Container Action -->
+		<record model="ir.actions.act_window" id="container_action">
+			<field name="name">Containers</field>
+			<field name="res_model">container.container</field>
+			<field name="view_type">form</field>
+			<field name="view_mode">tree,form</field>
+		</record>
+
+		<!-- Menu for Container -->
+		<menuitem id="container_menu" name="Containers" parent="base.menu_product"
+			action="container_action" sequence="10" />
+
+		<!-- inherited search view of product.product -->
+		<record id="product_search_form_view" model="ir.ui.view">
+			<field name="name">product.product.search</field>
+			<field name="model">product.product</field>
+			<field name="mode">primary</field>
+			<field name="inherit_id" ref="product.product_template_search_view" />
+			<field name="arch" type="xml">
+				<field name="product_variant_ids" position="replace">
+					<field name="attribute_value_ids" invisible="1" />
+				</field>
+				<field name="name" position="after">
+					<field name="product_tmpl_id" string="Product Template"
+						invisible="1" />
+				</field>
+				<xpath expr="//group[@string='Group by...']" position="inside">
+					<filter string='Product Template' name="template_id" domain="[]"
+						context="{'group_by' : 'product_tmpl_id'}" invisible="1" />
+				</xpath>
+			</field>
+		</record>
+
+
 	</data>
 </openerp>

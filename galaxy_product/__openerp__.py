@@ -28,7 +28,7 @@
     'description': """
                 Add Flavors,Brand in products
     """,
-    'depends': ['product'],
+    'depends': ['product','sale'],
     'demo': [],
     'data': [
              'security/ir.model.access.csv',

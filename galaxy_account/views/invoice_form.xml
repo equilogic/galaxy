@@ -23,7 +23,7 @@
             </field>
         </record>
         
-		<!-- Inherited Form View of Invoice Tree (Customer Invoices) -->
+		<!-- Inherited Tree View of Invoice Tree (Customer Invoices) -->
 		<record id="invoice_tree_inherited_new" model="ir.ui.view">
 			<field name="name">invoice.tree.inherited.new</field>
 			<field name="model">account.invoice</field>
