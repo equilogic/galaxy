@@ -313,9 +313,22 @@ class account_invoice(models.Model):
             if curr:
                 rec.currency_rate = curr and \
                             curr.rate_silent or 0.0
-
+    @api.one
+    @api.onchange('currency_rate')
+    def onchane_currency_rate(self):
+        """
+            This onchange method update latest currency rate manually
+        """
+        for rec in self:
+            if rec.currency_rate:
+                if rec.currency_id.rate_ids and rec.currency_id.rate_ids[0]:
+                    rec.currency_id.rate_ids[0].write({'rate': rec.currency_rate})
+                    
     @api.onchange('export')
     def onchange_export(self):
+        """
+            Onchange Export set 0% ZR in all invoice line
+        """
         account_tax_pool = self.env['account.tax']
         account_line_pool = self.env['account.invoice.line']
         curr = self.env['res.currency'].search([('name', '=', 'USD')])

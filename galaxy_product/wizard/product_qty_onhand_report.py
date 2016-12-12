@@ -70,7 +70,7 @@ class product_qty_on_hand(models.TransientModel):
         
         worksheet = wbk.add_sheet('Sales Register Report')
         rep_name = 'Item Register.xls'
-        product_ids = self.env['product.product'].search([('type','!=','service'), ('qty_available', '>=',0)])
+        product_ids = self.env['product.product'].search([('type','!=','service'), ('qty_available', '>',0)])
         
         worksheet.row(0).height = 600
         worksheet.write_merge(0, 0, 0, 6, 'Item Register Report ' + ' ( ' + start_dt + ' to ' + end_dt+' ) ', main_header)

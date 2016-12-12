@@ -6,7 +6,7 @@
             <field name="name">wizard.product.wise.sale.report.form.view.2</field>
             <field name="model">wiz.product.wise.sale.report.2</field>
             <field name="arch" type="xml">
-                <form string="Product Wise Sale Report 2">
+                <form string="Product-wise Sales Report">
                 	<group col="4" colspan="4">
                 		<field name="start_date" />
             			<field name="end_date"/>
@@ -23,7 +23,7 @@
 
         <!-- Action for Product Wise Sale Report Wizard 2-->
         <record model="ir.actions.act_window" id="wiz_prod_wise_sale_rpt_action_2">
-            <field name="name">Product Wise Sale Report 2</field>
+            <field name="name">Product-wise Sales Report</field>
             <field name="res_model">wiz.product.wise.sale.report.2</field>
             <field name="view_type">form</field>
             <field name="view_mode">form</field>
@@ -40,7 +40,7 @@
 			<field name="name">product.wise.sale.report.tree.view.2</field>
 			<field name="model">product.wise.sale.report.2</field>
 			<field name="arch" type="xml">
-				<tree string="Product Wise Sale Report 2" create="false">
+				<tree string="Product-wise Sales Report" create="false">
 					<field name="customer_name"/>
                     <field name="customer_code"/>
 					<field name="product_name"/>

@@ -489,6 +489,13 @@
 					<filter string="Day" domain="[ ]"
 						context="{'group_by': 'date_invoice:day'}" />
 				</xpath>
+				
+				<xpath expr="//search/filter[@string='Draft']" position="attributes">
+					<attribute name="string">Proforma</attribute>
+				</xpath>
+				<xpath expr="//search/group/filter[@string='Partner']" position="attributes">
+					<attribute name="string">Customer</attribute>
+				</xpath>								
 			</field>
 		</record>
 

@@ -73,7 +73,10 @@ class sale_order_register_report(models.Model):
     def init(self, cr):
         tools.drop_view_if_exists(cr, 'sale_order_register_report')
         cr.execute("""create or replace view sale_order_register_report as
-            (SELECT ROW_NUMBER() OVER (ORDER BY so.id) AS sl_no ,so.id,so.name as sale_order_no,so.date_order as date,
+        select a.id_a as id, ROW_NUMBER() OVER (ORDER BY a.id_a) AS sl_no,a.date,a.sale_order_no,
+                a.customer_po_no,a.order_amt_in_actual_curr,a.state,a.tax_amt,
+                a.customer_name  from
+            (SELECT so.id as id_a, ROW_NUMBER() OVER (ORDER BY so.id) AS sl_no_old ,so.id,so.name as sale_order_no,so.date_order as date,
                 so.amount_tax as tax_amt,rp.name as customer_name,
                 so.state as state,
                 so.amount_total as order_amt_in_actual_curr,
@@ -81,7 +84,8 @@ class sale_order_register_report(models.Model):
                 FROM sale_order so
                 INNER JOIN res_partner rp ON rp.id = so.partner_id
                 INNER JOIN sale_order_line sol ON sol.order_id = so.id
-                )""")
+                ) as  a
+                 """)
 
 
 # vim:expandtab:smartindent:tabstop=4:softtabstop=4:shiftwidth=4:
