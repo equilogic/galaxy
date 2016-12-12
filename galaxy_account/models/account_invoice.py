@@ -544,7 +544,8 @@ class account_invoice(models.Model):
                     if rout_ids:
                         vals.update({'route_id' : rout_ids and rout_ids[0].id})
                 res1 = so_line_obj.create(vals)
-                prdouct_dict[line.product_id.id] = {'line_id': res1.id}
+#                 prdouct_dict[line.product_id.id] = {'line_id': res1.id}
+                prdouct_dict[line.product_id.id] = {'line_id': line.id}
             res.signal_workflow('order_confirm')
             if res.picking_ids:
                 for pick_id in res.picking_ids:
@@ -552,8 +553,8 @@ class account_invoice(models.Model):
                     pick_id.inv_id = self.id or False
                     pick_id.do_transfer()
                     for m_line in pick_id.move_lines:
-                        s_line_id = prdouct_dict.get(m_line.product_id.id).get('line_id', False)
-                        self._cr.execute('update stock_move set sale_line_id=%s where id=%s', (s_line_id, m_line.id,))
+                        inv_line_id = prdouct_dict.get(m_line.product_id.id).get('line_id', False)
+                        self._cr.execute('update stock_move set inv_line_id=%s where id=%s', (inv_line_id, m_line.id,))
         if self.type == "in_invoice" and not self.invoice_from_purchase:
             product_ids = []
             invoice_method = 'picking'
@@ -603,6 +604,7 @@ class account_invoice(models.Model):
                         'order_id':po_res.id,
                         }
                 po_res1 = po_line_obj.create(vals)
+                prdouct_dict[line.product_id.id] = {'line_id': line.id}
             po_res.signal_workflow('purchase_confirm')
             if not self.direct_shipemt:
                 if po_res.picking_ids:
@@ -610,6 +612,9 @@ class account_invoice(models.Model):
                         pick_id.active = True
                         pick_id.inv_id = self.id or False
                         pick_id.do_transfer()
+                        for m_line in pick_id.move_lines:
+                            inv_line_id = prdouct_dict.get(m_line.product_id.id).get('line_id', False)
+                            self._cr.execute('update stock_move set inv_line_id=%s where id=%s', (inv_line_id, m_line.id,))
         return True
 
     @api.multi
@@ -814,24 +819,24 @@ class account_invoice(models.Model):
                                     purch_line_id.write(p_lines_vals)
                             if inv.type == 'out_invoice':
                                 if pick_lines_vals and pick_ord_id:
-                                    sale_line_id_new = sale_l_obj.search([('inv_line_id', '=', inv_line[1])])
-                                    pick_line_ids = False
-                                    if sale_line_id_new:
-                                        pick_line_ids = pick_line_obj.search([('sale_line_id', '=', sale_line_id_new.id)])
+                                    inv_line_rec = invoice_l_obj.browse(inv_line[1])
+                                    pick_line_ids = pick_line_obj.search([('inv_line_id', '=', inv_line[1])])
                                     if pick_line_ids:
                                         for pick_line_id in pick_line_ids:
                                                 pick_line_id.write(pick_lines_vals)
                                                 self._cr.execute('select quant_id from stock_quant_move_rel  where move_id=%s', (pick_line_id.id,))
                                                 quant_id = self._cr.fetchone()
                                                 quat_data = stock_quant_obj.browse(quant_id)
-                                                new_qnt = stock_quant_obj.create({'product_id': sale_line_id_new.product_id.id,
+                                                new_qnt = stock_quant_obj.create({'product_id': inv_line_rec.product_id.id,
                                                                         'qty': quat_data.qty - pick_lines_vals.get('product_uom_qty', 0.0),
-                                                                        'in_date': sale_line_id_new.order_id.date_order,
+                                                                        'in_date': inv_line_rec.invoice_id and inv_line_rec.invoice_id.date_invoice,
                                                                         'location_id': pick_line_id.location_id.id})
                                                 quat_data.write({'qty': pick_lines_vals.get('product_uom_qty')})
                             else:
-                                pur_line_id_new = purchase_l_obj.search([('inv_line_id', '=', inv_line[1])])
-                                pick_det_line_id = pick_line_obj.search([('purchase_line_id', '=', pur_line_id_new.id)])
+                                inv_line_rec = invoice_l_obj.browse(inv_line[1])
+                                pick_det_line_id = pick_line_obj.search([('inv_line_id', '=', inv_line[1])])
+#                                 pick_det_line_id = pick_line_obj.search([('purchase_line_id', '=', pur_line_id_new.id)])
+#                                 pur_line_id_new = purchase_l_obj.search([('inv_line_id', '=', inv_line[1])])
                                 diff = 0
                                 if pick_det_line_id:
                                     pick_det_line_id.write(pick_lines_vals)
@@ -842,9 +847,9 @@ class account_invoice(models.Model):
                                         diff = -quat_data.qty - pick_lines_vals.get('product_uom_qty', 0)
                                     else:
                                         diff = quat_data.qty - pick_lines_vals.get('product_uom_qty', 0)
-                                    stock_quant_obj.create({'product_id': pur_line_id_new.product_id.id,
+                                    stock_quant_obj.create({'product_id': inv_line_rec.product_id.id,
                                                             'qty':-(quat_data.qty - pick_lines_vals.get('product_uom_qty', 0)),
-                                                            'in_date': pur_line_id_new.order_id.date_order,
+                                                            'in_date': inv_line_rec.invoice_id and inv_line_rec.invoice_id.date_invoice,
                                                             'location_id': pick_det_line_id.location_id.id})
                                     quat_data.write({'qty': pick_lines_vals.get('product_uom_qty')})
 
@@ -876,33 +881,72 @@ class account_invoice(models.Model):
                                 inv_l_id = invoice_l_obj.search([('name', '=', s_lines_vals.get('name', '')),
                                                       ('product_id', '=', s_lines_vals.get('product_id', False)),
                                                       ('price_unit', '=', s_lines_vals.get('price_unit', 0.0)),
-                                                      ('quantity', '=', s_lines_vals.get('quantity', 0.0)),
+                                                      ('quantity', '=', s_lines_vals.get('product_uom_qty', 0.0)),
                                                       ('invoice_id', '=', inv.id or False)])
                                 if inv_l_id:
-                                    s_lines_vals.append({'inv_line_id': inv_l_id.ids[0] or False})
-                                sale_ord_vals.update({'order_line': [(0, 0, s_lines_vals)]})
+                                    s_lines_vals.update({'inv_line_id': inv_l_id.ids[0] or False})
+                                
+                                if sale_ord_vals.get('order_line', False):
+                                    sale_ord_vals['order_line'].append((0, 0, s_lines_vals))
+                                else:
+                                    sale_ord_vals.update({'order_line': [(0, 0, s_lines_vals)]})
                             if p_lines_vals and purch_ord_id:
                                 p_lines_vals.update({'date_planned': inv.date_invoice or False})
-                                inv_l_id = invoice_l_obj.search([('name', '=', s_lines_vals.get('name', '')),
-                                                      ('product_id', '=', s_lines_vals.get('product_id', False)),
-                                                      ('price_unit', '=', s_lines_vals.get('price_unit', 0.0)),
-                                                      ('quantity', '=', s_lines_vals.get('quantity', 0.0)),
+                                inv_l_id = invoice_l_obj.search([('name', '=', p_lines_vals.get('name', '')),
+                                                      ('product_id', '=', p_lines_vals.get('product_id', False)),
+                                                      ('price_unit', '=', p_lines_vals.get('price_unit', 0.0)),
+                                                      ('quantity', '=', p_lines_vals.get('product_qty', 0.0)),
                                                       ('invoice_id', '=', inv.id or False)])
                                 if inv_l_id:
-                                    p_lines_vals.append({'inv_line_id': inv_l_id.ids[0] or False})
-                                purchase_ord_vals.update({'order_line': [(0, 0, p_lines_vals)]})
-
+                                    p_lines_vals.update({'inv_line_id': inv_l_id.ids[0] or False})
+#                                 purchase_ord_vals.update({'order_line': [(0, 0, p_lines_vals)]})
+                                if purchase_ord_vals.get('order_line', False):
+                                    purchase_ord_vals['order_line'].append((0, 0, p_lines_vals))
+                                else:
+                                    purchase_ord_vals.update({'order_line': [(0, 0, p_lines_vals)]})
                             if pick_lines_vals and pick_ord_id:
-                                pick_lines_vals.update({'state': 'done'})
-                                picking_ord_vals.update({'order_line': [(0, 0, pick_lines_vals)]})
-                            if pick_ord_id and pick_lines_vals:
-                                picking_ord_vals.update({'move_lines': pick_lines_vals})
+                                pick_lines_vals.update({'state': 'assigned'})
+                                inv_l_id = invoice_l_obj.search([('product_id', '=', pick_lines_vals.get('product_id', False)),
+                                                      ('price_unit', '=', pick_lines_vals.get('price_unit', 0.0)),
+                                                      ('quantity', '=', pick_lines_vals.get('product_uom_qty', 0.0)),
+                                                      ('invoice_id', '=', inv.id or False)])
+                                if inv_l_id:
+                                    pick_lines_vals.update({'inv_line_id': inv_l_id.ids[0] or False,
+                                                            'product_uom': inv_l_id.product_id and \
+                                                                inv_l_id.product_id.uom_id and \
+                                                                inv_l_id.product_id.uom_id.id or False,
+                                                            'name': inv_l_id.name or ''})
+                                    if inv_l_id.invoice_id and inv_l_id.invoice_id.type == 'out_invoice':
+                                        loc_id = self.env['stock.location'].search([('location_id', '!=', False), ('location_id.name', 'ilike', 'WH'),
+                                                                                    ('company_id.id', '=', self.company_id.id),
+                                                                                    ('usage', '=', 'internal')], limit = 1)
+                                        dest_loc_id = self.env['stock.location'].search([('location_id', '!=', False),
+                                                             ('location_id.name', 'ilike', 'Partner Locations'),
+                                                             ('usage', '=', 'customer')], limit = 1)
+                                        pick_lines_vals.update({'location_id': loc_id and loc_id.id or False,
+                                                                'location_dest_id': dest_loc_id and dest_loc_id.id or False})
+                                    if inv_l_id.invoice_id and inv_l_id.invoice_id.type == 'in_invoice':
+                                        loc_id = self.env['stock.location'].search([('location_id', '!=', False), ('location_id.name', 'ilike', 'WH'),
+                                                                                    ('company_id.id', '=', self.company_id.id),
+                                                                                    ('usage', '=', 'internal')], limit = 1)
+                                        dest_loc_id = self.env['stock.location'].search([('location_id', '!=', False),
+                                                             ('location_id.name', 'ilike', 'Partner Locations'),
+                                                             ('usage', '=', 'supplier')], limit = 1)
+                                        pick_lines_vals.update({'location_id': dest_loc_id and dest_loc_id.id or False,
+                                                                'location_dest_id': loc_id and loc_id.id or False})
+                                if picking_ord_vals.get('move_lines', False):
+                                    picking_ord_vals['move_lines'].append((0, 0, pick_lines_vals))
+                                else:
+                                    picking_ord_vals.update({'move_lines': [(0, 0, pick_lines_vals)]})
                 if sale_ord_id and sale_ord_vals:
                     sale_ord_id.write(sale_ord_vals)
                 if purch_ord_id and purchase_ord_vals:
                     purch_ord_id.write(purchase_ord_vals)
                 if pick_ord_id and picking_ord_vals:
                     pick_ord_id.write(picking_ord_vals)
+                    for pick in pick_ord_id:
+                        if pick.state == 'assigned':
+                            pick.do_transfer()
         return res
 
     @api.multi
@@ -958,9 +1002,16 @@ class account_invoice(models.Model):
                 purchase_rec.write({'state':'except_invoice'})
         return True
 
-#class account_move(models.Model):
-#     _inherit = "account.move"
-#
+class account_move(models.Model):
+     _inherit = "account.move"
+
+     @api.model
+     def create(self, vals):
+         if self._context and self._context.get('invoice', False):
+             vals['name'] = self._context['invoice'].number or '/'
+         res = super(account_move, self).create(vals)
+         return res
+
 #     @api.multi
 #     def post(self):
 #         cr,uid,context = self.env.args

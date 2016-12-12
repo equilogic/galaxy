@@ -32,5 +32,5 @@ class stock_picking(models.Model):
 class stock_move(models.Model):
     _inherit = 'stock.move'
  
-    sale_line_id = fields.Many2one('sale.order.line', 'Sale line')
+    inv_line_id = fields.Many2one('account.invoice.line', 'Invoice line')
 
