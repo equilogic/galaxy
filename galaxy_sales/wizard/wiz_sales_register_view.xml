@@ -52,5 +52,23 @@
 				</tree>
 			</field>
 		</record>
+		
+		<!-- Search view for sale Register report  -->
+		<record model="ir.ui.view" id="sale_register_search_list_new_view">
+			<field name="name">sale.register.search.view.list.new</field>
+			<field name="model">sale.register.report.list.new</field>
+			<field name="arch" type="xml">
+				<search>
+					<field name="date"/>
+					<field name="invoice_no"/>
+					<!-- <field name="sales_no"/> -->
+					<field name="customer_po_no"/>
+					<field name="customer_name"/>
+					<field name="cur_sym_code"/>
+					<field name="amount" sum="Total"/>
+					<field name="amount_due" sum="Total"/>
+				</search>
+			</field>
+		</record>
     </data>
 </openerp>

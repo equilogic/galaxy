@@ -52,5 +52,23 @@
 				</tree>
 			</field>
 		</record>
+		
+		<!-- Search view for sale order report  -->
+		<record model="ir.ui.view" id="sale_order_register_search_view">
+			<field name="name">sale.order.register.search.view</field>
+			<field name="model">sale.order.register.report</field>
+			<field name="arch" type="xml">
+				<search>
+					<field name="sl_no"/>
+					<field name="date"/>
+					<field name="sale_order_no"/>
+					<field name="customer_po_no"/>
+					<field name="customer_name"/>
+					<field name="state"/>
+					<field name="order_amt_in_actual_curr"/>
+					<field name="tax_amt"/>
+				</search>
+			</field>
+		</record>
     </data>
 </openerp>

@@ -49,5 +49,20 @@
 				</tree>
 			</field>
 		</record>
+		
+		<!-- search view for product wise sale report 1 -->
+		<record model="ir.ui.view" id="product_wise_sale_report_search_view_1">
+			<field name="name">product.wise.sale.report.search.view.1</field>
+			<field name="model">product.wise.sale.report.1</field>
+			<field name="arch" type="xml">
+				<search>
+					<field name="customer_name"/>
+					<field name="product_name"/>
+					<field name="qty"/>
+					<field name="amt_in_actual_currency"/>
+					<field name="amt_in_sgd"/>
+				</search> 
+			</field>
+		</record>
     </data>
 </openerp>
