@@ -7,9 +7,9 @@
 			<field name="model">sale.order</field>
 			<field name="inherit_id" ref="sale.view_order_tree" />
 			<field name="arch" type="xml">
-                <xpath expr="/tree/field[@name='user_id']" position='attributes'>
-                    <attribute name="invisible">1</attribute>
-                </xpath>
+				<xpath expr="/tree/field[@name='user_id']" position='attributes'>
+					<attribute name="invisible">1</attribute>
+				</xpath>
 			</field>
 		</record>
 
@@ -20,30 +20,35 @@
 			<field name="model">sale.order</field>
 			<field name="inherit_id" ref="sale.view_order_form" />
 			<field name="arch" type="xml">
-			
-				<button name="print_quotation" string="Print" type="object" states="draft" 
-						class="oe_highlight" groups="base.group_user" position='replace'>
-					<button name="print_quotation" string="Print" type="object"  
-					invisible="1" class="oe_highlight" groups="base.group_user"/>
+
+				<button name="print_quotation" string="Print" type="object"
+					states="draft" class="oe_highlight" groups="base.group_user"
+					position='replace'>
+					<button name="print_quotation" string="Print" type="object"
+						invisible="1" class="oe_highlight" groups="base.group_user" />
 				</button>
-                <button name="print_quotation" string="Print" type="object" 
-                		states="sent,progress,manual" groups="base.group_user" position='replace'>
-                	<button name="print_quotation" string="Print" type="object" invisible="1" groups="base.group_user"/>	
-                </button>
-				<button name="action_quotation_send" string="Send by Email" type="object" states="draft"  
-						class="oe_highlight" groups="base.group_user" position='replace'>
-					<button name="action_quotation_send" string="Send by Email" type="object" invisible="1" 
-						class="oe_highlight" groups="base.group_user"/>
+				<button name="print_quotation" string="Print" type="object"
+					states="sent,progress,manual" groups="base.group_user" position='replace'>
+					<button name="print_quotation" string="Print" type="object"
+						invisible="1" groups="base.group_user" />
 				</button>
-                <button name="action_quotation_send" string="Send by Email" type="object" states="sent,progress,manual" 
-                		groups="base.group_user" position='replace'>
-               		<button name="action_quotation_send" string="Send by Email" type="object" invisible="1" 
-                		groups="base.group_user"/>
-                </button>                
-                <xpath
-                    expr="/form[@string='Sales Order']/header/button[@name='print_quotation']" position='attributes'>
-                    <attribute name="invisible">1</attribute>
-                </xpath>
+				<button name="action_quotation_send" string="Send by Email"
+					type="object" states="draft" class="oe_highlight" groups="base.group_user"
+					position='replace'>
+					<button name="action_quotation_send" string="Send by Email"
+						type="object" invisible="1" class="oe_highlight" groups="base.group_user" />
+				</button>
+				<button name="action_quotation_send" string="Send by Email"
+					type="object" states="sent,progress,manual" groups="base.group_user"
+					position='replace'>
+					<button name="action_quotation_send" string="Send by Email"
+						type="object" invisible="1" groups="base.group_user" />
+				</button>
+				<xpath
+					expr="/form[@string='Sales Order']/header/button[@name='print_quotation']"
+					position='attributes'>
+					<attribute name="invisible">1</attribute>
+				</xpath>
 				<xpath
 					expr="/form[@string='Sales Order']/header/button[@name='action_button_confirm']"
 					position="before">
@@ -68,6 +73,8 @@
 					<attribute name="context">{'search_default_customer':1,
 						'show_address': 1,'default_type':'invoice'}
 					</attribute>
+					<attribute name="domain">['|',('type','=','invoice'),'|',('parent_id','=',partner_id),('id','=',partner_id)]
+					</attribute>
 					<attribute name="options">{"always_reload": True}</attribute>
 				</xpath>
 
@@ -76,17 +83,19 @@
 					<attribute name="context">{'search_default_customer':1,
 						'show_address': 1,'default_type':'delivery'}
 					</attribute>
+					<attribute name="domain">['|',('type','=','delivery'),'|',('parent_id','=',partner_id),('id','=',partner_id)]
+					</attribute>
 					<attribute name="options">{"always_reload": True}</attribute>
 				</xpath>
 
 				<xpath expr="/form/sheet/group/group/field[@name='partner_shipping_id']"
 					position="after">
 					<field name="attn_sal"
-						domain="[('type','=','contact'),('parent_id','=',partner_id)]"
+						domain="[('type','=','contact'),'|',('parent_id','=',partner_id),('id','=',partner_id)]"
 						attrs="{'readonly': [('state','not in',('draft','sent'))]}"
-						options="{'no_create': True}"/>
+						options="{'no_create': True}" />
 					<field name="customer_po" />
-					<field name="direct_invoice" invisible="1"/>
+					<field name="direct_invoice" invisible="1" />
 				</xpath>
 				<xpath
 					expr="//page[@string='Order Lines']/field[@name='order_line']/tree[@string='Sales Order Lines']/field[@name='price_unit']"
@@ -108,34 +117,28 @@
 					position='after'>
 					<field name="price_unit" />
 					<field name="price_subtotal" />
-					<field name="tax_id" widget="many2many_tags" domain="[('parent_id','=',False),('type_tax_use','&lt;&gt;','purchase')]"/>
+					<field name="tax_id" widget="many2many_tags"
+						domain="[('parent_id','=',False),('type_tax_use','&lt;&gt;','purchase')]" />
 				</xpath>
-				
-                <xpath
-                    expr="//page[@string='Order Lines']/field[@name='order_line']/tree[@string='Sales Order Lines']/field[@name='name']"
-                    position='after'>
-                    <field name="qty_on_hand" readonly="1"/>
-                </xpath>
+
+				<xpath
+					expr="//page[@string='Order Lines']/field[@name='order_line']/tree[@string='Sales Order Lines']/field[@name='name']"
+					position='after'>
+					<field name="qty_on_hand" readonly="1" />
+				</xpath>
 
 				<field name="pricelist_id" position="after">
 					<field name="currency_rate" />
 				</field>
 
-<!-- 				<xpath expr="//field[@name='amount_untaxed']" position="after">
-					<field name="landed_cost_price" readonly="1"
-					widget="monetary" options="{'currency_field': 'currency_id'}" />
-				</xpath> -->
-				
-<!-- 				<xpath expr="//page[@string='Other Information']" position='after'>
-					<page string="Landed Cost Details">
-						<field name="landed_cost_sal">
-							<tree editable="bottom">
-								<field name="landed_id"/>
-								<field name="amount"/>
-							</tree>
-						</field>
-					</page>
-				</xpath> -->
+				<!-- <xpath expr="//field[@name='amount_untaxed']" position="after"> 
+					<field name="landed_cost_price" readonly="1" widget="monetary" options="{'currency_field': 
+					'currency_id'}" /> </xpath> -->
+
+				<!-- <xpath expr="//page[@string='Other Information']" position='after'> 
+					<page string="Landed Cost Details"> <field name="landed_cost_sal"> <tree 
+					editable="bottom"> <field name="landed_id"/> <field name="amount"/> </tree> 
+					</field> </page> </xpath> -->
 
 			</field>
 		</record>

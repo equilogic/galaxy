@@ -33,11 +33,16 @@
 					</attribute>
 					<attribute name="options">{"always_reload": True}</attribute>
 				</xpath>
-				<!-- <xpath expr="//field[@name='partner_id']" position="after"> <field 
-					name="partner_inv_id" context="{'search_default_supplier':1, 'show_address': 
-					1,'default_type':'invoice'}" options="{'always_reload': True}" /> <field 
-					name="partner_ship_id" context="{'search_default_supplier':1, 'show_address': 
-					1,'default_type':'delivery'}" options="{'always_reload': True}" /> </xpath> -->
+				<xpath expr="//field[@name='partner_id']" position="after">
+					<field name="partner_inv_id"
+						context="{'search_default_supplier':1, 'show_address':1,'default_type':'invoice'}"
+						domain="['|',('type','=','invoice'),'|',('parent_id','=',partner_id),('id','=',partner_id)]"
+						options="{'always_reload': True}" />
+					<field name="partner_ship_id"
+						context="{'search_default_supplier':1, 'show_address':1,'default_type':'delivery'}"
+						domain="['|',('type','=','delivery'),'|',('parent_id','=',partner_id),('id','=',partner_id)]"
+						options="{'always_reload': True}" />
+				</xpath>
 
 				<xpath expr="//field[@name='picking_type_id']" position="after">
 					<field name="sup_inv_num"
@@ -46,12 +51,13 @@
 
 				<xpath expr="//field[@name='dest_address_id']" position="attributes">
 					<attribute name="attrs">{'required': [('related_usage','=',
-						'customer')]}</attribute>
+						'customer')]}
+					</attribute>
 				</xpath>
 
 				<xpath expr="//field[@name='currency_id']" position="after">
 					<field name="attn_pur"
-						domain="[('type','=','contact'),('parent_id','=',partner_id)]"
+						domain="[('type','=','contact'),'|',('parent_id','=',partner_id),('id','=',partner_id)]"
 						attrs="{'readonly': [('state','not in',('draft','sent'))]}"
 						options="{'no_create': True}" />
 					<field name="direct_invoice" invisible="1" />
@@ -200,8 +206,8 @@
 			<field name="inherit_id" ref="product.product_template_search_view" />
 			<field name="arch" type="xml">
 				<filter name="filter_to_sell" position="after">
-					<filter name="filter_to_purchase" string="Can be Purchased" invisible="1"
-						icon="terp-accessories-archiver+" domain="[('purchase_ok', '=', 1)]" />
+					<filter name="filter_to_purchase" string="Can be Purchased"
+						invisible="1" icon="terp-accessories-archiver+" domain="[('purchase_ok', '=', 1)]" />
 				</filter>
 			</field>
 		</record>
