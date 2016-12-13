@@ -41,7 +41,6 @@ class account_invoice_line(models.Model):
     @api.multi
     @api.depends('product_id')
     def _compute_profoma_qty(self):
-        inv_obj=self.env['account.invoice']
         for cost in self:
             if cost.product_id and cost.product_id.non_invenotry_item == False:
                 line_ids = self.search([('product_id', '=', cost.product_id.id), ('invoice_id.state', '=', 'draft')])
