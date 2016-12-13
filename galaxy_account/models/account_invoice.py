@@ -41,19 +41,21 @@ class account_invoice_line(models.Model):
     @api.multi
     @api.depends('product_id')
     def _compute_profoma_qty(self):
-        qty = 0.0
+        inv_obj=self.env['account.invoice']
         for cost in self:
             if cost.product_id and cost.product_id.non_invenotry_item == False:
                 line_ids = self.search([('product_id', '=', cost.product_id.id), ('invoice_id.state', '=', 'draft')])
+                qty=0.0
                 for line_id in line_ids:
-                    qty += line_id.quantity
-            cost.profoma_qty = qty
+                    if line_id.id != cost.id and line_id.invoice_id.id != cost.invoice_id.id :
+                        qty += line_id.quantity
+                cost.profoma_qty = qty
 
     prod_desc = fields.Text(related = 'product_id.description', string = 'Full Description')
     origin_ids = fields.Many2many('origin.origin', string = 'Origin')
     no_origin = fields.Boolean('NO Origin')
     qty_on_hand = fields.Float(related = 'product_id.qty_available', string = 'Quantity On Hand', default = 0.0)
-    profoma_qty = fields.Float(compute = '_compute_profoma_qty', string = 'Profoma QTY')
+    profoma_qty = fields.Float(compute = '_compute_profoma_qty', string = 'Profoma QTY',store = True)
     discount = fields.Float(string='Discount (%)',
                             digits=(16, 2),
                             # digits= dp.get_precision('Discount'),
