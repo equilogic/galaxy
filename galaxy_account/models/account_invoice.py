@@ -802,7 +802,7 @@ class account_invoice(models.Model):
                             if inv_line[2].get('product_id', False):
                                 s_lines_vals.update({'product_id': inv_line[2]['product_id'] or False})
                                 p_lines_vals.update({'product_id': inv_line[2]['product_id'] or False})
-                                pick_lines_vals.update({'price_unit': inv_line[2]['product_id'] or 0.0})
+                                pick_lines_vals.update({'product_id': inv_line[2]['product_id'] or 0.0})
                             if inv_line[2].get('quantity', False):
                                 s_lines_vals.update({'product_uom_qty': inv_line[2]['quantity'] or 0.0})
                                 p_lines_vals.update({'product_qty': inv_line[2]['quantity'] or 0.0})
@@ -810,7 +810,7 @@ class account_invoice(models.Model):
                             if inv_line[2].get('name', False):
                                 s_lines_vals.update({'name': inv_line[2]['name'] or ''})
                                 p_lines_vals.update({'name': inv_line[2]['name'] or ''})
-                                pick_lines_vals.update({'price_unit': inv_line[2]['name'] or 0.0})
+                                pick_lines_vals.update({'name': inv_line[2]['name'] or 0.0})
                             if inv_line[2].get('invoice_line_tax_id', False):
                                 if inv_line[2]['invoice_line_tax_id'][0] and inv_line[2]['invoice_line_tax_id'][0][2]:
                                     s_lines_vals.update({'tax_id': [(6, 0, inv_line[2]['invoice_line_tax_id'][0][2])]})
@@ -953,6 +953,10 @@ class account_invoice(models.Model):
                     purch_ord_id.write(purchase_ord_vals)
                 if pick_ord_id and picking_ord_vals:
                     pick_ord_id.write(picking_ord_vals)
+                    for pick in pick_ord_id:
+                        if pick.state == 'assigned':
+                            pick.do_transfer()
+                elif pick_ord_id:
                     for pick in pick_ord_id:
                         if pick.state == 'assigned':
                             pick.do_transfer()
