@@ -722,7 +722,8 @@ class account_invoice(models.Model):
                         res1 = self._cr.fetchone()    
                         seq_id1 = self.env['ir.sequence'].next_by_id(res1[0])                    
                         inv.number = seq_id1
-                        inv.internal_number = seq_id1        
+                        inv.internal_number = seq_id1
+                        latest_number = seq_id1
                     else:                               
                         if not inv.partner_id.cust_code:
                             if inv.type == "out_invoice":
