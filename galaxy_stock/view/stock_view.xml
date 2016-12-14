@@ -28,11 +28,12 @@
 			<field name="inherit_id" ref="product.product_template_search_view" />
 			<field name="arch" type="xml">
 				<field name="product_variant_ids" position="before">
+					<field name="qty_available" filter_domain="[('qty_available','&gt;',0),]" />
 					<separator />
 					<filter name="real_stock_available" string="Available Products"
-						domain="[('qty_available','&gt;',0)]" invisible="1" />
+						domain="[('qty_available','&gt;',0)]" context="{'search_default_real_stock_available':1}"/>
 					<filter name="virtual_stock_available" string="Forecast Available Products"
-						domain="[('virtual_available','&gt;',0)]" invisible="1" />
+						domain="[('virtual_available','&gt;',0)]" />
 					<filter name="real_stock_exhausted" invisible="1"
 						string="Exhausted Stock" domain="[('qty_available','&lt;=',0)]" />
 					<filter name="virtual_stock_exhausted" invisible="1"

@@ -75,13 +75,10 @@
 					<field name="description" string='Full Description'/>
 					<field name="default_code" string="Item No" />
 				</xpath>
-				<xpath expr="//search/group[@string='Group by...']" position="attributes">
+ 				<xpath expr="//search/field[@name='categ_id']" position="attributes">
 					<attribute name="invisible">1</attribute>
 				</xpath>
-				<xpath expr="//search/field[@name='categ_id']" position="attributes">
-					<attribute name="invisible">1</attribute>
-				</xpath>
-				<xpath expr="//search/field[@name='product_variant_ids']"
+			<!--	<xpath expr="//search/field[@name='product_variant_ids']"
 					position="attributes">
 					<attribute name="invisible">1</attribute>
 				</xpath>
@@ -99,17 +96,7 @@
 				</xpath>
 				<xpath expr="//search/filter[@string='Can be Sold']" position="attributes">
 					<attribute name="invisible">1</attribute>
-				</xpath>
-				<!-- <xpath expr="//search/filter[@string='Services']" position="replace"> 
-					</xpath> -->
-				<!-- <xpath expr="//search/field[@name='name']" position="after"> <field 
-					string="Brand" name="brand" domain="[('brand','ilike',self)]"/> </xpath> 
-					<xpath expr="//search/field[@name='name']" position="after"> <field string="Flavor" 
-					name="flavor" domain="[('flavor','ilike',self)]"/> </xpath> <xpath expr="//search/group/filter[@string='Type']" 
-					position="after"> <field name="brand"/> <filter name="grp_braproductnd" string="Brand" 
-					domain="[]" context="{'group_by':'brand'}"/> </xpath> <xpath expr="//search/group/filter[@string='Type']" 
-					position="after"> <field name="flavor"/> <filter name="grp_flavor" string="Flavor" 
-					domain="[]" context="{'group_by':'flavor'}"/> </xpath> -->
+				</xpath> -->
 			</field>
 		</record>
 

@@ -53,7 +53,7 @@ class account_invoice_line(models.Model):
     prod_desc = fields.Text(related = 'product_id.description', string = 'Full Description')
     origin_ids = fields.Many2many('origin.origin', string = 'Origin')
     no_origin = fields.Boolean('NO Origin')
-    qty_on_hand = fields.Float(related = 'product_id.qty_available', string = 'Quantity On Hand', default = 0.0)
+    qty_on_hand = fields.Float(related = 'product_id.qty_available', string = 'Quantity On Hand',digits=(16, 0), default = 0.0)
     profoma_qty = fields.Float(compute = '_compute_profoma_qty', string = 'Profoma QTY',store = True)
     discount = fields.Float(string='Discount (%)',
                             digits=(16, 2),
@@ -155,6 +155,7 @@ class account_invoice(models.Model):
                                    digits = dp.get_precision('Account'),
                                    readonly = True, compute = '_compute_amount')
     sequence_update =  fields.Boolean('Sequence updated')
+    shipping_date = fields.Date('Shipping Date')
 
     @api.multi
     def compute_discount(self, discount):

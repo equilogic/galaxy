@@ -118,14 +118,14 @@
 					/>
 					<field name="part_inv_id"
 						context="{'search_default_customer':1, 'default_type':'invoice'}"
-						domain="['|',('type','=','invoice'),'|',('parent_id','=',partner_id),('id','=',partner_id)]"
+						domain="[('type','not in',('delivery','contact','other','default')),('parent_id','=',partner_id)]"
 						options="{'always_reload': True}" />
 					<label string=''/>
 					<field name="part_inv_add" nolabel="1" options="{'always_reload': True}" 
 					/>
 					<field name="part_ship_id"
 						context="{'search_default_customer':1,'default_type':'delivery'}"
-						domain="['|',('type','=','delivery'),'|',('parent_id','=',partner_id),('id','=',partner_id)]"
+						domain="[('type','not in',('invoice','contact','other','default')),('parent_id','=',partner_id)]"
 						options="{'always_reload': True}" />
 					<label string=''/>
 					<field name="part_ship_add" nolabel="1" options="{'always_reload': True}"
@@ -209,6 +209,7 @@
 						options="{'no_create': True}"/>
 						
 					<field name="customer_po"/>
+					<field name="shipping_date" />
 					<field name="delivery_status"/>
 					<field name="currency_rate" />
 					<field name="export" />
@@ -374,12 +375,12 @@
 				<xpath expr="//field[@name='partner_id']" position="after">
 					<field name="part_inv_id"
 						context="{'search_default_supplier':1, 'show_address': 1,'default_type':'invoice'}"
-                        domain="['|',('type','=','invoice'),'|',('parent_id','=',partner_id),('id','=',partner_id)]"
+                        domain="[('type','not in',('delivery','contact','other','default')),('parent_id','=',partner_id)]"
 						options="{'always_reload': True}" />
 					
 					<field name="part_ship_id"
 						context="{'search_default_supplier':1, 'show_address': 1,'default_type':'delivery'}"
-                        domain="['|',('type','=','delivery'),'|',('parent_id','=',partner_id),('id','=',partner_id)]"
+                        domain="[('type','not in',('invoice','contact','other','default')),('parent_id','=',partner_id)]"
 						options="{'always_reload': True}"  />
 				</xpath>
 				<xpath expr="//field[@name='fiscal_position']" position="after">
