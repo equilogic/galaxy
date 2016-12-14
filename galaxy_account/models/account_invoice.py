@@ -91,6 +91,36 @@ class account_invoice_line(models.Model):
                         'quantity': 1.0})
         return res
 
+    @api.multi
+    def unlink(self):
+        purch_line_obj = self.env['purchase.order.line']
+        sale_line_obj = self.env['sale.order.line']
+        move_obj = self.env['stock.move']
+        quants_obj = self.env['stock.quant']
+        for inv_line in self:
+            if inv_line.invoice_id and inv_line.invoice_id.state not in ('draft', 'cancel'):
+                purchase_l_ids = purch_line_obj.search([('inv_line_id','=', inv_line.id)])
+                sale_l_ids = sale_line_obj.search([('inv_line_id','=', inv_line.id)])
+                stock_move_ids = move_obj.search([('inv_line_id','=', inv_line.id)])
+                if purchase_l_ids:
+                    for purch_l in purchase_l_ids:
+                        purch_l.state = 'draft'
+                    purchase_l_ids.unlink()
+                if sale_l_ids:
+                    for sale_l in sale_l_ids:
+                        sale_l.state = 'draft'
+                    sale_l_ids.unlink()
+                if stock_move_ids:
+                    for move in stock_move_ids:
+                        if inv_line.invoice_id:
+                            reverse_pick = inv_line.invoice_id._create_returns_when_prod_change_in_inv_line(move.picking_id, move)
+                            if reverse_pick and reverse_pick.state == 'assigned':
+                                reverse_pick.do_transfer()
+                        move.state = 'draft'
+                    stock_move_ids.unlink()
+        res = super(account_invoice_line, self).unlink()
+        return res
+
 
 class account_invoice(models.Model):
     _inherit = "account.invoice"
@@ -768,6 +798,7 @@ class account_invoice(models.Model):
             'move_lines': [],
             'picking_type_id': pick_type_id,
             'state': 'draft',
+            'inv_id': False,
             'origin': pick.name,
         })
  
@@ -1013,8 +1044,8 @@ class account_invoice(models.Model):
                 if purch_ord_id and purchase_ord_vals:
                     purch_ord_id.write(purchase_ord_vals)
                 if pick_ord_id and picking_ord_vals:
-                    pick_ord_id.write(picking_ord_vals)
                     for pick in pick_ord_id:
+                        pick.write(picking_ord_vals)
                         if pick.state == 'assigned':
                             pick.do_transfer()
                 elif pick_ord_id:
