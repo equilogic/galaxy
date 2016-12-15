@@ -91,6 +91,36 @@ class account_invoice_line(models.Model):
                         'quantity': 1.0})
         return res
 
+    @api.multi
+    def unlink(self):
+        purch_line_obj = self.env['purchase.order.line']
+        sale_line_obj = self.env['sale.order.line']
+        move_obj = self.env['stock.move']
+        quants_obj = self.env['stock.quant']
+        for inv_line in self:
+            if inv_line.invoice_id and inv_line.invoice_id.state not in ('draft', 'cancel'):
+                purchase_l_ids = purch_line_obj.search([('inv_line_id','=', inv_line.id)])
+                sale_l_ids = sale_line_obj.search([('inv_line_id','=', inv_line.id)])
+                stock_move_ids = move_obj.search([('inv_line_id','=', inv_line.id)])
+                if purchase_l_ids:
+                    for purch_l in purchase_l_ids:
+                        purch_l.state = 'draft'
+                    purchase_l_ids.unlink()
+                if sale_l_ids:
+                    for sale_l in sale_l_ids:
+                        sale_l.state = 'draft'
+                    sale_l_ids.unlink()
+                if stock_move_ids:
+                    for move in stock_move_ids:
+                        if inv_line.invoice_id:
+                            reverse_pick = inv_line.invoice_id._create_returns_when_prod_change_in_inv_line(move.picking_id, move)
+                            if reverse_pick and reverse_pick.state == 'assigned':
+                                reverse_pick.do_transfer()
+                        move.state = 'draft'
+                    stock_move_ids.unlink()
+        res = super(account_invoice_line, self).unlink()
+        return res
+
 
 class account_invoice(models.Model):
     _inherit = "account.invoice"
@@ -740,6 +770,76 @@ class account_invoice(models.Model):
         return latest_number
     
     @api.multi
+    def _create_returns_when_prod_change_in_inv_line(self, pick, move_ids):
+        move_obj = self.env['stock.move']
+        returned_lines = 0
+        # Cancel assignment of existing chained assigned moves
+        moves_to_unreserve = []
+        for move in move_ids:
+            to_check_moves = [move.move_dest_id] if move.move_dest_id.id else []
+            while to_check_moves:
+                current_move = to_check_moves.pop()
+                if current_move.state not in ('done', 'cancel') and current_move.reserved_quant_ids:
+                    moves_to_unreserve.append(current_move)
+                split_move_ids = move_obj.search([('split_from', '=', current_move.id)])
+                if split_move_ids:
+                    to_check_moves += split_move_ids
+ 
+        if moves_to_unreserve:
+            for mv_unreserv in moves_to_unreserve:
+                mv_unreserv.do_unreserve()
+                #break the link between moves in order to be able to fix them later if needed
+                mv_unreserv.move_orig_ids = False
+ 
+        #Create new picking for returned products
+        pick_type_id = pick.picking_type_id.return_picking_type_id and \
+                        pick.picking_type_id.return_picking_type_id.id or pick.picking_type_id.id
+        new_picking = pick.copy({
+            'move_lines': [],
+            'picking_type_id': pick_type_id,
+            'state': 'draft',
+            'inv_id': False,
+            'origin': pick.name,
+        })
+ 
+        for move in move_ids:
+            if not move:
+                raise osv.except_osv(_('Warning !'), _("You have manually created product lines, please delete them to proceed"))
+            new_qty = move.product_uom_qty or 0.0
+            if new_qty:
+                # The return of a return should be linked with the original's destination move if it was not cancelled
+                if move.origin_returned_move_id.move_dest_id.id and move.origin_returned_move_id.move_dest_id.state != 'cancel':
+                    move_dest_id = move.origin_returned_move_id.move_dest_id.id
+                else:
+                    move_dest_id = False
+ 
+                returned_lines += 1
+                move.copy({
+                    'product_id': move.product_id and move.product_id.id or False,
+                    'product_uom_qty': new_qty,
+                    'product_uos_qty': new_qty * move.product_uos_qty / move.product_uom_qty,
+                    'picking_id': new_picking and new_picking.id or False,
+                    'state': 'draft',
+                    'location_id': move.location_dest_id and move.location_dest_id.id or False,
+                    'location_dest_id': move.location_id and move.location_id.id or False,
+                    'picking_type_id': pick_type_id,
+                    'warehouse_id': pick.picking_type_id and pick.picking_type_id.warehouse_id and \
+                                        pick.picking_type_id.warehouse_id.id or False,
+                    'origin_returned_move_id': move.id,
+                    'procure_method': 'make_to_stock',
+#                     'restrict_lot_id': data_get.lot_id.id,
+                    'inv_line_id': False,
+                    'move_dest_id': move_dest_id
+                })
+ 
+        if not returned_lines:
+            raise osv.except_osv(_('Warning!'), _("Please specify at least one non-zero quantity."))
+
+        new_picking.action_confirm()
+        new_picking.action_assign()
+        return new_picking
+    
+    @api.multi
     def write(self, vals):
         picking_obj = self.env['stock.picking']
         sale_obj = self.env['sale.order']
@@ -832,36 +932,27 @@ class account_invoice(models.Model):
                                     pick_line_ids = pick_line_obj.search([('inv_line_id', '=', inv_line[1])])
                                     if pick_line_ids:
                                         for pick_line_id in pick_line_ids:
+                                            if pick_lines_vals.get('product_id', False) or pick_lines_vals.get('product_uom_qty', False):
+                                                reverse_pick = self._create_returns_when_prod_change_in_inv_line(pick_line_id.picking_id, pick_line_id)
+                                                if reverse_pick and reverse_pick.state == 'assigned':
+                                                    reverse_pick.do_transfer()
+                                                pick_line_id.state = 'assigned'
                                                 pick_line_id.write(pick_lines_vals)
-                                                self._cr.execute('select quant_id from stock_quant_move_rel  where move_id=%s', (pick_line_id.id,))
-                                                quant_id = self._cr.fetchone()
-                                                quat_data = stock_quant_obj.browse(quant_id)
-                                                new_qnt = stock_quant_obj.create({'product_id': inv_line_rec.product_id.id,
-                                                                        'qty': quat_data.qty - pick_lines_vals.get('product_uom_qty', 0.0),
-                                                                        'in_date': inv_line_rec.invoice_id and inv_line_rec.invoice_id.date_invoice,
-                                                                        'location_id': pick_line_id.location_id.id})
-                                                quat_data.write({'qty': pick_lines_vals.get('product_uom_qty')})
+                                            else:
+                                                pick_line_id.write(pick_lines_vals)
                             else:
                                 inv_line_rec = invoice_l_obj.browse(inv_line[1])
                                 pick_det_line_id = pick_line_obj.search([('inv_line_id', '=', inv_line[1])])
-#                                 pick_det_line_id = pick_line_obj.search([('purchase_line_id', '=', pur_line_id_new.id)])
-#                                 pur_line_id_new = purchase_l_obj.search([('inv_line_id', '=', inv_line[1])])
-                                diff = 0
                                 if pick_det_line_id:
-                                    pick_det_line_id.write(pick_lines_vals)
                                     for pick_det_line_data in pick_det_line_id:
-                                        self._cr.execute('select quant_id from stock_quant_move_rel  where move_id=%s', (pick_det_line_data.id,))
-                                        quant_id = self._cr.fetchone()
-                                        quat_data = stock_quant_obj.browse(quant_id)
-                                        if quat_data.qty - pick_lines_vals.get('product_uom_qty', 0) > 0:
-                                            diff = -quat_data.qty - pick_lines_vals.get('product_uom_qty', 0)
+                                        if pick_lines_vals.get('product_id', False) or pick_lines_vals.get('product_uom_qty', False):
+                                            reverse_pick = self._create_returns_when_prod_change_in_inv_line(pick_det_line_data.picking_id, pick_det_line_data)
+                                            if reverse_pick and reverse_pick.state == 'assigned':
+                                                reverse_pick.do_transfer()
+                                            pick_det_line_data.state = 'assigned'
+                                            pick_det_line_data.write(pick_lines_vals)
                                         else:
-                                            diff = quat_data.qty - pick_lines_vals.get('product_uom_qty', 0)
-                                        stock_quant_obj.create({'product_id': inv_line_rec.product_id.id,
-                                                                'qty':-(quat_data.qty - pick_lines_vals.get('product_uom_qty', 0)),
-                                                                'in_date': inv_line_rec.invoice_id and inv_line_rec.invoice_id.date_invoice,
-                                                                'location_id': pick_det_line_data.location_id.id})
-                                        quat_data.write({'qty': pick_lines_vals.get('product_uom_qty')})
+                                            pick_det_line_data.write(pick_lines_vals)
 
                         if inv_line[2] and not inv_line[1]:
                             s_lines_vals = {}
@@ -953,8 +1044,8 @@ class account_invoice(models.Model):
                 if purch_ord_id and purchase_ord_vals:
                     purch_ord_id.write(purchase_ord_vals)
                 if pick_ord_id and picking_ord_vals:
-                    pick_ord_id.write(picking_ord_vals)
                     for pick in pick_ord_id:
+                        pick.write(picking_ord_vals)
                         if pick.state == 'assigned':
                             pick.do_transfer()
                 elif pick_ord_id:
