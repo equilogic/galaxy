@@ -120,7 +120,7 @@
 					/>
 					<field name="part_inv_id"
 						context="{'search_default_customer':1, 'default_type':'invoice'}"
-						domain="[('type','not in',('delivery','contact','other','default')),('parent_id','=',partner_id)]"
+						domain="['|',('type','=','invoice'),'|',('parent_id','=',partner_id),('id','=',partner_id)]"
 						options="{'always_reload': True}" 
 						attrs="{'required':[('type','in',('in_invoice','out_invoice'))]}" 
 					/>
@@ -129,7 +129,7 @@
 					/>
 					<field name="part_ship_id"
 						context="{'search_default_customer':1,'default_type':'delivery'}"
-						domain="[('type','not in',('invoice','contact','other','default')),('parent_id','=',partner_id)]"
+						domain="['|',('type','=','delivery'),'|',('parent_id','=',partner_id),('id','=',partner_id)]"
 						options="{'always_reload': True}" 
 						attrs="{'required':[('type','in',('in_invoice','out_invoice'))]}" 
 					/>
