@@ -8,7 +8,7 @@
             <field name="arch" type="xml">
                 <form string="Sale Order Register Report">
                 	<group col="4" colspan="4">
-                		<field name="start_date" />
+						<field name="start_date" />
             			<field name="end_date"/>
             		</group>
                     <footer>
@@ -41,7 +41,7 @@
 			<field name="model">sale.order.register.report</field>
 			<field name="arch" type="xml">
 				<tree string="Sale Order Register Report" create="false">
-					<field name="sl_no"/>
+					<field name="no"/>
 					<field name="date"/>
 					<field name="sale_order_no"/>
 					<field name="customer_po_no"/>
@@ -59,7 +59,7 @@
 			<field name="model">sale.order.register.report</field>
 			<field name="arch" type="xml">
 				<search>
-					<field name="sl_no"/>
+					<field name="no"/>
 					<field name="date"/>
 					<field name="sale_order_no"/>
 					<field name="customer_po_no"/>
