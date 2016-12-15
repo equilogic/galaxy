@@ -25,9 +25,9 @@ from datetime import datetime
 from openerp.tools.sql import drop_view_if_exists
 from openerp import tools
 
+
 class wiz_sale_order_register_report(models.TransientModel):
     _name = "wiz.sale.order.register"
-
 
     start_date = fields.Date('Start Date', required = True , default = datetime.now().date().strftime("%Y-%m-01"))
     end_date = fields.Date('End Date', required = True, default = datetime.now().date())
@@ -42,15 +42,37 @@ class wiz_sale_order_register_report(models.TransientModel):
                 'name':'Sale Order Register Report',
                 'res_model':'sale.order.register.report',
                 'view_type':'form',
-                'domain':domain,
                 'view_mode':'tree,form',
             }
+
+class temp_range(models.Model):
+    _name = 'temp.range'
+    _description = 'A Temporary table used for Dashboard view'
+
+    no = fields.Integer('Range')
+    sale_order_no = fields.Char('Sale Order No.')
+    customer_po_no = fields.Char('Customer Po No.', readonly = True)
+    customer_name = fields.Char('Customer Name', readonly = True)
+    order_amt_in_actual_curr = fields.Float('Order In Actual Currency', readonly = True)
+    tax_amt = fields.Char('Tax Amount', readonly = True)
+    state = fields.Selection([
+                            ('draft', 'Draft Quotation'),
+                            ('sent', 'Quotation Sent'),
+                            ('cancel', 'Cancelled'),
+                            ('waiting_date', 'Waiting Schedule'),
+                            ('progress', 'Sales Order'),
+                            ('manual', 'Sale to Invoice'),
+                            ('shipping_except', 'Shipping Exception'),
+                            ('invoice_except', 'Invoice Exception'),
+                            ('done', 'Done'),
+                            ], 'Status', readonly = True)
+    date = fields.Date('Date', readonly = True)
 
 class sale_order_register_report(models.Model):
     _name = 'sale.order.register.report'
     _auto = False
 
-    sl_no = fields.Char('Sl.No.', readonly = True)
+    no = fields.Integer('Sl.No.', readonly = True)
     date = fields.Date('Date', readonly = True)
     sale_order_no = fields.Char('Sale Order No.', readonly = True)
     customer_po_no = fields.Char('Customer Po No.', readonly = True)
@@ -68,24 +90,39 @@ class sale_order_register_report(models.Model):
                             ('invoice_except', 'Invoice Exception'),
                             ('done', 'Done'),
                             ], 'Status', readonly = True)
-    _order = "date"
+    _order = "no"
 
     def init(self, cr):
         tools.drop_view_if_exists(cr, 'sale_order_register_report')
-        cr.execute("""create or replace view sale_order_register_report as
-        select a.id_a as id, ROW_NUMBER() OVER (ORDER BY a.id_a) AS sl_no,a.date,a.sale_order_no,
-                a.customer_po_no,a.order_amt_in_actual_curr,a.state,a.tax_amt,
-                a.customer_name  from
-            (SELECT so.id as id_a, ROW_NUMBER() OVER (ORDER BY so.id) AS sl_no_old ,so.id,so.name as sale_order_no,so.date_order as date,
-                so.amount_tax as tax_amt,rp.name as customer_name,
-                so.state as state,
-                so.amount_total as order_amt_in_actual_curr,
-                sol.product_id as customer_po_no
-                FROM sale_order so
-                INNER JOIN res_partner rp ON rp.id = so.partner_id
-                INNER JOIN sale_order_line sol ON sol.order_id = so.id
-                ) as  a
-                 """)
+        cr.execute('delete from temp_range')
+        cr.execute("SELECT distinct(so.id) as id,so.name as sale_order_no,so.date_order as date,\
+                        so.amount_tax as tax_amt,rp.name as customer_name,\
+                        so.state as state,\
+                        so.amount_total as order_amt_in_actual_curr,\
+                        so.customer_po as customer_po_no \
+                    FROM sale_order so \
+                    INNER JOIN res_partner rp ON rp.id = so.partner_id \
+                    INNER JOIN sale_order_line sol ON sol.order_id = so.id")
+        recs = cr.fetchall()
+        counter = 1
+        for i in recs:
+            self.pool['temp.range'].create(cr, 1,
+                                                {
+                                                 'no':counter,
+                                                'sale_order_no':i[1],
+                                                'date':i[2],
+                                                'tax_amt':i[3],
+                                                'customer_name':i[4],
+                                                'state':i[5],
+                                                'order_amt_in_actual_curr':i[6],
+                                                'customer_po_no':i[7],
+                                                 })
+            counter += 1
+
+        cr.execute("""
+            create or replace view sale_order_register_report as (
+                select id,no,sale_order_no,date,tax_amt,customer_name,state,order_amt_in_actual_curr,customer_po_no from temp_range
+            )""")
 
 
 # vim:expandtab:smartindent:tabstop=4:softtabstop=4:shiftwidth=4:
