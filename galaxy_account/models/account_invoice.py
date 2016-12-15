@@ -1068,6 +1068,10 @@ class res_partner(models.Model):
     cust_code = fields.Char('Code')
     bank_detail = fields.Text(string = 'Bank Description')
 
+    _defaults = {
+        'is_company': True,
+    }
+    
     @api.multi
     def name_get(self):
         result = []

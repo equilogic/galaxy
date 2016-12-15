@@ -1,7 +1,19 @@
 <openerp>
 	<data>
 
-
+		<record id="inherited_partner_view" model="ir.ui.view">
+			<field name="name">inherited.partner.view</field>
+			<field name="model">res.partner</field>
+			<field name="inherit_id" ref="base.view_partner_form" />
+			<field name="arch" type="xml">
+				<xpath expr="//field[@name='website']" position="after">
+					<field name="cust_code" />
+					<field name="bank_detail" placeholder="Bank Descriptions...."
+				        cols="2" colspan="4"/>
+				</xpath>
+			</field>
+		</record>
+		
         <record id="base.action_partner_form" model="ir.actions.act_window">
             <field name="name">Customers</field>
             <field name="type">ir.actions.act_window</field>
