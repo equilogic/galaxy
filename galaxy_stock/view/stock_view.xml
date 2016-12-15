@@ -28,11 +28,12 @@
 			<field name="inherit_id" ref="product.product_template_search_view" />
 			<field name="arch" type="xml">
 				<field name="product_variant_ids" position="before">
+					<field name="qty_available" filter_domain="[('qty_available','&gt;',0),]" />
 					<separator />
 					<filter name="real_stock_available" string="Available Products"
-						domain="[('qty_available','&gt;',0)]" invisible="1" />
-					<filter name="virtual_stock_available" string="Forecast Available Products"
-						domain="[('virtual_available','&gt;',0)]" invisible="1" />
+						domain="[('qty_available','&gt;',0)]" context="{'search_default_real_stock_available':1}"/>
+					<!--  <filter name="virtual_stock_available" string="Forecast Available Products"
+						domain="[('virtual_available','&gt;',0)]" />
 					<filter name="real_stock_exhausted" invisible="1"
 						string="Exhausted Stock" domain="[('qty_available','&lt;=',0)]" />
 					<filter name="virtual_stock_exhausted" invisible="1"
@@ -40,17 +41,21 @@
 					<filter name="real_stock_negative" invisible="1"
 						string="Negative Stock" domain="[('qty_available','&lt;',0)]" />
 					<filter name="virtual_stock_negative" invisible="1"
-						string="Forecast Negative Stock" domain="[('virtual_available','&lt;',0)]" />
+						string="Forecast Negative Stock" domain="[('virtual_available','&lt;',0)]" /> -->
 				</field>
-				<filter name="consumable" position="before">
+				<!-- <filter name="consumable" position="before">
 					<filter string="Products" icon="terp-accessories-archiver"
 						invisible="1" domain="[('type','=','product')]" help="Stockable products" />
-				</filter>
+				</filter> -->
 			</field>
 		</record>
 
 		<!-- inherited search view of product.product -->
+<<<<<<< HEAD
 		<record id="product_search_form_view_stock_inherited" model="ir.ui.view">
+=======
+<!-- 		<record id="product_search_form_view_stock" model="ir.ui.view">
+>>>>>>> d097046007835996c15fe5bf7e0d19b6b46f3e94
 			<field name="name">product.search.stock.form</field>
 			<field name="model">product.product</field>
 			<field name="inherit_id" ref="stock.product_search_form_view_stock" />
@@ -62,7 +67,7 @@
 					<attribute name="invisible">1</attribute>
 				</field>
 			</field>
-		</record>
+		</record> -->
 
 	</data>
 </openerp>

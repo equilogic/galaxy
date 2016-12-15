@@ -84,7 +84,9 @@
                 <xpath expr="//form/sheet/h1/label[@string='Draft Invoice']" position="attributes">
                     <attribute name="string">Profoma Invoice</attribute>
                 </xpath>
-                											
+                <xpath expr="//form/header/button[@string='Refund Invoice']" position="attributes">
+                    <attribute name="invisible">1</attribute>
+                </xpath>
 				<xpath expr="//form/sheet[@string='Invoice']/h1" position="after">
 					<div class="oe_right oe_button_box" name="btn_sale_order">
 	                        <button class="oe_inline oe_stat_button" name="%(action_view_sale_order_from_invoice)d"
@@ -118,15 +120,19 @@
 					/>
 					<field name="part_inv_id"
 						context="{'search_default_customer':1, 'default_type':'invoice'}"
-						domain="['|',('type','=','invoice'),'|',('parent_id','=',partner_id),('id','=',partner_id)]"
-						options="{'always_reload': True}" />
+						domain="[('type','not in',('delivery','contact','other','default')),('parent_id','=',partner_id)]"
+						options="{'always_reload': True}" 
+						attrs="{'required':[('type','in',('in_invoice','out_invoice'))]}" 
+					/>
 					<label string=''/>
 					<field name="part_inv_add" nolabel="1" options="{'always_reload': True}" 
 					/>
 					<field name="part_ship_id"
 						context="{'search_default_customer':1,'default_type':'delivery'}"
-						domain="['|',('type','=','delivery'),'|',('parent_id','=',partner_id),('id','=',partner_id)]"
-						options="{'always_reload': True}" />
+						domain="[('type','not in',('invoice','contact','other','default')),('parent_id','=',partner_id)]"
+						options="{'always_reload': True}" 
+						attrs="{'required':[('type','in',('in_invoice','out_invoice'))]}" 
+					/>
 					<label string=''/>
 					<field name="part_ship_add" nolabel="1" options="{'always_reload': True}"
 					/>
@@ -173,9 +179,12 @@
 					expr="//page[@string='Invoice Lines']/field[@name='invoice_line']/tree[@string='Invoice Lines']/field[@name='name']"
 					position='after'>
 					<field name="qty_on_hand" readonly="1"/>
+				</xpath>
+				<xpath
+					expr="//page[@string='Invoice Lines']/field[@name='invoice_line']/tree[@string='Invoice Lines']/field[@name='price_subtotal']"
+					position='after'>
 					<field name="profoma_qty" />
 				</xpath>
-
 				<xpath
 					expr="//page[@string='Invoice Lines']/field[@name='invoice_line']/tree[@string='Invoice Lines']/field[@name='product_id']"
 					position='attributes'>
@@ -209,6 +218,7 @@
 						options="{'no_create': True}"/>
 						
 					<field name="customer_po"/>
+					<field name="shipping_date" />
 					<field name="delivery_status"/>
 					<field name="currency_rate" />
 					<field name="export" />
@@ -308,7 +318,10 @@
                 </xpath>
                 <xpath expr="//form/sheet/div/h1/label[@string='Draft Invoice']" position="attributes">
                     <attribute name="string">Profoma Invoice</attribute>
-                </xpath>                
+                </xpath>
+                <xpath expr="//form/header/button[@string='Ask Refund']" position="attributes">
+                    <attribute name="invisible">1</attribute>
+                </xpath>
                 <xpath expr="//form/sheet[@string='Supplier Invoice']/div" position="after">
 					<div class="oe_right oe_button_box" name="btn_sale_order">
 	                        <button class="oe_inline oe_stat_button" name="%(action_view_po_frm_inv)d"
@@ -374,13 +387,17 @@
 				<xpath expr="//field[@name='partner_id']" position="after">
 					<field name="part_inv_id"
 						context="{'search_default_supplier':1, 'show_address': 1,'default_type':'invoice'}"
-                        domain="['|',('type','=','invoice'),'|',('parent_id','=',partner_id),('id','=',partner_id)]"
-						options="{'always_reload': True}" />
+                        domain="[('type','not in',('delivery','contact','other','default')),('parent_id','=',partner_id)]"
+						options="{'always_reload': True}" 
+						attrs="{'required':[('type','in',('in_invoice','out_invoice'))]}" 
+					/>
 					
 					<field name="part_ship_id"
 						context="{'search_default_supplier':1, 'show_address': 1,'default_type':'delivery'}"
-                        domain="['|',('type','=','delivery'),'|',('parent_id','=',partner_id),('id','=',partner_id)]"
-						options="{'always_reload': True}"  />
+                        domain="[('type','not in',('invoice','contact','other','default')),('parent_id','=',partner_id)]"
+						options="{'always_reload': True}" 
+						attrs="{'required':[('type','in',('in_invoice','out_invoice'))]}"
+					 />
 				</xpath>
 				<xpath expr="//field[@name='fiscal_position']" position="after">
 					<field name="attn_inv"
@@ -526,21 +543,6 @@
             </field>
         </record>
 
-		<record id="inherited_partner_view" model="ir.ui.view">
-			<field name="name">inherited.partner.view</field>
-			<field name="model">res.partner</field>
-			<field name="inherit_id" ref="base.view_partner_form" />
-			<field name="arch" type="xml">
-				<xpath expr="//field[@name='website']" position="after">
-					<field name="cust_code" />
-				</xpath>
-				<field name="bank_ids" position="before">
-				    <field name="bank_detail" placeholder="Bank Descriptions...."
-				        cols="2" colspan="4"/>
-				</field>
-			</field>
-		</record>
-		
 		 <!-- Landed Cost tree View -->
         <record id="landed_cost_tree_view" model="ir.ui.view" >
             <field name="name">landed.cost.tree.view</field>

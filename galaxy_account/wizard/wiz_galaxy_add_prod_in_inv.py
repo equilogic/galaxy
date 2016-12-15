@@ -56,9 +56,9 @@ class wiz_galaxy_add_prod_in_invoice(models.TransientModel):
                 so_line = {'product_id': product_rec.id,
                            'name': name, 'price_unit': product_rec.list_price,
                            'quantity': 1.0,
-                           'invoice_line_tax_id': [(6, 0, tax_ids)]
+                           'invoice_line_tax_id': [(6, 0, tax_ids)],
+                           'uos_id': product_rec.uom_id and product_rec.uom_id.id or False,
                            }
                 order_line_list.append((0, 0, so_line))
-                print "order_line_list===========",order_line_list
             invoice_rec.write({'invoice_line': order_line_list})
         return True

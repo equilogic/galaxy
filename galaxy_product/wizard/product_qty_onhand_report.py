@@ -36,6 +36,9 @@ class product_qty_on_hand(models.TransientModel):
 
     date_from = fields.Date(string='From', default=datetime.now().date().strftime("%Y-%m-01"))
     date_to = fields.Date(string='To', default=datetime.now().date())
+    product_ids = fields.Many2many('product.product', 'product_qty_available_rel', 'avi_id', 'product_id')
+    zero_qty = fields.Boolean('Include Zero Qty')
+    in_active_product = fields.Boolean('Include In Active Product')
     
 
     @api.multi
@@ -44,6 +47,7 @@ class product_qty_on_hand(models.TransientModel):
         stock_obj = self.env['stock.move']
         sale_line_obj = self.env['sale.order.line']
         purchase_line_obj = self.env['purchase.order.line']
+        location_obj = self.env['stock.location']
         proudct_list = []
         product_qty = {}
 #        for wiz in self:
@@ -69,19 +73,35 @@ class product_qty_on_hand(models.TransientModel):
         end_dt = datetime.strftime(en_dt, "%d-%m-%Y")
         
         worksheet = wbk.add_sheet('Sales Register Report')
+        product_ids = []
         rep_name = 'Item Register.xls'
-        product_ids = self.env['product.product'].search([('type','!=','service'), ('qty_available', '>',0)])
-        
+        zero_qty = False
+        in_active = False
+        domain = [('type','!=','service')]
+        if zero_qty:
+            domain.append(('qty_available', '>=', 0))
+        elif not zero_qty:
+            domain.append(('qty_available', '>', 0))
+        elif in_active:
+            domain.append(('active','=', False))
+        if self.zero_qty:
+            zero_qty = True
+        if self.in_active_product:
+            in_active = True
+        if self.product_ids:
+            product_ids=self.product_ids
+        else:
+            product_ids = self.env['product.product'].search(domain)
         worksheet.row(0).height = 600
         worksheet.write_merge(0, 0, 0, 6, 'Item Register Report ' + ' ( ' + start_dt + ' to ' + end_dt+' ) ', main_header)
         col = 0
         row = 3
         worksheet.row(3).height = 400
         worksheet.col(col).width = 10000
-        worksheet.write(row, col, 'Product Reference', header2)
+        worksheet.write(row, col, 'Item Name', header2)
         col += 1
         worksheet.col(col).width = 10000
-        worksheet.write(row, col, 'Product Name', header2)
+        worksheet.write(row, col, 'Full Description', header2)
         col += 1
         worksheet.col(col).width = 5000
         worksheet.write(row, col, 'Opening Stock', header2)
@@ -101,8 +121,10 @@ class product_qty_on_hand(models.TransientModel):
                 
         if product_ids:
             for product in  product_ids:
-                stock_data = stock_obj.search([('inventory_id', '!=', False),('product_id','=',product.id),
-                                               ('date','>=',self.date_from),('date','<=', self.date_to)]) 
+                
+                inv_los = location_obj.search([('name','=', 'Inventory loss')])
+                stock_loc = location_obj.search([('name','=', 'Stock')])
+                stock_data = stock_obj.search([('inventory_id', '!=', False),('product_id','=',product.id)]) 
                 if stock_data:
                     if product_qty.has_key(product.id):
                         product_qty[product.id].update({'opening_stock': product_qty[product.id].get('opening_stock', False)\
@@ -132,9 +154,9 @@ class product_qty_on_hand(models.TransientModel):
                         else:
                             product_qty[product.id] = {'pur_qty': line1.product_qty} 
                 if product_qty.has_key(product.id): 
-                    product_qty[product.id].update({'name': product.name,'ref': product.default_code, 'qty_avi': product.qty_available})
+                    product_qty[product.id].update({'name': product.default_code,'full_name': product.description, 'qty_avi': product.qty_available})
                 else:
-                    product_qty[product.id] = {'name': product.name,'ref': product.default_code,'qty_avi': product.qty_available}
+                    product_qty[product.id] = {'name': product.default_code,'full_name': product.description,'qty_avi': product.qty_available}
             if product_qty: 
                 proudct_list.append(product_qty)                                                 
     
@@ -142,12 +164,14 @@ class product_qty_on_hand(models.TransientModel):
             row = 4
             for pro_dict in proudct_list:
                 for key, data in pro_dict.items():
+                    sum_pur_opening = int(data.get('opening_stock', False)) + int(data.get('pur_qty', False))
+                    total = sum_pur_opening - int(data.get('sold_qty', False))
                     worksheet.write(row, 0, data.get('name'), header2_left)
-                    worksheet.write(row, 1, data.get('ref'), header2_left)
+                    worksheet.write(row, 1, data.get('full_name'), header2_left)
                     worksheet.write(row, 2, int(data.get('opening_stock', False)) or 0, header2_left)
                     worksheet.write(row, 3, int(data.get('pur_qty', False)) or 0, header2_left)
                     worksheet.write(row, 4, int(data.get('sold_qty', False)) or 0, header2_left)
-                    worksheet.write(row, 5, (int(data.get('opening_stock', False)) + int(data.get('pur_qty', False)) - int(data.get('sold_qty', False))) or 0, header2_left)
+                    worksheet.write(row, 5, total or 0, header2_left)
                     worksheet.write(row, 6, int(data.get('qty_avi', False)) or 0, header2_left)
                     row+=1
             wbk.save(fl)

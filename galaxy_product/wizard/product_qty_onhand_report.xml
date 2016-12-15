@@ -6,10 +6,15 @@
             <field name="type">form</field>
             <field name="arch" type="xml">
                 <form string="Sales Reports">
-                    <group colspan="4" cols="4">
+                    <group >
                         <field name="date_from" />
                         <field name="date_to" />
+                        <field name="zero_qty" />
+                        <field name="in_active_product" />
                     </group>
+                    <newline/>
+                   	<separator string="Products" />
+                   	<field name="product_ids"/>
                     <footer>
                         <button name="print_report" string="Print" type="object" class="oe_highlight"/>
                         or
