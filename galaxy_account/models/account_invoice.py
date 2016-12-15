@@ -155,7 +155,7 @@ class account_invoice(models.Model):
     bank = fields.Char('Bank')
     currency_rate = fields.Float(string = 'Currency rate', digits = (16, 4))
 
-    part_inv_id = fields.Many2one('res.partner', 'Invoice Address', readonly = True, required = True,
+    part_inv_id = fields.Many2one('res.partner', 'Invoice Address', readonly = True,
                                   states = {'draft': [('readonly', False)], 'sent': [('readonly', False)], 'open': [('readonly', False)]},
                                   help = "Invoice address for current sales order.")
     cust_add = fields.Text('Customer Address', readonly = True, states = {'draft': [('readonly', False)], 'open': [('readonly', False)]})
@@ -163,7 +163,7 @@ class account_invoice(models.Model):
     part_ship_add = fields.Text('Delivery Address', readonly = True, states = {'draft': [('readonly', False)], 'open': [('readonly', False)]})
 
 
-    part_ship_id = fields.Many2one('res.partner', 'Delivery Address', readonly = True, required = True,
+    part_ship_id = fields.Many2one('res.partner', 'Delivery Address', readonly = True,
                                    states = {'draft': [('readonly', False)], },
                                    help = "Delivery address for current sales order.")
     attn_inv = fields.Many2one('res.partner', 'ATTN')
