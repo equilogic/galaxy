@@ -60,17 +60,17 @@ class account_invoice_line(models.Model):
         for cost in self:
             if cost.product_id and cost.product_id.non_invenotry_item == False:
                 line_ids = self.search([('product_id', '=', cost.product_id.id), ('invoice_id.state', '=', 'draft')])
-                qty=0.0
+                qty = 0.0
                 for line_id in line_ids:
                     if line_id.id != cost.id and line_id.invoice_id.id != cost.invoice_id.id :
                         qty += line_id.quantity
                 cost.profoma_qty = int(qty)
 
-    prod_desc = fields.Text(related = 'product_id.description', string = 'Full Description')
-    origin_ids = fields.Many2many('origin.origin', string = 'Origin')
+    prod_desc = fields.Text(related='product_id.description', string='Full Description')
+    origin_ids = fields.Many2many('origin.origin', string='Origin')
     no_origin = fields.Boolean('NO Origin')
-    profoma_qty = fields.Integer(compute = '_compute_profoma_qty', string = 'Profoma QTY',store = True)
-    qty_on_hand = fields.Float(related = 'product_id.qty_available', string = 'Quantity On Hand',digits=(16, 0), default = 0.0)
+    profoma_qty = fields.Integer(compute='_compute_profoma_qty', string='Profoma QTY', store=True)
+    qty_on_hand = fields.Float(related='product_id.qty_available', string='Quantity On Hand', digits=(16, 0), default=0.0)
     discount = fields.Float(string='Discount (%)',
                             digits=(16, 2),
                             # digits= dp.get_precision('Discount'),
@@ -79,9 +79,9 @@ class account_invoice_line(models.Model):
 #         store=True, readonly=True, compute='_compute_price')
 
     @api.multi
-    def product_id_change(self, product, uom_id, qty = 0, name = '', type = 'out_invoice',
-            partner_id = False, fposition_id = False, price_unit = False, currency_id = False,
-            company_id = None):
+    def product_id_change(self, product, uom_id, qty=0, name='', type='out_invoice',
+            partner_id=False, fposition_id=False, price_unit=False, currency_id=False,
+            company_id=None):
 
         res = super(account_invoice_line, self).product_id_change(product, uom_id, qty, name, type, \
                          partner_id, fposition_id, price_unit, currency_id, company_id)
@@ -117,9 +117,9 @@ class account_invoice_line(models.Model):
         quants_obj = self.env['stock.quant']
         for inv_line in self:
             if inv_line.invoice_id and inv_line.invoice_id.state not in ('draft', 'cancel'):
-                purchase_l_ids = purch_line_obj.search([('inv_line_id','=', inv_line.id)])
-                sale_l_ids = sale_line_obj.search([('inv_line_id','=', inv_line.id)])
-                stock_move_ids = move_obj.search([('inv_line_id','=', inv_line.id)])
+                purchase_l_ids = purch_line_obj.search([('inv_line_id', '=', inv_line.id)])
+                sale_l_ids = sale_line_obj.search([('inv_line_id', '=', inv_line.id)])
+                stock_move_ids = move_obj.search([('inv_line_id', '=', inv_line.id)])
                 if purchase_l_ids:
                     for purch_l in purchase_l_ids:
                         purch_l.state = 'draft'
@@ -152,7 +152,7 @@ class account_invoice(models.Model):
             ('type', 'in', filter(None, map(TYPE2JOURNAL.get, inv_types))),
             ('company_id', '=', company_id),
         ]
-        return self.env['account.journal'].search(domain, limit = 1)
+        return self.env['account.journal'].search(domain, limit=1)
 
     @api.model
     def _default_currency(self):
@@ -171,96 +171,96 @@ class account_invoice(models.Model):
     insurence_covered_id = fields.Many2one('insurence.covered', 'Insurance Covered')
     vessale_name_id = fields.Many2one('vessale.name', 'Vessale')
     bank = fields.Char('Bank')
-    currency_rate = fields.Float(string = 'Currency rate', digits = (16, 4))
+    currency_rate = fields.Float(string='Currency rate', digits=(16, 4))
 
-    part_inv_id = fields.Many2one('res.partner', 'Invoice Address', readonly = True,
-                                  states = {'draft': [('readonly', False)], 'sent': [('readonly', False)], 'open': [('readonly', False)]},
-                                  help = "Invoice address for current sales order.")
-    cust_add = fields.Text('Customer Address', readonly = True, states = {'draft': [('readonly', False)], 'open': [('readonly', False)]})
-    part_inv_add = fields.Text('Invoice Address', readonly = True, states = {'draft': [('readonly', False)], 'open': [('readonly', False)]})
-    part_ship_add = fields.Text('Delivery Address', readonly = True, states = {'draft': [('readonly', False)], 'open': [('readonly', False)]})
+    part_inv_id = fields.Many2one('res.partner', 'Invoice Address', readonly=True,
+                                  states={'draft': [('readonly', False)], 'sent': [('readonly', False)], 'open': [('readonly', False)]},
+                                  help="Invoice address for current sales order.")
+    cust_add = fields.Text('Customer Address', readonly=True, states={'draft': [('readonly', False)], 'open': [('readonly', False)]})
+    part_inv_add = fields.Text('Invoice Address', readonly=True, states={'draft': [('readonly', False)], 'open': [('readonly', False)]})
+    part_ship_add = fields.Text('Delivery Address', readonly=True, states={'draft': [('readonly', False)], 'open': [('readonly', False)]})
 
 
-    part_ship_id = fields.Many2one('res.partner', 'Delivery Address', readonly = True,
-                                   states = {'draft': [('readonly', False)], },
-                                   help = "Delivery address for current sales order.")
+    part_ship_id = fields.Many2one('res.partner', 'Delivery Address', readonly=True,
+                                   states={'draft': [('readonly', False)], },
+                                   help="Delivery address for current sales order.")
     attn_inv = fields.Many2one('res.partner', 'ATTN')
 
-    landed_cost = fields.One2many('landed.cost.invoice', 'acc_inv_id', string = 'Landed Cost')
-    landed_cost_price = fields.Float(compute = '_compute_amount', store = True, string = 'Landed Amount')
-    customer_po = fields.Char(string = "Customer PO")
-    delivery_status = fields.Char(string = "Delivery Status")
-    export = fields.Boolean('Export', readonly = True, states = {'draft': [('readonly', False)]})
-    direct_shipemt = fields.Boolean('Direct Shipment', readonly = True, states = {'draft': [('readonly', False)]})
+    landed_cost = fields.One2many('landed.cost.invoice', 'acc_inv_id', string='Landed Cost')
+    landed_cost_price = fields.Float(compute='_compute_amount', store=True, string='Landed Amount')
+    customer_po = fields.Char(string="Customer PO")
+    delivery_status = fields.Char(string="Delivery Status")
+    export = fields.Boolean('Export', readonly=True, states={'draft': [('readonly', False)]})
+    direct_shipemt = fields.Boolean('Direct Shipment', readonly=True, states={'draft': [('readonly', False)]})
 
-    discount_type = fields.Selection([('percent', 'Percentage'), ('amount', 'Amount')], 'Discount Type', readonly = True,
-                                     states = {'draft': [('readonly', False)], 'open': [('readonly', False)]})
+    discount_type = fields.Selection([('percent', 'Percentage'), ('amount', 'Amount')], 'Discount Type', readonly=True,
+                                     states={'draft': [('readonly', False)], 'open': [('readonly', False)]})
     discount_rate = fields.Float('Discount Rate',
-                                 digits_compute = dp.get_precision('Account'),
-                                 readonly = True,
-                                 states = {'draft': [('readonly', False)], 'open': [('readonly', False)]})
-    amount_discount = fields.Float(string = 'Discount',
-                                   digits = dp.get_precision('Account'),
-                                   readonly = True, compute = '_compute_amount',store=True)
-    sequence_update =  fields.Boolean('Sequence updated')
+                                 digits_compute=dp.get_precision('Account'),
+                                 readonly=True,
+                                 states={'draft': [('readonly', False)], 'open': [('readonly', False)]})
+    amount_discount = fields.Float(string='Discount',
+                                   digits=dp.get_precision('Account'),
+                                   readonly=True, compute='_compute_amount', store=True)
+    sequence_update = fields.Boolean('Sequence updated')
     shipping_date = fields.Date('Shipping Date')
 
     ####
     # This Fields Overrite to Edit its value after validate invoice.(TO Change Attrs and domains)
     ####
-    partner_id = fields.Many2one('res.partner', string = 'Partner', change_default = True,
-        required = True, readonly = True, states = {'draft': [('readonly', False)]},
-        track_visibility = 'always')
-    date_invoice = fields.Date(string = 'Invoice Date',
-        readonly = True, states = {'draft': [('readonly', False)], 'open': [('readonly', False)]}, index = True,
-        help = "Keep empty to use the current date", copy = False, default = date.today().strftime('%Y-%m-%d'))
-    journal_id = fields.Many2one('account.journal', string = 'Journal',
-        required = True, readonly = True, states = {'draft': [('readonly', False)], 'open': [('readonly', False)]},
-        default = _default_journal,
-        domain = "[('type', 'in', {'out_invoice': ['sale'], 'out_refund': ['sale_refund'], 'in_refund': ['purchase_refund'], 'in_invoice': ['purchase']}.get(type, [])), ('company_id', '=', company_id)]")
-    account_id = fields.Many2one('account.account', string = 'Account',
-        required = True, readonly = True, states = {'draft': [('readonly', False)], 'open': [('readonly', False)]},
-        help = "The partner account used for this invoice.")
-    fiscal_position = fields.Many2one('account.fiscal.position', string = 'Fiscal Position',
-        readonly = True, states = {'draft': [('readonly', False)], 'open': [('readonly', False)]})
-    company_id = fields.Many2one('res.company', string = 'Company', change_default = True,
-        required = True, readonly = True, states = {'draft': [('readonly', False)], 'open': [('readonly', False)]},
-        default = lambda self: self.env['res.company']._company_default_get('account.invoice'))
-    payment_term = fields.Many2one('account.payment.term', string = 'Payment Terms',
-        readonly = True, states = {'draft': [('readonly', False)], 'open': [('readonly', False)]},
-        help = "If you use payment terms, the due date will be computed automatically at the generation "
+    partner_id = fields.Many2one('res.partner', string='Partner', change_default=True,
+        required=True, readonly=True, states={'draft': [('readonly', False)]},
+        track_visibility='always')
+    date_invoice = fields.Date(string='Invoice Date',
+        readonly=True, states={'draft': [('readonly', False)], 'open': [('readonly', False)]}, index=True,
+        help="Keep empty to use the current date", copy=False, default=date.today().strftime('%Y-%m-%d'))
+    journal_id = fields.Many2one('account.journal', string='Journal',
+        required=True, readonly=True, states={'draft': [('readonly', False)], 'open': [('readonly', False)]},
+        default=_default_journal,
+        domain="[('type', 'in', {'out_invoice': ['sale'], 'out_refund': ['sale_refund'], 'in_refund': ['purchase_refund'], 'in_invoice': ['purchase']}.get(type, [])), ('company_id', '=', company_id)]")
+    account_id = fields.Many2one('account.account', string='Account',
+        required=True, readonly=True, states={'draft': [('readonly', False)], 'open': [('readonly', False)]},
+        help="The partner account used for this invoice.")
+    fiscal_position = fields.Many2one('account.fiscal.position', string='Fiscal Position',
+        readonly=True, states={'draft': [('readonly', False)], 'open': [('readonly', False)]})
+    company_id = fields.Many2one('res.company', string='Company', change_default=True,
+        required=True, readonly=True, states={'draft': [('readonly', False)], 'open': [('readonly', False)]},
+        default=lambda self: self.env['res.company']._company_default_get('account.invoice'))
+    payment_term = fields.Many2one('account.payment.term', string='Payment Terms',
+        readonly=True, states={'draft': [('readonly', False)], 'open': [('readonly', False)]},
+        help="If you use payment terms, the due date will be computed automatically at the generation "
              "of accounting entries. If you keep the payment term and the due date empty, it means direct payment. "
              "The payment term may compute several due dates, for example 50% now, 50% in one month.")
-    user_id = fields.Many2one('res.users', string = 'Salesperson', track_visibility = 'onchange',
-        readonly = True, states = {'draft': [('readonly', False)], 'open': [('readonly', False)]},
-        default = lambda self: self.env.user)
-    partner_bank_id = fields.Many2one('res.partner.bank', string = 'Bank Account',
-        help = 'Bank Account Number to which the invoice will be paid. A Company bank account if this is a Customer Invoice or Supplier Refund, otherwise a Partner bank account number.',
-        readonly = True, states = {'draft': [('readonly', False)], 'open': [('readonly', False)]})
-    period_id = fields.Many2one('account.period', string = 'Force Period',
-        domain = [('state', '!=', 'done')], copy = False,
-        help = "Keep empty to use the period of the validation(invoice) date.",
-        readonly = True, states = {'draft': [('readonly', False)], 'open': [('readonly', False)]})
-    date_due = fields.Date(string = 'Due Date',
-        readonly = True, states = {'draft': [('readonly', False)], 'open': [('readonly', False)]}, index = True, copy = False,
-        help = "If you use payment terms, the due date will be computed automatically at the generation "
+    user_id = fields.Many2one('res.users', string='Salesperson', track_visibility='onchange',
+        readonly=True, states={'draft': [('readonly', False)], 'open': [('readonly', False)]},
+        default=lambda self: self.env.user)
+    partner_bank_id = fields.Many2one('res.partner.bank', string='Bank Account',
+        help='Bank Account Number to which the invoice will be paid. A Company bank account if this is a Customer Invoice or Supplier Refund, otherwise a Partner bank account number.',
+        readonly=True, states={'draft': [('readonly', False)], 'open': [('readonly', False)]})
+    period_id = fields.Many2one('account.period', string='Force Period',
+        domain=[('state', '!=', 'done')], copy=False,
+        help="Keep empty to use the period of the validation(invoice) date.",
+        readonly=True, states={'draft': [('readonly', False)], 'open': [('readonly', False)]})
+    date_due = fields.Date(string='Due Date',
+        readonly=True, states={'draft': [('readonly', False)], 'open': [('readonly', False)]}, index=True, copy=False,
+        help="If you use payment terms, the due date will be computed automatically at the generation "
              "of accounting entries. The payment term may compute several due dates, for example 50% "
              "now and 50% in one month, but if you want to force a due date, make sure that the payment "
              "term is not set on the invoice. If you keep the payment term and the due date empty, it "
              "means direct payment.")
-    origin = fields.Char(string = 'Source Document',
-        help = "Reference of the document that produced this invoice.",
-        readonly = True, states = {'draft': [('readonly', False)], 'open': [('readonly', False)]})
-    name = fields.Char(string = 'Reference/Description', index = True,
-        readonly = True, states = {'draft': [('readonly', False)], 'open': [('readonly', False)]})
-    currency_id = fields.Many2one('res.currency', string = 'Currency',
-        required = True, readonly = True, states = {'draft': [('readonly', False)]},
-        default = _default_currency, track_visibility = 'always')
-    supplier_invoice_number = fields.Char(string = 'Supplier Invoice Number',
-        help = "The reference of this invoice as provided by the supplier.",
-        readonly = True, states = {'draft': [('readonly', False)], 'open': [('readonly', False)]})
-    invoice_line = fields.One2many('account.invoice.line', 'invoice_id', string = 'Invoice Lines',
-        readonly = True, states = {'draft': [('readonly', False)], 'open': [('readonly', False)]}, copy = True)
+    origin = fields.Char(string='Source Document',
+        help="Reference of the document that produced this invoice.",
+        readonly=True, states={'draft': [('readonly', False)], 'open': [('readonly', False)]})
+    name = fields.Char(string='Reference/Description', index=True,
+        readonly=True, states={'draft': [('readonly', False)], 'open': [('readonly', False)]})
+    currency_id = fields.Many2one('res.currency', string='Currency',
+        required=True, readonly=True, states={'draft': [('readonly', False)]},
+        default=_default_currency, track_visibility='always')
+    supplier_invoice_number = fields.Char(string='Supplier Invoice Number',
+        help="The reference of this invoice as provided by the supplier.",
+        readonly=True, states={'draft': [('readonly', False)], 'open': [('readonly', False)]})
+    invoice_line = fields.One2many('account.invoice.line', 'invoice_id', string='Invoice Lines',
+        readonly=True, states={'draft': [('readonly', False)], 'open': [('readonly', False)]}, copy=True)
 
     state = fields.Selection([
             ('draft', 'Proforma'),
@@ -269,9 +269,9 @@ class account_invoice(models.Model):
             ('open', 'Open'),
             ('paid', 'Paid'),
             ('cancel', 'Cancelled'),
-        ], string = 'Status', index = True, readonly = True, default = 'draft',
-        track_visibility = 'onchange', copy = False,
-        help = " * The 'Draft' status is used when a user is encoding a new and unconfirmed Invoice.\n"
+        ], string='Status', index=True, readonly=True, default='draft',
+        track_visibility='onchange', copy=False,
+        help=" * The 'Draft' status is used when a user is encoding a new and unconfirmed Invoice.\n"
              " * The 'Pro-forma' when invoice is in Pro-forma status,invoice does not have an invoice number.\n"
              " * The 'Open' status is used when user create invoice,a invoice number is generated.Its in open status till user does not pay invoice.\n"
              " * The 'Paid' status is set automatically when the invoice is paid. Its related journal entries may or may not be reconciled.\n"
@@ -282,7 +282,7 @@ class account_invoice(models.Model):
         ship_add_list = []
         ship_address = ''
         for rec in self:
-            res_ship = rec.partner_id.address_get(adr_pref = ['delivery', 'invoice', 'contact']).get('delivery')
+            res_ship = rec.partner_id.address_get(adr_pref=['delivery', 'invoice', 'contact']).get('delivery')
             ship_inv = self.env['res.partner'].browse(res_ship)
             if ship_inv.street:
                 ship_add_list.append(ship_inv.street + '\n')
@@ -306,7 +306,7 @@ class account_invoice(models.Model):
         inv_add_list = []
         inv_address = ''
         for rec in self:
-            res_inv = rec.partner_id.address_get(adr_pref = ['delivery', 'invoice', 'contact']).get('invoice')
+            res_inv = rec.partner_id.address_get(adr_pref=['delivery', 'invoice', 'contact']).get('invoice')
             part_inv = self.env['res.partner'].browse(res_inv)
             if part_inv.street:
                 inv_add_list.append(part_inv.street + '\n')
@@ -384,12 +384,12 @@ class account_invoice(models.Model):
             self.env['account.invoice'].button_reset_taxes()
             
     @api.v7
-    def _check_check_currency_rate(self, cr, uid, ids, context = None):
+    def _check_check_currency_rate(self, cr, uid, ids, context=None):
         curr_day = datetime.now().strftime('%A')
         curr_dt = datetime.now().strftime(DEFAULT_SERVER_DATE_FORMAT)
         flag = False
         if curr_day == 'Tuesday':
-            for invoice in self.browse(cr, uid, ids, context = context):
+            for invoice in self.browse(cr, uid, ids, context=context):
                 if invoice.currency_id and invoice.currency_id.rate_ids:
                     for rate_line in invoice.currency_id.rate_ids:
                         if rate_line.name:
@@ -407,21 +407,21 @@ class account_invoice(models.Model):
     ]
 
     @api.multi
-    def onchange_partner_id(self, type, partner_id, date_invoice = False,
-            payment_term = False, partner_bank_id = False, company_id = False):
+    def onchange_partner_id(self, type, partner_id, date_invoice=False,
+            payment_term=False, partner_bank_id=False, company_id=False):
         inv_add_list = []
         ship_add_list = []
         cust_add_list = []
         inv_address = ''
         ship_address = ''
         cust_address = ''
-        res = super(account_invoice, self).onchange_partner_id(type = type, partner_id = partner_id,
-                                    date_invoice = date_invoice, payment_term = payment_term,
-                                    partner_bank_id = partner_bank_id, company_id = company_id)
+        res = super(account_invoice, self).onchange_partner_id(type=type, partner_id=partner_id,
+                                    date_invoice=date_invoice, payment_term=payment_term,
+                                    partner_bank_id=partner_bank_id, company_id=company_id)
 
         part = self.env['res.partner'].browse(partner_id)
-        res_inv = part.address_get(adr_pref = ['delivery', 'invoice', 'contact']).get('invoice')
-        res_ship = part.address_get(adr_pref = ['delivery', 'invoice', 'contact']).get('delivery')
+        res_inv = part.address_get(adr_pref=['delivery', 'invoice', 'contact']).get('invoice')
+        res_ship = part.address_get(adr_pref=['delivery', 'invoice', 'contact']).get('delivery')
 
 
         if part.street:
@@ -485,7 +485,7 @@ class account_invoice(models.Model):
         return res
 
     @api.one
-    @api.depends('invoice_line.price_subtotal', 'tax_line.amount', 'discount_type','discount_rate')
+    @api.depends('invoice_line.price_subtotal', 'tax_line.amount', 'discount_type', 'discount_rate')
     def _compute_amount(self):
         val = 0.0
         discount = 0.0
@@ -493,7 +493,7 @@ class account_invoice(models.Model):
         self.amount_untaxed = self.currency_id.round(sum(line.price_subtotal for line in self.invoice_line))
         if self.discount_type == 'percent':
             if self.discount_rate != 0:
-                discount = (self.amount_untaxed*self.discount_rate) / 100.0
+                discount = (self.amount_untaxed * self.discount_rate) / 100.0
         else:
             discount = self.discount_rate
         if total == 0:
@@ -520,7 +520,6 @@ class account_invoice(models.Model):
                     ('company_id.id', '=', self.company_id.id), ('usage', '=', 'internal')])
         prdouct_dict = {}
         if self.type == "out_invoice" and not self.invoice_from_sale:
-            print "\n discount type========",self.discount_type
             order_vals = {
                           'partner_id': self.partner_id.id,
                           'partner_invoice_id':self.part_inv_id.id,
@@ -722,9 +721,9 @@ class account_invoice(models.Model):
         return inv
 
     def update_sequnce(self):
-        latest_number=''
+        latest_number = ''
         for inv in self:
-            if inv.type=='out_invoice' and inv.sequence_update == False:
+            if inv.type == 'out_invoice' and inv.sequence_update == False:
                 if inv.number:
                     invoice_id = self.search([('internal_number', '=', inv.number)])
                     if inv.id == invoice_id.id:
@@ -772,10 +771,10 @@ class account_invoice(models.Model):
         if moves_to_unreserve:
             for mv_unreserv in moves_to_unreserve:
                 mv_unreserv.do_unreserve()
-                #break the link between moves in order to be able to fix them later if needed
+                # break the link between moves in order to be able to fix them later if needed
                 mv_unreserv.move_orig_ids = False
  
-        #Create new picking for returned products
+        # Create new picking for returned products
         pick_type_id = pick.picking_type_id.return_picking_type_id and \
                         pick.picking_type_id.return_picking_type_id.id or pick.picking_type_id.id
         new_picking = pick.copy({
@@ -1004,19 +1003,19 @@ class account_invoice(models.Model):
                                     if inv_l_id.invoice_id and inv_l_id.invoice_id.type == 'out_invoice':
                                         loc_id = self.env['stock.location'].search([('location_id', '!=', False), ('location_id.name', 'ilike', 'WH'),
                                                                                     ('company_id.id', '=', self.company_id.id),
-                                                                                    ('usage', '=', 'internal')], limit = 1)
+                                                                                    ('usage', '=', 'internal')], limit=1)
                                         dest_loc_id = self.env['stock.location'].search([('location_id', '!=', False),
                                                              ('location_id.name', 'ilike', 'Partner Locations'),
-                                                             ('usage', '=', 'customer')], limit = 1)
+                                                             ('usage', '=', 'customer')], limit=1)
                                         pick_lines_vals.update({'location_id': loc_id and loc_id.id or False,
                                                                 'location_dest_id': dest_loc_id and dest_loc_id.id or False})
                                     if inv_l_id.invoice_id and inv_l_id.invoice_id.type == 'in_invoice':
                                         loc_id = self.env['stock.location'].search([('location_id', '!=', False), ('location_id.name', 'ilike', 'WH'),
                                                                                     ('company_id.id', '=', self.company_id.id),
-                                                                                    ('usage', '=', 'internal')], limit = 1)
+                                                                                    ('usage', '=', 'internal')], limit=1)
                                         dest_loc_id = self.env['stock.location'].search([('location_id', '!=', False),
                                                              ('location_id.name', 'ilike', 'Partner Locations'),
-                                                             ('usage', '=', 'supplier')], limit = 1)
+                                                             ('usage', '=', 'supplier')], limit=1)
                                         pick_lines_vals.update({'location_id': dest_loc_id and dest_loc_id.id or False,
                                                                 'location_dest_id': loc_id and loc_id.id or False})
                                 if picking_ord_vals.get('move_lines', False):
@@ -1141,7 +1140,7 @@ class res_partner(models.Model):
     _inherit = 'res.partner'
 
     cust_code = fields.Char('Code')
-    bank_detail = fields.Text(string = 'Bank Description')
+    bank_detail = fields.Text(string='Bank Description')
 
     _defaults = {
         'is_company': True,
@@ -1163,8 +1162,8 @@ class res_partner(models.Model):
 #     ]
 
     @api.v7
-    def _check_cust_code_unique(self, cr, uid, ids, context = None):
-        for partner in self.browse(cr, uid, ids, context = context):
+    def _check_cust_code_unique(self, cr, uid, ids, context=None):
+        for partner in self.browse(cr, uid, ids, context=context):
             if partner.customer == True and partner.cust_code:
                 partners = self.search(cr, uid, [('cust_code', '=', partner.cust_code),
                                                  ('customer', '=', True)])
