@@ -50,14 +50,16 @@
 		</record>
 
 		<!-- inherited search view of product.product -->
-		<record id="product_search_form_view_stock" model="ir.ui.view">
+		<record id="product_search_form_view_stock_inherited" model="ir.ui.view">
 			<field name="name">product.search.stock.form</field>
 			<field name="model">product.product</field>
-			<field name="inherit_id" ref="product.product_search_form_view" />
+			<field name="inherit_id" ref="stock.product_search_form_view_stock" />
 			<field name="arch" type="xml">
-				<field name="pricelist_id" position="before">
-					<field name="location_id" widget="selection" context="{'location': self}" invisible="1"/>
-					<field name="warehouse_id" widget="selection" context="{'warehouse': self}" invisible="1" />
+				<field name="location_id" position="attributes">
+					<attribute name="invisible">1</attribute>
+				</field>
+				<field name="warehouse_id" position="attributes">
+					<attribute name="invisible">1</attribute>
 				</field>
 			</field>
 		</record>

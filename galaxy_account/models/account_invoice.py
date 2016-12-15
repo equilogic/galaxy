@@ -48,13 +48,13 @@ class account_invoice_line(models.Model):
                 for line_id in line_ids:
                     if line_id.id != cost.id and line_id.invoice_id.id != cost.invoice_id.id :
                         qty += line_id.quantity
-                cost.profoma_qty = qty
+                cost.profoma_qty = int(qty)
 
     prod_desc = fields.Text(related = 'product_id.description', string = 'Full Description')
     origin_ids = fields.Many2many('origin.origin', string = 'Origin')
     no_origin = fields.Boolean('NO Origin')
     qty_on_hand = fields.Float(related = 'product_id.qty_available', string = 'Quantity On Hand', default = 0.0)
-    profoma_qty = fields.Float(compute = '_compute_profoma_qty', string = 'Profoma QTY',store = True)
+    profoma_qty = fields.Integer(compute = '_compute_profoma_qty', string = 'Profoma QTY',store = True)
     discount = fields.Float(string='Discount (%)',
                             digits=(16, 2),
                             # digits= dp.get_precision('Discount'),
@@ -153,40 +153,8 @@ class account_invoice(models.Model):
                                  states = {'draft': [('readonly', False)], 'open': [('readonly', False)]})
     amount_discount = fields.Float(string = 'Discount',
                                    digits = dp.get_precision('Account'),
-                                   readonly = True, compute = '_compute_amount')
+                                   readonly = True, compute = '_compute_amount',store=True)
     sequence_update =  fields.Boolean('Sequence updated')
-
-    @api.multi
-    def compute_discount(self, discount):
-        for inv in self:
-            val1 = val2 = 0.0
-            disc_amnt = 0.0
-            val2 = sum(line.amount for line in self.tax_line)
-            for line in inv.invoice_line:
-                val1 += (line.quantity * line.price_unit)
-                line.discount = discount
-                disc_amnt += (line.quantity * line.price_unit) * discount / 100
-            total = val1 + val2 - disc_amnt
-            self.amount_discount = disc_amnt
-            self.amount_tax = val2
-            self.amount_total = total
-
-    @api.onchange('discount_type', 'discount_rate')
-    def supply_rate(self):
-        for inv in self:
-            if inv.discount_rate != 0:
-                amount = sum(line.price_subtotal for line in self.invoice_line)
-                tax = sum(line.amount for line in self.tax_line)
-                if inv.discount_type == 'percent':
-                    self.compute_discount(inv.discount_rate)
-                else:
-                    total = 0.0
-                    discount = 0.0
-                    for line in inv.invoice_line:
-                        total += (line.quantity * line.price_unit)
-                    if inv.discount_rate != 0:
-                        discount = (inv.discount_rate / total) * 100
-                    self.compute_discount(discount)
 
     ####
     # This Fields Overrite to Edit its value after validate invoice.(TO Change Attrs and domains)
@@ -468,28 +436,22 @@ class account_invoice(models.Model):
         return res
 
     @api.one
-    @api.depends('invoice_line.price_subtotal', 'tax_line.amount', 'landed_cost')
+    @api.depends('invoice_line.price_subtotal', 'tax_line.amount', 'discount_type','discount_rate')
     def _compute_amount(self):
         val = 0.0
         discount = 0.0
         total = 0.0
-        for cost in self.landed_cost:
-            val += cost.amount
-        self.landed_cost_price = self.currency_id.round(val)
+        self.amount_untaxed = self.currency_id.round(sum(line.price_subtotal for line in self.invoice_line))
         if self.discount_type == 'percent':
             if self.discount_rate != 0:
-                for line in self.invoice_line:
-                    total += (line.quantity * line.price_unit)
-                discount = self.discount_rate / 100.0
+                discount = (self.amount_untaxed*self.discount_rate) / 100.0
         else:
             discount = self.discount_rate
         if total == 0:
             total = 1
         self.amount_discount = discount * total
-        self.amount_untaxed = self.currency_id.round(sum(line.price_subtotal for line in self.invoice_line))
         self.amount_tax = self.currency_id.round(sum(line.amount for line in self.tax_line))
-        self.amount_total = self.amount_untaxed + self.amount_tax + self.landed_cost_price - self.amount_discount
-
+        self.amount_total = self.amount_untaxed + self.amount_tax - self.amount_discount
 
     @api.multi
     def prepare_order_line(self):
@@ -509,6 +471,7 @@ class account_invoice(models.Model):
                     ('company_id.id', '=', self.company_id.id), ('usage', '=', 'internal')])
         prdouct_dict = {}
         if self.type == "out_invoice" and not self.invoice_from_sale:
+            print "\n discount type========",self.discount_type
             order_vals = {
                           'partner_id': self.partner_id.id,
                           'partner_invoice_id':self.part_inv_id.id,
@@ -524,6 +487,9 @@ class account_invoice(models.Model):
                           'customer_po': self.customer_po,
                           'direct_invoice': True,
                           'invoice_ids':[(4, self.ids)],
+                          'amount_discount':self.amount_discount,
+                          'discount_type':self.discount_type,
+                          'discount_rate':self.discount_rate,
                           }
             res = so_obj.create(order_vals)
             for line in self.invoice_line:

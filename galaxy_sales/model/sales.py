@@ -35,8 +35,8 @@ class sale_order_line(models.Model):
     @api.model
     def create(self, values):
         product_lst = []
-        prod_obj=self.env['product.product'].browse(values.get('product_id'))
-        qty=prod_obj.qty_available
+        prod_obj = self.env['product.product'].browse(values.get('product_id'))
+        qty = prod_obj.qty_available
         if prod_obj.product_tmpl_id.non_invenotry_item == False:
             if qty > 0 and values.get('product_uom_qty', 0.0) <= qty:
                 return super(sale_order_line, self).create(values)
@@ -49,7 +49,7 @@ class sale_order_line(models.Model):
             return super(sale_order_line, self).create(values)
     
     @api.model
-    def _prepare_order_line_invoice_line(self,line, account_id=False):
+    def _prepare_order_line_invoice_line(self, line, account_id=False):
         res = super(sale_order_line, self)._prepare_order_line_invoice_line(line, account_id)
         res.update({'origin_ids': [(6, 0, line.origin_ids.ids)], 'no_origin': line.no_origin})
         return res
@@ -80,47 +80,72 @@ class sale_order(models.Model):
 
 
     pricelist_id = fields.Many2one('product.pricelist', 'Currency', required=True, readonly=True, states={'draft': [('readonly', False)], 'sent': [('readonly', False)]}, help="Pricelist for current sales order.")
-    currency_rate = fields.Float(string='Currency rate', digits=(16,4))
+    currency_rate = fields.Float(string='Currency rate', digits=(16, 4))
     active = fields.Boolean('Active', default=True, help="If the active field is set to False, it will allow you to hide the sale order without removing it.")
     attn_sal = fields.Many2one('res.partner', 'ATTN')
     inv_id = fields.Many2one('account.invoice', 'Invoice')
-    landed_cost_sal = fields.One2many('landed.cost.invoice','acc_sal_id',string='Landed Cost')
     customer_po = fields.Char('Customer PO')
     direct_invoice = fields.Boolean('Direct Invoice', defualt=False)
+    discount_type = fields.Selection([
+                        ('percent', 'Percentage'),
+                        ('amount', 'Amount')],
+                        'Discount Type', readonly=True,
+                states={'draft': [('readonly', False)], 'open': [('readonly', False)]})
+    discount_rate = fields.Float('Discount Rate',
+                                 digits_compute=dp.get_precision('Account'),
+                                 readonly=True,
+                                 states={'draft': [('readonly', False)], 'open': [('readonly', False)]})
 
-
-from openerp.osv import osv,fields
+from openerp.osv import osv, fields
 class sale_order(osv.osv):
 
     _inherit = 'sale.order'
 
+    @api.onchange('discount_type', 'discount_rate')
+    def supply_rate(self):
+        disc_amnt=0.0
+        total=0.0
+        for so in self:
+            if so.discount_rate != 0:
+                if so.discount_type == 'percent':
+                    disc_amnt = (self.amount_untaxed * so.discount_rate) / 100
+                else:
+                    disc_amnt = so.discount_rate * 1
+            self.amount_discount =disc_amnt
+            total = (so.amount_untaxed+so.amount_tax) - disc_amnt
+            self.amount_total = total
 
     def _amount_all_wrapper(self, cr, uid, ids, field_name, arg, context=None):
         """ Wrapper because of direct method passing as parameter for function fields """
         return self._amount_all(cr, uid, ids, field_name, arg, context=context)
 
+   
     def _amount_all(self, cr, uid, ids, field_name, arg, context=None):
         cur_obj = self.pool.get('res.currency')
         res = {}
+        total=0.0
+        discount=0.0
         for order in self.browse(cr, uid, ids, context=context):
             res[order.id] = {
-                'amount_untaxed': 0.0,
-                'amount_tax': 0.0,
-                'amount_total': 0.0,
-                'landed_cost_price':0.0,
+                 'amount_untaxed': 0.0,
+                 'amount_tax': 0.0,
+                 'amount_total': 0.0,
+                 'amount_discount':0.0,
             }
             val = val1 =val2= 0.0
             cur = order.pricelist_id.currency_id
-            for cost in order.landed_cost_sal:
-                val2 += cost.amount 
             for line in order.order_line:
-                val1 += line.price_subtotal
-                val += self._amount_line_tax(cr, uid, line, context=context)
+                 val1 += line.price_subtotal
+                 val += self._amount_line_tax(cr, uid, line, context=context)
             res[order.id]['amount_tax'] = cur_obj.round(cr, uid, cur, val)
             res[order.id]['amount_untaxed'] = cur_obj.round(cr, uid, cur, val1)
-            res[order.id]['landed_cost_price'] = cur_obj.round(cr, uid, cur, val2)
-            res[order.id]['amount_total'] = res[order.id]['amount_untaxed'] + res[order.id]['amount_tax']\
-                                            +res[order.id]['landed_cost_price'] 
+            if order.discount_rate != 0:
+                if order.discount_type == 'percent':
+                    discount = (res[order.id]['amount_untaxed']*order.discount_rate) / 100.0
+                else:
+                    discount = order.discount_rate
+            res[order.id]['amount_discount'] = discount
+            res[order.id]['amount_total'] = res[order.id]['amount_untaxed'] + res[order.id]['amount_tax']-res[order.id]['amount_discount']
         return res
     
     def _get_order(self, cr, uid, ids, context=None):
@@ -135,24 +160,27 @@ class sale_order(osv.osv):
                 
             'amount_untaxed': fields.function(_amount_all_wrapper, digits_compute=dp.get_precision('Account'),
                              string='Untaxed Amount',
-                            store={'sale.order': (lambda self, cr, uid, ids, c={}: ids, ['order_line'], 10),
+                            store={'sale.order': (lambda self, cr, uid, ids, c={}: ids, ['order_line','discount_type', 'discount_rate'], 10),
                                    'sale.order.line': (_get_order, ['price_unit', 'tax_id', 'discount', 'product_uom_qty'], 10)},
                             multi='sums', help="The amount without tax.", track_visibility='always'),
             'amount_tax': fields.function(_amount_all_wrapper, digits_compute=dp.get_precision('Account'),
                          string='Taxes',
-                         store={'sale.order': (lambda self, cr, uid, ids, c={}: ids, ['order_line'], 10),
+                         store={'sale.order': (lambda self, cr, uid, ids, c={}: ids, ['order_line','discount_type', 'discount_rate'], 10),
                                 'sale.order.line': (_get_order,
-                             ['price_unit', 'tax_id', 'discount', 'product_uom_qty'], 10),},
+                             ['price_unit', 'tax_id', 'discount', 'product_uom_qty'], 10), },
                          multi='sums', help="The tax amount."),
-            'amount_total': fields.function(_amount_all_wrapper, digits_compute=dp.get_precision('Account'), 
+            'amount_total': fields.function(_amount_all_wrapper, digits_compute=dp.get_precision('Account'),
                             string='Total',
                             store={
-                            'sale.order': (lambda self, cr, uid, ids, c={}: ids, ['order_line'], 10),
+                            'sale.order': (lambda self, cr, uid, ids, c={}: ids, ['order_line','discount_type', 'discount_rate'], 10),
                             'sale.order.line': (_get_order, ['price_unit', 'tax_id', 'discount', 'product_uom_qty'], 10),
                             },
                             multi='sums', help="The total amount."),
-            'landed_cost_price': fields.function(_amount_all_wrapper, digits_compute=dp.get_precision('Purchase Price'), string='Landed amount',
-                            store=True, multi="sums", help="The total Landed Cost Price"),
+            'amount_discount' : fields.function(_amount_all_wrapper, digits_compute=dp.get_precision('Purchase Price'), string='Discount',
+                            multi="sums", help="The total discount amount",
+                            store={'sale.order': (lambda self, cr, uid, ids, c={}: ids, ['order_line','discount_type', 'discount_rate'], 10),
+                                   'sale.order.line': (_get_order, ['price_unit', 'tax_id', 'discount', 'product_uom_qty'], 10)},
+                            ),
                 
                 }
 
@@ -204,14 +232,16 @@ class sale_order(osv.osv):
     
    
     @api.model
-    def _prepare_invoice(self,order, lines):
+    def _prepare_invoice(self, order, lines):
         res = super(sale_order, self)._prepare_invoice(order, lines)
         res.update({'invoice_from_sale':True,
+                    'partner_id':order.partner_id.id,
                     'part_inv_id':order.partner_invoice_id.id,
                     'part_ship_id':order.partner_shipping_id.id,
                     'attn_inv':order.attn_sal.id,
-                    'landed_cost':[(6, 0, order.landed_cost_sal.ids)],
-                    'landed_cost_price':order.landed_cost_price,
+                    'discount_type':order.discount_type,
+                    'discount_rate':order.discount_rate,
+                    'amount_discount':order.amount_discount,
                     })
         return res
 
@@ -224,11 +254,13 @@ class sale_advance_payment_inv(osv.osv_memory):
         sale = self.env['sale.order'].browse(self._context.get('active_id'))
         for val in res:
             val[1].update({'invoice_from_sale':True,
+                           'partner_id':sale.partner_id.id,
                            'part_inv_id':sale.partner_invoice_id.id,
                            'part_ship_id':sale.partner_shipping_id.id,
                            'attn_inv':sale.attn_sal.id,
-                           'landed_cost':[(6, 0, sale.landed_cost_sal.ids)],
-                           'landed_cost_price':sale.landed_cost_price,
+                           'discount_type':sale.discount_type,
+                           'discount_rate':sale.discount_rate,
+                           'amount_discount':sale.amount_discount,
                            })
         return res
 

@@ -130,6 +130,26 @@
 				<field name="pricelist_id" position="after">
 					<field name="currency_rate" />
 				</field>
+				
+				<xpath expr="//group[@class='oe_subtotal_footer oe_right']" position="replace">
+                    <group col="4">
+                       <group name="discount">
+                            <field name="discount_type"/>
+                            <field name="discount_rate"/>
+                        </group>
+                        <group class="oe_subtotal_footer oe_right">
+                            <field name="amount_untaxed" widget='monetary' options="{'currency_field': 'currency_id'}"/>
+                            <field name="amount_discount" widget='monetary' options="{'currency_field': 'currency_id'}"/>
+                            <field name="amount_tax" widget='monetary' options="{'currency_field': 'currency_id'}"/>
+                            <div class="oe_subtotal_footer_separator oe_inline">
+                                    <label for="amount_total" />
+                                    <button name="button_dummy"
+                                        states="draft,sent" string="(update)" type="object" class="oe_edit_only oe_link"/>
+                                </div>
+                            <field name="amount_total" nolabel="1" class="oe_subtotal_footer_separator" widget='monetary' options="{'currency_field': 'currency_id'}"/>
+                        </group>
+                    </group>
+                </xpath>
 
 				<!-- <xpath expr="//field[@name='amount_untaxed']" position="after"> 
 					<field name="landed_cost_price" readonly="1" widget="monetary" options="{'currency_field': 
