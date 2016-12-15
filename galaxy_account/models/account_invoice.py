@@ -38,6 +38,22 @@ TYPE2JOURNAL = {
 class account_invoice_line(models.Model):
     _inherit = 'account.invoice.line'
 
+    @api.one
+    @api.depends('price_unit', 'discount', 'invoice_line_tax_id', 'quantity',
+        'product_id', 'invoice_id.partner_id', 'invoice_id.currency_id')
+    def _compute_price(self):
+        price = self.price_unit * (1 - (self.discount or 0.0) / 100.0)
+        taxes = self.invoice_line_tax_id.compute_all(price, self.quantity, product=self.product_id, partner=self.invoice_id.partner_id)
+        self.price_subtotal = taxes['total']
+        curr = self.env['res.currency'].search([('name', '=', 'USD')])
+        curr_sgd = self.env['res.currency'].search([('name', '=', 'SGD')])
+        if self.invoice_id:
+            if self.invoice_id.export and curr_sgd and curr:
+                exchange_rate = curr_sgd[0].rate_silent / curr[0].rate_silent
+                self.price_subtotal = self.price_subtotal * exchange_rate
+            else:
+                self.price_subtotal = self.invoice_id.currency_id.round(self.price_subtotal)
+
     @api.multi
     @api.depends('product_id')
     def _compute_profoma_qty(self):
@@ -59,6 +75,8 @@ class account_invoice_line(models.Model):
                             digits=(16, 2),
                             # digits= dp.get_precision('Discount'),
                             default=0.0)
+    price_subtotal = fields.Float(string='Amount', digits= dp.get_precision('Account'),
+        store=True, readonly=True, compute='_compute_price')
 
     @api.multi
     def product_id_change(self, product, uom_id, qty = 0, name = '', type = 'out_invoice',
@@ -155,7 +173,7 @@ class account_invoice(models.Model):
     bank = fields.Char('Bank')
     currency_rate = fields.Float(string = 'Currency rate', digits = (16, 4))
 
-    part_inv_id = fields.Many2one('res.partner', 'Invoice Address', readonly = True, required = True,
+    part_inv_id = fields.Many2one('res.partner', 'Invoice Address', readonly = True,
                                   states = {'draft': [('readonly', False)], 'sent': [('readonly', False)], 'open': [('readonly', False)]},
                                   help = "Invoice address for current sales order.")
     cust_add = fields.Text('Customer Address', readonly = True, states = {'draft': [('readonly', False)], 'open': [('readonly', False)]})
@@ -163,7 +181,7 @@ class account_invoice(models.Model):
     part_ship_add = fields.Text('Delivery Address', readonly = True, states = {'draft': [('readonly', False)], 'open': [('readonly', False)]})
 
 
-    part_ship_id = fields.Many2one('res.partner', 'Delivery Address', readonly = True, required = True,
+    part_ship_id = fields.Many2one('res.partner', 'Delivery Address', readonly = True,
                                    states = {'draft': [('readonly', False)], },
                                    help = "Delivery address for current sales order.")
     attn_inv = fields.Many2one('res.partner', 'ATTN')
