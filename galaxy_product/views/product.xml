@@ -78,7 +78,7 @@
  				<xpath expr="//search/field[@name='categ_id']" position="attributes">
 					<attribute name="invisible">1</attribute>
 				</xpath>
-			<!--	<xpath expr="//search/field[@name='product_variant_ids']"
+				<xpath expr="//search/field[@name='product_variant_ids']"
 					position="attributes">
 					<attribute name="invisible">1</attribute>
 				</xpath>
@@ -96,7 +96,7 @@
 				</xpath>
 				<xpath expr="//search/filter[@string='Can be Sold']" position="attributes">
 					<attribute name="invisible">1</attribute>
-				</xpath> -->
+				</xpath> 
 			</field>
 		</record>
 

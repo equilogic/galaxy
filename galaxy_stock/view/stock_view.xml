@@ -32,7 +32,7 @@
 					<separator />
 					<filter name="real_stock_available" string="Available Products"
 						domain="[('qty_available','&gt;',0)]" context="{'search_default_real_stock_available':1}"/>
-					<filter name="virtual_stock_available" string="Forecast Available Products"
+					<!--  <filter name="virtual_stock_available" string="Forecast Available Products"
 						domain="[('virtual_available','&gt;',0)]" />
 					<filter name="real_stock_exhausted" invisible="1"
 						string="Exhausted Stock" domain="[('qty_available','&lt;=',0)]" />
@@ -41,17 +41,17 @@
 					<filter name="real_stock_negative" invisible="1"
 						string="Negative Stock" domain="[('qty_available','&lt;',0)]" />
 					<filter name="virtual_stock_negative" invisible="1"
-						string="Forecast Negative Stock" domain="[('virtual_available','&lt;',0)]" />
+						string="Forecast Negative Stock" domain="[('virtual_available','&lt;',0)]" /> -->
 				</field>
-				<filter name="consumable" position="before">
+				<!-- <filter name="consumable" position="before">
 					<filter string="Products" icon="terp-accessories-archiver"
 						invisible="1" domain="[('type','=','product')]" help="Stockable products" />
-				</filter>
+				</filter> -->
 			</field>
 		</record>
 
 		<!-- inherited search view of product.product -->
-		<record id="product_search_form_view_stock" model="ir.ui.view">
+<!-- 		<record id="product_search_form_view_stock" model="ir.ui.view">
 			<field name="name">product.search.stock.form</field>
 			<field name="model">product.product</field>
 			<field name="inherit_id" ref="product.product_search_form_view" />
@@ -61,7 +61,7 @@
 					<field name="warehouse_id" widget="selection" context="{'warehouse': self}" invisible="1" />
 				</field>
 			</field>
-		</record>
+		</record> -->
 
 	</data>
 </openerp>
