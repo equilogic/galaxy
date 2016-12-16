@@ -223,7 +223,7 @@
 					<field name="currency_rate" />
 					<field name="export" />
 					<field name="direct_shipemt" />
-					<field name="sequence_update" />
+					<field name="sequence_update" invisible="1"/>
 				</field>
 
 				<xpath
