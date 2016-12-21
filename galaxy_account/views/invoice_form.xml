@@ -168,7 +168,13 @@
 						</field>
 					</page> -->
 				</xpath>
-				
+
+                <xpath
+					expr="//page[@string='Invoice Lines']/field[@name='invoice_line']/tree[@string='Invoice Lines']/field[@name='quantity']"
+					 position="attributes">
+                    <attribute name="class">test_class</attribute>
+                </xpath>
+                				
 				<xpath
 					expr="//page[@string='Invoice Lines']/field[@name='invoice_line']/tree[@string='Invoice Lines']/field[@name='name']"
 					position='attributes'>
@@ -413,6 +419,12 @@
 						attrs="{ 'readonly':[('no_origin', '=', True)]}" invisible="1" />
 					<field name="no_origin" invisible="1" />
 				</xpath>
+                <xpath
+					expr="//page[@string='Invoice']/field[@name='invoice_line']/tree[@string='Invoice lines']/field[@name='quantity']"
+					 position="attributes">
+                    <attribute name="class">test_class</attribute>
+                </xpath>
+                				
 				<field name="currency_id" position="after">
 					<field name="currency_rate"/>
 					<field name="export" />
