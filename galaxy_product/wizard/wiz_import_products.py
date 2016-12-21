@@ -45,7 +45,6 @@ class wiz_import_products(models.TransientModel):
                                 products_ids = []
                                 for header_l in header_list:
                                     rec_value = final_product_dict.get(header_l, False) or False
-                                    print "rec_value==========",rec_value
                                     if header_l == 'Item Name':
 #                                        if rec_value:
 #                                            products_ids = prod_obj.search([('name', '=', ustr(rec_value))])

@@ -38,22 +38,6 @@ TYPE2JOURNAL = {
 class account_invoice_line(models.Model):
     _inherit = 'account.invoice.line'
 
-#     @api.one
-#     @api.depends('price_unit', 'discount', 'invoice_line_tax_id', 'quantity',
-#         'product_id', 'invoice_id.partner_id', 'invoice_id.currency_id')
-#     def _compute_price(self):
-#         price = self.price_unit * (1 - (self.discount or 0.0) / 100.0)
-#         taxes = self.invoice_line_tax_id.compute_all(price, self.quantity, product=self.product_id, partner=self.invoice_id.partner_id)
-#         self.price_subtotal = taxes['total']
-#         curr = self.env['res.currency'].search([('name', '=', 'USD')])
-#         curr_sgd = self.env['res.currency'].search([('name', '=', 'SGD')])
-#         if self.invoice_id:
-#             if self.invoice_id.export and curr_sgd and curr:
-#                 exchange_rate = curr_sgd[0].rate_silent / curr[0].rate_silent
-#                 self.price_subtotal = self.price_subtotal * exchange_rate
-#             else:
-#                 self.price_subtotal = self.invoice_id.currency_id.round(self.price_subtotal)
-
     @api.multi
     @api.depends('product_id')
     def _compute_profoma_qty(self):
@@ -75,8 +59,6 @@ class account_invoice_line(models.Model):
                             digits=(16, 2),
                             # digits= dp.get_precision('Discount'),
                             default=0.0)
-#     price_subtotal = fields.Float(string='Amount', digits= dp.get_precision('Account'),
-#         store=True, readonly=True, compute='_compute_price')
 
     @api.multi
     def product_id_change(self, product, uom_id, qty=0, name='', type='out_invoice',
@@ -111,6 +93,9 @@ class account_invoice_line(models.Model):
 
     @api.multi
     def unlink(self):
+        """
+            Override unlink method for allow user to update record after validation
+        """
         purch_line_obj = self.env['purchase.order.line']
         sale_line_obj = self.env['sale.order.line']
         move_obj = self.env['stock.move']
@@ -424,6 +409,10 @@ class account_invoice(models.Model):
             
     @api.v7
     def _check_check_currency_rate(self, cr, uid, ids, context=None):
+        """
+            Method will check on every Tuesday currency rate will 
+            updated or not.
+        """
         curr_day = datetime.now().strftime('%A')
         curr_dt = datetime.now().strftime(DEFAULT_SERVER_DATE_FORMAT)
         flag = False
@@ -741,7 +730,6 @@ class account_invoice(models.Model):
                     inv.number = seq
                     inv.internal_number = seq
                 else:
-                    print "\n export create::::::::::::::"
                     if not inv.partner_id.cust_code:
                         if inv.type == "out_invoice":
                             raise except_orm(_('Error!'), _('Please Enter Customer code'))
@@ -794,6 +782,9 @@ class account_invoice(models.Model):
     
     @api.multi
     def _create_returns_when_prod_change_in_inv_line(self, pick, move_ids):
+        """
+            Method will create returns when product changed in invoice line
+        """
         move_obj = self.env['stock.move']
         returned_lines = 0
         # Cancel assignment of existing chained assigned moves
@@ -1143,42 +1134,6 @@ class account_move(models.Model):
          res = super(account_move, self).create(vals)
          return res
 
-#     @api.multi
-#     def post(self):
-#         cr,uid,context = self.env.args
-#         if context is None:
-#             context = {}
-#         invoice = context.get('invoice', False)
-#         valid_moves = self.with_context(context=context).validate()
-#
-#         if not valid_moves:
-#             raise osv.except_osv(_('Error!'), _('You cannot validate a non-balanced entry.\nMake sure you have configured payment terms properly.\nThe latest payment term line should be of the "Balance" type.'))
-#         obj_sequence = self.pool.get('ir.sequence')
-#         for move in self.browse(valid_moves):
-#             if move.name =='/':
-#                 new_name = False
-#                 journal = move.journal_id
-#
-#                 if invoice and invoice.internal_number:
-#                     new_name = invoice.internal_number
-#                 else:
-#                     if journal.sequence_id:
-#                         c = {'fiscalyear_id': move.period_id.fiscalyear_id.id}
-#                         new_name = obj_sequence.next_by_id(cr, uid, journal.sequence_id.id, c)
-#                     else:
-#                         raise osv.except_osv(_('Error!'), _('Please define a sequence on the journal.'))
-#
-#                 if new_name:
-#                     move.name = new_name
-#
-#         cr.execute('UPDATE account_move '\
-#                    'SET state=%s '\
-#                    'WHERE id IN %s',
-#                    ('posted', tuple(valid_moves),))
-#         self.with_context(context=context).invalidate_cache(['state', ], valid_moves)
-#         return True
-
-
 class res_partner(models.Model):
     _inherit = 'res.partner'
 
@@ -1214,20 +1169,8 @@ class res_partner(models.Model):
                     return False
         return True
 
-
-#    @api.v7
-#    def _check_supp_code_unique(self, cr, uid, ids, context=None):
-#        for partner in self.browse(cr, uid, ids, context=context):
-#            if partner.supplier == True and partner.cust_code:
-#                partners = self.search(cr, uid, [('cust_code', '=', partner.cust_code),
-#                                                 ('supplier','=', True)])
-#                if partners and len(partners) > 1:
-#                    return False
-#        return True
-
     _constraints = [
         (_check_cust_code_unique, 'Please Enter Unique Customer Code.', ['cust_code']),
-#        (_check_supp_code_unique, 'Please Enter Unique Supplier Code.', ['cust_code']),
     ]
 
 class ship_via(models.Model):

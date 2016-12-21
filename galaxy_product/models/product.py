@@ -54,16 +54,6 @@ class ProductTemplate(models.Model):
             if curr:
                 rec.type = 'service'
                     
-#    @api.v7
-#    def _check_product_code_unique(self, cr, uid, ids, context=None):
-#        for product in self.browse(cr, uid, ids, context=context):
-#            product = self.search(cr, uid, [('cust_code', '=', partner.cust_code),
-#                                                 ('customer','=', True)])
-#            if partners and len(partners) > 1:
-#                return False
-#        return True
-
-
 class container_container(models.Model):
     _name = 'container.container'
     _description = "Containers"
