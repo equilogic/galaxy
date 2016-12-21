@@ -17,7 +17,7 @@
   max-width: 100px;
 }
 
-.openerp .oe_form .oe_form_required.test_class input:not([disabled]):not([readonly]), .openerp .oe_form .oe_form_required select:not([disabled]):not([readonly]), .openerp .oe_form .oe_form_required textarea:not([disabled]):not([readonly]) {
+.openerp .oe_form .oe_form_required.test_class input:not([disabled]):not([readonly]) {
     background-color: red !important;
 }
 
