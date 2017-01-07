@@ -1,0 +1,41 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<openerp>
+    <data>
+        <!-- Import Invoices wizard form view -->
+        <record id="wiz_account_invoice_import_form" model="ir.ui.view">
+            <field name="name">wiz.account.invoice.import.form</field>
+            <field name="model">wiz.account.invoice.import</field>
+            <field name="type">form</field>
+            <field name="arch" type="xml">
+                <form string="Import Invoices">
+                    <group>
+                        <field name="xls_file" filename="datas_fname"/>
+                        <field name="datas_fname" invisible="True"/>
+                    </group>    
+                    <footer>
+                        <button string="Import"  type="object" name="import_invoices" class="oe_highlight"/>
+                        <button string="Cancel" class="oe_link" special="cancel"/>
+                    </footer>
+                </form>
+            </field>
+        </record>
+        
+        <!-- Import Invoices wizard Action view -->
+        <record id="action_wiz_import_invoices" model="ir.actions.act_window">
+            <field name="name">Import Invoices</field>
+            <field name="res_model">wiz.account.invoice.import</field>
+            <field name="view_type">form</field>
+            <field name="view_mode">form</field>
+            <field name="target">new</field>
+        </record>
+        
+        <!-- Import Invoices wizard Menuitem -->
+        <menuitem id="menu_main_import" name="Imports"
+            parent="account.menu_finance"/>
+        
+        <menuitem id="menu_import_invoices" name="Import Supplier Invoices"
+            action="action_wiz_import_invoices"
+            parent="menu_main_import"/>
+    </data>
+</openerp>
+ 

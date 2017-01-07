@@ -32,6 +32,7 @@
     'demo': [],
     'data': [
             'wizard/wiz_galaxy_add_prod_in_inv_view.xml',
+            'wizard/wiz_import_account_invoices_view.xml',
             'views/invoice_form.xml',
             'views/report_view.xml',    
             'views/res_partner_view.xml',
