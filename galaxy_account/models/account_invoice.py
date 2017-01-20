@@ -337,43 +337,43 @@ class account_invoice(models.Model):
         curr = self.env['res.currency'].search([('name', '=', 'USD')])
         curr_sgd = self.env['res.currency'].search([('name', '=', 'SGD')])
         for inv_rec in self:
-            if not self._origin.id:
-                continue
-            if inv_rec.partner_id and inv_rec.type == 'out_invoice':
-                if not inv_rec.export:
-                    if inv_rec.number:
-                        number = str(inv_rec.number).split('/')
-                        invoice_id = self.search([('internal_number', '=', inv_rec.number)])
-                        if self._origin.id == invoice_id.id:
-                            self._cr.execute("select id from ir_sequence where name = %s", ('Customer Invoice Export',))
-                            loc_res = self._cr.fetchone()
-                            if loc_res:
-                                sq_id=self.env['ir.sequence'].browse(loc_res[0])
-                                sq_id.write({'number_next_actual':int(number[1])})
-                    seq = self.env['ir.sequence'].get('invoice_local')
-                    self._cr.execute("update account_invoice set number=%s,internal_number=%s where \
-                    id = %s",(ustr(seq),ustr(seq),self._origin.id))
-                else:
-                    if inv_rec.number:
-                        invoice_id = self.search([('internal_number', '=', inv_rec.number)])
-                        if self._origin.id == invoice_id.id:
-                            self._cr.execute("select id from ir_sequence where name = %s", ('Account Invoice Local',))
-                            loc_res = self._cr.fetchone()
-                            if loc_res:
-                                sq_id=self.env['ir.sequence'].browse(loc_res[0])
-                                sq_id.write({'number_next':int(inv_rec.number)})
-                    if inv_rec.partner_id and not inv_rec.partner_id.cust_code:
-                        if inv_rec.type == "out_invoice":
-                            raise except_orm(_('Error!'), _('Please Enter Customer code'))
-                    cust_code = str(inv_rec.partner_id.cust_code) + '/'
-                    prefix = cust_code[:3].upper()
-                    self._cr.execute("select id from ir_sequence where name = %s", ('Customer Invoice Export',))
-                    res = self._cr.fetchone()
-                    if res:
-                        self._cr.execute("update ir_sequence set prefix = %s where id=%s", (cust_code, res[0]))
-                        seq_id = self.env['ir.sequence'].next_by_id(res[0])
-                        self._cr.execute("update account_invoice set number=%s,internal_number=%s where \
-                    id = %s",(ustr(seq_id),ustr(seq_id),self._origin.id))
+#            if not self._origin.id:
+#                continue
+#            if inv_rec.partner_id and inv_rec.type == 'out_invoice':
+#                if not inv_rec.export:
+#                    if inv_rec.number:
+#                        number = str(inv_rec.number).split('/')
+#                        invoice_id = self.search([('internal_number', '=', inv_rec.number)])
+#                        if self._origin.id == invoice_id.id:
+#                            self._cr.execute("select id from ir_sequence where name = %s", ('Customer Invoice Export',))
+#                            loc_res = self._cr.fetchone()
+#                            if loc_res:
+#                                sq_id=self.env['ir.sequence'].browse(loc_res[0])
+#                                sq_id.write({'number_next_actual':int(number[1])})
+#                    seq = self.env['ir.sequence'].get('invoice_local')
+#                    self._cr.execute("update account_invoice set number=%s,internal_number=%s where \
+#                    id = %s",(ustr(seq),ustr(seq),self._origin.id))
+#                else:
+#                    if inv_rec.number:
+#                        invoice_id = self.search([('internal_number', '=', inv_rec.number)])
+#                        if self._origin.id == invoice_id.id:
+#                            self._cr.execute("select id from ir_sequence where name = %s", ('Account Invoice Local',))
+#                            loc_res = self._cr.fetchone()
+#                            if loc_res:
+#                                sq_id=self.env['ir.sequence'].browse(loc_res[0])
+#                                sq_id.write({'number_next':int(inv_rec.number)})
+#                    if inv_rec.partner_id and not inv_rec.partner_id.cust_code:
+#                        if inv_rec.type == "out_invoice":
+#                            raise except_orm(_('Error!'), _('Please Enter Customer code'))
+#                    cust_code = str(inv_rec.partner_id.cust_code) + '/'
+#                    prefix = cust_code[:3].upper()
+#                    self._cr.execute("select id from ir_sequence where name = %s", ('Customer Invoice Export',))
+#                    res = self._cr.fetchone()
+#                    if res:
+#                        self._cr.execute("update ir_sequence set prefix = %s where id=%s", (cust_code, res[0]))
+#                        seq_id = self.env['ir.sequence'].next_by_id(res[0])
+#                        self._cr.execute("update account_invoice set number=%s,internal_number=%s where \
+#                    id = %s",(ustr(seq_id),ustr(seq_id),self._origin.id))
 
             if inv_rec.export:
                 inv_rec.currency_id = curr and curr.id
@@ -854,6 +854,45 @@ class account_invoice(models.Model):
         return new_picking
     
     @api.multi
+    def change_seq(self,export):
+        for inv_rec in self:
+            if inv_rec.partner_id and inv_rec.type == 'out_invoice':
+                if not export:
+                    if inv_rec.number:
+                        number = str(inv_rec.number).split('/')
+                        invoice_id = self.search([('internal_number', '=', inv_rec.number)])
+                        self._cr.execute("select id from ir_sequence where name = %s", ('Customer Invoice Export',))
+                        loc_res = self._cr.fetchone()
+                        if loc_res:
+                            sq_id=self.env['ir.sequence'].browse(loc_res[0])
+                            if len(number) > 1:
+                                sq_id.write({'number_next_actual':int(number[1])})
+                    seq = self.env['ir.sequence'].get('invoice_local')
+                    self._cr.execute("update account_invoice set number=%s,internal_number=%s where \
+                    id = %s",(ustr(seq),ustr(seq),self.id))
+                else:
+                    if inv_rec.number:
+                        invoice_id = self.search([('internal_number', '=', inv_rec.number)])
+                        self._cr.execute("select id from ir_sequence where name = %s", ('Account Invoice Local',))
+                        loc_res = self._cr.fetchone()
+                        if loc_res:
+                            sq_id=self.env['ir.sequence'].browse(loc_res[0])
+                            sq_id.write({'number_next':int(inv_rec.number)})
+                    if inv_rec.partner_id and not inv_rec.partner_id.cust_code:
+                        if inv_rec.type == "out_invoice":
+                            inv_rec.write({'sequence_update':False})
+                            raise except_orm(_('Error!'), _('Please Enter Customer code'))
+                    cust_code = str(inv_rec.partner_id.cust_code) + '/'
+                    prefix = cust_code[:3].upper()
+                    self._cr.execute("select id from ir_sequence where name = %s", ('Customer Invoice Export',))
+                    res = self._cr.fetchone()
+                    if res:
+                        self._cr.execute("update ir_sequence set prefix = %s where id=%s", (cust_code, res[0]))
+                        seq_id = self.env['ir.sequence'].next_by_id(res[0])
+                        self._cr.execute("update account_invoice set number=%s,internal_number=%s where \
+                    id = %s",(ustr(seq_id),ustr(seq_id),self.id))
+    
+    @api.multi
     def write(self, vals):
         picking_obj = self.env['stock.picking']
         sale_obj = self.env['sale.order']
@@ -873,6 +912,9 @@ class account_invoice(models.Model):
 
         res = super(account_invoice, self).write(vals)
         for inv in self:
+            if vals.has_key('export'):
+                export = vals.get('export',False)
+                self.change_seq(export)
             if inv.state not in ('draft', 'cancel'):
                 sale_ord_id = sale_obj.search([('inv_id', '=', inv.id)])
                 purch_ord_id = purchase_obj.search([('inv_id', '=', inv.id)])
@@ -1172,6 +1214,28 @@ class res_partner(models.Model):
     _constraints = [
         (_check_cust_code_unique, 'Please Enter Unique Customer Code.', ['cust_code']),
     ]
+
+class mail_compose_message(models.Model):
+    _inherit = 'mail.compose.message'
+
+    @api.multi
+    def send_mail(self):
+        context = self._context
+        if context.get('default_model') == 'account.invoice' and \
+                context.get('default_res_id') and context.get('mark_invoice_as_sent'):
+            email = ''
+            for partner in self.partner_ids:
+                if len(self.partner_ids) > 1:
+                    email += partner.email +','
+                elif len(self.partner_ids) == 1:
+                    email = partner.email
+            invoice = self.env['account.invoice'].browse(context['default_res_id'])
+            invoice = invoice.with_context(mail_post_autofollow=True)
+            invoice.write({'sent': True})
+            invoice.message_post(body=_("Invoice sent"))
+            self.template_id.write({'email_to': email})
+            self.template_id.send_mail(context.get('default_res_id'), force_send = True)
+        return self.template_id.write({'email_to': ''})
 
 class ship_via(models.Model):
     _name = 'ship.via'

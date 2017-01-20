@@ -41,7 +41,7 @@ class sale_order_line(models.Model):
                 return super(sale_order_line, self).create(values)
             else :
                 raise except_orm(_('Product Stock is not Available!'),
-                    _('Please check Product %s') % prod_obj.name)
+                    _('Please check Product %s') % prod_obj.name +'['+prod_obj.default_code+']')
                 return False
         else:
             return super(sale_order_line, self).create(values)
